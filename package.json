@@ -1,0 +1,21 @@
+{
+  "name": "station-kestrel",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Station Kestrel - a point-and-click mystery demo for the browser",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173",
+    "test": "vitest run",
+    "walkthrough": "node tests/walkthrough.cjs"
+  },
+  "dependencies": {
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
+  }
+}

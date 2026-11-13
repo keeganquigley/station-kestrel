@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Station Kestrel</title>
+    <meta name="description" content="A point-and-click mystery. Hollund Island, 14 November 1996." />
+  </head>
+  <body>
+    <div id="stage">
+      <div id="viewwrap">
+        <canvas id="view" width="640" height="400"></canvas>
+
+        <div id="doc" hidden>
+          <div id="doc-paper" class="paper"></div>
+          <button id="doc-close" aria-label="Put the paper down">&times;</button>
+        </div>
+
+        <div id="title" hidden>
+          <div class="title-card">
+            <h1>Station Kestrel</h1>
+            <p class="sub">Hollund Island &middot; 14 November 1996</p>
+            <div class="title-buttons">
+              <button id="btn-new" class="btn big">New investigation</button>
+              <button id="btn-continue" class="btn big" hidden>Continue</button>
+            </div>
+            <p class="how">Click ahead to walk. Click the edges of the picture to turn.<br />Click things to use them. Keep a pencil handy.</p>
+          </div>
+        </div>
+
+        <div id="ending" hidden>
+          <div class="title-card">
+            <p class="sub">The boat returns at first light.</p>
+            <h1>End of demo</h1>
+            <p class="how">Station Kestrel &middot; one level of a longer story</p>
+            <div class="title-buttons">
+              <button id="btn-again" class="btn big">Back to the title</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="bar">
+        <div id="caption" aria-live="polite"></div>
+        <div id="inv"></div>
+        <div class="bar-buttons">
+          <button id="btn-notes" class="btn">Notebook</button>
+          <button id="btn-sound" class="btn">Sound: on</button>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
