@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { FLOOR as F, ROOMS, CEIL, RY } from './layout.js';
 import { mat, lampMat, setLamp } from './materials.js';
-import { M, box, cyl, put, grp, wall, line, decal, text, plate, hot, proxy, sideOf, chair, rng } from './kit.js';
+import { M, box, cyl, put, grp, wall, line, decal, text, plate, hot, proxy, sideOf, chair, rng, cuts } from './kit.js';
 import { powered } from '../puzzles/generator.js';
 import { CIPHER } from '../puzzles/cipher.js';
 
@@ -62,7 +62,7 @@ export function buildVault(scene) {
 
   // --- inside
   const w = v.x1 - v.x0, d = v.z1 - v.z0, mx = (v.x0 + v.x1) / 2, mz = (v.z0 + v.z1) / 2;
-  const fl = M(new THREE.PlaneGeometry(w, d), mat.concreteDark, false, true);
+  const fl = M(new THREE.PlaneGeometry(w, d, cuts(w), cuts(d)), mat.concreteDark, false, true);
   fl.rotation.x = -Math.PI / 2;
   put(root, fl, mx, F + 0.005, mz);
   put(root, box(w + 0.4, 0.1, d + 0.4, mat.concreteDark, 2), mx, F + CEIL + 0.05, mz);

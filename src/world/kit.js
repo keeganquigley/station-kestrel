@@ -8,20 +8,29 @@ export function M(geo, mat, cast = true, recv = true) {
   return m;
 }
 
+/**
+ * No face of anything should be much bigger than this, in metres. With free look, a long wall can
+ * run from in front of you to just beside the camera, and one huge triangle stretched that far
+ * loses depth precision and lets whatever is behind it show through.
+ */
+export const MAX_FACE = 2.5;
+export const cuts = (len) => Math.max(1, Math.ceil(len / MAX_FACE));
+
 /** Stretch a box's UVs so a texture covers `s` metres regardless of the box size. */
 function boxUV(g, w, h, d, s) {
   const uv = g.attributes.uv;
-  const dims = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
-  for (let f = 0; f < 6; f++) {
-    for (let i = 0; i < 4; i++) {
-      const k = f * 4 + i;
-      uv.setXY(k, (uv.getX(k) * dims[f][0]) / s, (uv.getY(k) * dims[f][1]) / s);
-    }
+  const sw = cuts(w), sh = cuts(h), sd = cuts(d);
+  // BoxGeometry lays its faces out in this order: +x, -x, +y, -y, +z, -z
+  const faces = [[d, h, sd, sh], [d, h, sd, sh], [w, d, sw, sd], [w, d, sw, sd], [w, h, sw, sh], [w, h, sw, sh]];
+  let k = 0;
+  for (const [fu, fv, su, sv] of faces) {
+    const n = (su + 1) * (sv + 1);
+    for (let i = 0; i < n; i++, k++) uv.setXY(k, (uv.getX(k) * fu) / s, (uv.getY(k) * fv) / s);
   }
 }
 
 export function box(w, h, d, mat, uv = 0) {
-  const g = new THREE.BoxGeometry(w, h, d);
+  const g = new THREE.BoxGeometry(w, h, d, cuts(w), cuts(h), cuts(d));
   if (uv) boxUV(g, w, h, d, uv);
   return M(g, mat);
 }

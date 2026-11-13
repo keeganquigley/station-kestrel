@@ -26,13 +26,16 @@ const fs = require('fs');
     for (const id of ['lighting', 'ops', 'door', 'vault']) s.gen.breakers[id] = true;
     if (location.hash.includes('open')) s.vault.open = true;
   });
-  const views = await page.evaluate(() => Object.entries(window.kestrel.nodes).flatMap(([id, n]) => (n.cam ? [[id, null]] : n.faces.split('').map((f) => [id, f]))));
+  const diag = process.env.KESTREL_DIAGONALS === '1';
+  const views = await page.evaluate((d) => Object.entries(window.kestrel.nodes).flatMap(([id, n]) => (n.cam ? (d ? [] : [[id, null]]) : (d ? ['NE', 'SE', 'SW', 'NW', 'UP', 'DN'] : n.faces.split('')).map((f) => [id, f]))), diag);
   let i = 1;
   for (const [node, face] of views) {
     if (only && !only.includes(node)) continue;
     await page.evaluate(([n, f]) => {
       if (n === 'vault' || n === 'corridor') window.kestrel.game.state.vault.open = n === 'vault';
-      window.kestrel.jump(n, f);
+      const odd = { NE: [45, 0], SE: [135, 0], SW: [225, 0], NW: [315, 0], UP: [20, 40], DN: [200, -40] }[f];
+      if (odd) window.kestrel.jump(n, 'N', odd[0], odd[1]);
+      else window.kestrel.jump(n, f);
     }, [node, face]);
     await page.waitForTimeout(250);
     const el = await page.$('#viewwrap');

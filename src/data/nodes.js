@@ -6,7 +6,9 @@ const out = (x, z) => [x, terrainH(x, z) + EYE, z];
 const inn = (x, z) => [x, FLOOR + EYE, z];
 
 /**
- * pos/faces/fwd      a standing place: turn with the screen edges, click ahead to walk
+ * pos/fwd            a standing place: look around freely, click toward a link to walk it.
+ *                    fwd is keyed by the compass facing you arrive with.
+ * faces              the composed compass views (used by the screenshot tour)
  * cam/look/back      a close-up: one fixed view, bottom edge steps back
  * tilt               look up (+) or down (-) on a given facing
  * amb                how loud each background sound is here

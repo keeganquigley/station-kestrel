@@ -71,7 +71,7 @@ export function buildIsland(scene) {
   root.add(sky);
 
   // --- sea
-  const sea = M(new THREE.PlaneGeometry(1800, 1800), mat.water, false, true);
+  const sea = M(new THREE.PlaneGeometry(1800, 1800, 48, 48), mat.water, false, true);
   sea.rotation.x = -Math.PI / 2;
   root.add(sea);
 

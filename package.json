@@ -9,7 +9,8 @@
     "build": "vite build",
     "preview": "vite preview --port 4173",
     "test": "vitest run",
-    "walkthrough": "node tests/walkthrough.cjs"
+    "walkthrough": "node tests/walkthrough.cjs",
+    "seethrough": "node tests/seethrough.cjs"
   },
   "dependencies": {
     "three": "^0.187.0"

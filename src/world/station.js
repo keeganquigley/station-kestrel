@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { FLOOR as F, STN, ROOMS, CEIL, RY } from './layout.js';
 import { mat, lampMat, setLamp } from './materials.js';
-import { M, box, cyl, put, grp, wall, decal, text, plate, hot, proxy, rng } from './kit.js';
+import { M, box, cyl, put, grp, wall, decal, text, plate, hot, proxy, rng, cuts } from './kit.js';
 import { busLive } from '../puzzles/generator.js';
 
 const DOOR_H = 2.25;
@@ -65,7 +65,7 @@ export function buildStation(scene) {
   const room = (r, walls, opts = {}) => {
     const w = r.x1 - r.x0, d = r.z1 - r.z0, mx = (r.x0 + r.x1) / 2, mz = (r.z0 + r.z1) / 2;
     const wm = opts.wall || mat.paint;
-    const fl = M(new THREE.PlaneGeometry(w, d), opts.floor || mat.lino, false, true);
+    const fl = M(new THREE.PlaneGeometry(w, d, cuts(w), cuts(d)), opts.floor || mat.lino, false, true);
     fl.geometry.attributes.uv.array.forEach((v, i, a) => (a[i] = v * (i % 2 ? d : w) / 2));
     fl.rotation.x = -Math.PI / 2;
     put(root, fl, mx, F + 0.005, mz);

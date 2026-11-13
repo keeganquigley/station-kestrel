@@ -1,7 +1,7 @@
 # Station Kestrel
 
 A point-and-click mystery for the browser, in the manner of the mid-90s slideshow
-adventures: fixed views, dissolves between them, nobody about, and machines that
+adventures: fixed standing places you can look around from, nobody about, and machines that
 have to be understood before they will work.
 
 **Hollund Island, 14 November 1996.** A listening post that closed on paper five
@@ -30,15 +30,17 @@ npm run build
 
 The result is in `dist/` and runs from any folder.
 
-**Controls.** Click ahead to walk, click the left and right edges of the picture
-to turn, click things to use them. In a close-up, click the bottom edge to step
-back. Arrow keys also work. Progress saves itself in the browser.
+**Controls.** Drag the picture to look around. Click in the direction you want
+to walk and you glide to the next standing place. Click things to use them. The
+left and right edges of the picture turn you a quarter turn, and in a close-up
+the bottom edge steps back. Arrow keys also work. Progress saves itself in the
+browser.
 
 ## How it is made
 
 Everything is generated in code. There are no image, model or sound files.
 
-- **Pictures** are a real 3D scene (Three.js) shown as stills from fixed cameras,
+- **Pictures** are a real 3D scene (Three.js) seen from fixed standing places,
   drawn at 640x400 and scaled up with hard pixels, a reduced palette and an
   ordered dither.
 - **Textures, labels, dials, papers and the wall chart** are painted on canvases
@@ -56,6 +58,7 @@ src/
 tests/
   puzzles.test.js  rules, clues and the node graph
   walkthrough.cjs  plays the whole demo in a real browser
+  seethrough.cjs   checks no wall lets the one behind it show, at the angles that matter
   tour.cjs         screenshots every view
 ```
 
@@ -78,6 +81,10 @@ npm run build && npm run preview
 
 ```bash
 npm run walkthrough
+```
+
+```bash
+npm run seethrough
 ```
 
 `tests/walkthrough.cjs` contains the full solution, so do not read it if you

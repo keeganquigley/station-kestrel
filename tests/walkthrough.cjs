@@ -23,7 +23,15 @@ const shots = process.argv[2] || null;
   };
   const state = () => page.evaluate(() => JSON.parse(JSON.stringify(window.kestrel.game.state)));
   const caption = () => page.textContent('#caption');
-  const settle = () => page.waitForTimeout(60);
+  // wait for any glide or turn to finish before the next input
+  const settle = async () => {
+    await page.waitForFunction(() => !window.kestrel.busy(), null, { timeout: 10000 });
+    await page.waitForTimeout(40);
+  };
+  const ready = async () => {
+    await page.waitForFunction(() => window.kestrel, null, { timeout: 30000 });
+    await page.evaluate(() => (window.kestrel.timeScale = 0.3));
+  };
   const shot = async (name) => shots && (await (await page.$('#stage')).screenshot({ path: path.join(shots, name + '.png') }));
 
   const expectAt = async (node, facing) => {
@@ -38,9 +46,10 @@ const shots = process.argv[2] || null;
   const left = () => key('ArrowLeft');
   const right = () => key('ArrowRight');
   const back = () => key('ArrowDown');
+  const YAW = { N: 0, E: 90, S: 180, W: 270 };
   const face = async (f) => {
-    for (let i = 0; i < 4 && (await state()).facing !== f; i++) await right();
-    if ((await state()).facing !== f) fail(`cannot face ${f} at ${(await state()).node}`);
+    for (let i = 0; i < 8 && (await state()).yaw !== YAW[f]; i++) await right();
+    if ((await state()).yaw !== YAW[f]) fail(`cannot face ${f} at ${(await state()).node}`);
   };
 
   /** Real mouse click at a fraction of the 3D view. */
@@ -67,10 +76,10 @@ const shots = process.argv[2] || null;
 
   try {
     await page.goto(URL);
-    await page.waitForFunction(() => window.kestrel, null, { timeout: 30000 });
+    await ready();
     await page.evaluate(() => localStorage.clear());
     await page.reload();
-    await page.waitForFunction(() => window.kestrel);
+    await ready();
 
     // --- title
     if (await page.isVisible('#btn-continue')) fail('Continue offered with no save');
@@ -80,6 +89,29 @@ const shots = process.argv[2] || null;
     await expectAt('jetty', 'N');
     log('new game starts on the jetty with the orders in hand');
     await shot('02-jetty');
+
+    // --- dragging looks around and is not mistaken for a click
+    {
+      const box = await (await page.$('#view')).boundingBox();
+      const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
+      await page.mouse.move(cx, cy);
+      await page.mouse.down();
+      await page.mouse.move(cx + 80, cy + 30, { steps: 4 });
+      await page.mouse.move(cx + 160, cy + 60, { steps: 4 });
+      await page.mouse.up();
+      await settle();
+      const s = await state();
+      if (s.node !== 'jetty') fail('a drag should not walk anywhere');
+      if (!(s.yaw > 340 && s.yaw < 356)) fail('drag right should swing the view left by about ten degrees, yaw is ' + s.yaw);
+      if (!(s.pitch > 0)) fail('drag down should tip the view up, pitch is ' + s.pitch);
+      await shot('02b-looking-around');
+      await left();
+      if ((await state()).yaw !== 315) fail('left arrow should stop at 315, got ' + (await state()).yaw);
+      await right();
+      await expectAt('jetty', 'N');
+      if ((await state()).yaw !== 0) fail('arrow keys should snap back onto north');
+      log('dragging looks around; arrow keys turn in 45 degree stops');
+    }
 
     // --- mouse navigation: edges turn, middle walks
     await clickView(0.95, 0.5);
@@ -216,13 +248,18 @@ const shots = process.argv[2] || null;
     await back();
 
     // --- save and resume
+    // leave the view at an odd angle so the save has something particular to restore
+    await page.evaluate(() => window.kestrel.jump('ops', 'N', 33, -7));
+    await left();
+    await right();
+    if ((await state()).yaw !== 45) fail('expected yaw 45 before reload');
     await page.reload();
-    await page.waitForFunction(() => window.kestrel);
+    await ready();
     if (!(await page.isVisible('#btn-continue'))) fail('Continue should be offered after a reload');
     await page.click('#btn-continue');
     await settle();
-    await expectAt('ops', 'N');
     const resumed = await state();
+    if (resumed.node !== 'ops' || resumed.yaw !== 45) fail('save did not restore where you were looking: ' + resumed.node + ' ' + resumed.yaw);
     if (!resumed.rx.printed || !resumed.inv.includes('key') || !resumed.gen.running) fail('save did not restore progress');
     log('reload offers Continue and restores place, inventory and machines');
 
@@ -273,6 +310,7 @@ const shots = process.argv[2] || null;
     if (!(await state()).vault.open) fail('vault should open on ' + plain[2]);
     log('vault opens on the third group, ' + plain[2]);
     await page.waitForTimeout(3200);
+    await settle();
     await expectAt('corridor', 'E');
     await shot('12-vault-open');
     await fwd();
