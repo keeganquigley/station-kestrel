@@ -104,6 +104,18 @@ npm test
 That runs the unit tests: the rules of every puzzle, that each set of clues
 allows exactly one answer, and that the three chapters join up on the map.
 
+```bash
+npm run lint
+```
+
+```bash
+npm run format
+```
+
+ESLint checks the code and Prettier formats it. Both, with the build and the
+unit tests, run on GitHub for every push and pull request
+(`.github/workflows/ci.yml`). Node 22 is expected; see `.nvmrc`.
+
 The browser tests need [Playwright](https://playwright.dev) installed and the
 built game being served:
 
