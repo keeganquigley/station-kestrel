@@ -8,7 +8,8 @@ const ICONS = {
   key: '<svg viewBox="0 0 32 32"><circle cx="10" cy="16" r="5.5" fill="none" stroke="#c9a03c" stroke-width="3"/><path d="M15 16h13M23 16v5M27 16v4" stroke="#c9a03c" stroke-width="3" fill="none"/></svg>',
   printout: '<svg viewBox="0 0 32 32"><path d="M8 3h16v26l-3-2-3 2-3-2-3 2-4-2z" fill="#e9e3cf" stroke="#222"/><path d="M11 9h10M11 13h10M11 17h10" stroke="#3a3e52" stroke-width="1.5"/></svg>',
   film: '<svg viewBox="0 0 32 32"><rect x="9" y="7" width="14" height="20" rx="2" fill="#2b2b2b" stroke="#111"/><rect x="12" y="4" width="8" height="4" fill="#b9bcbc" stroke="#111"/><rect x="11" y="13" width="10" height="8" fill="#c8611f"/></svg>',
-  photo: '<svg viewBox="0 0 32 32"><rect x="4" y="7" width="24" height="18" fill="#efe9d6" stroke="#222"/><rect x="7" y="10" width="18" height="12" fill="#2b2924"/><path d="M9 20h14v-3l-3-2H12l-3 2z" fill="#b8b3a2"/><rect x="14" y="12" width="5" height="4" fill="#d9d4c2"/></svg>',
+  photo:
+    '<svg viewBox="0 0 32 32"><rect x="4" y="7" width="24" height="18" fill="#efe9d6" stroke="#222"/><rect x="7" y="10" width="18" height="12" fill="#2b2924"/><path d="M9 20h14v-3l-3-2H12l-3 2z" fill="#b8b3a2"/><rect x="14" y="12" width="5" height="4" fill="#d9d4c2"/></svg>',
 };
 
 export class UI {
@@ -64,13 +65,17 @@ export class UI {
     $('doc-paper').className = 'paper notebook';
     $('doc-paper').innerHTML =
       '<p class="head">NOTEBOOK</p><p class="small">Papers you have read. Select one to read it again.</p>' +
-      '<ul>' + ids.map((id) => `<li><button data-open="${id}">${DOCS[id].title}</button></li>`).join('') + '</ul>';
-    $('doc-paper').querySelectorAll('button[data-open]').forEach((b) =>
-      b.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.showDoc(b.dataset.open, () => this.notebook());
-      })
-    );
+      '<ul>' +
+      ids.map((id) => `<li><button data-open="${id}">${DOCS[id].title}</button></li>`).join('') +
+      '</ul>';
+    $('doc-paper')
+      .querySelectorAll('button[data-open]')
+      .forEach((b) =>
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.showDoc(b.dataset.open, () => this.notebook());
+        }),
+      );
     $('doc').dataset.doc = 'notebook';
     $('doc').hidden = false;
     this.onDocClose = null;

@@ -23,7 +23,9 @@ export function buildWorld(scene) {
     scene.add(g);
     return g;
   };
-  const surface = group('surface'), below = group('below'), penGroup = group('pen');
+  const surface = group('surface'),
+    below = group('below'),
+    penGroup = group('pen');
 
   const island = buildIsland(surface);
   const ops = buildOps(surface);

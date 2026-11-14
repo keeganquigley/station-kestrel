@@ -54,7 +54,8 @@ export function run(s, hasFilm) {
   if (s.printed) return { state: s, result: 'already' };
   if (!hasFilm) return { state: s, result: 'nofilm' };
   if (!s.safe) return { state: s, result: 'fogged' };
-  const [dev, stop, fix] = minutes(s), [wantDev, wantStop, wantFix] = target();
+  const [dev, stop, fix] = minutes(s),
+    [wantDev, wantStop, wantFix] = target();
   if (dev < wantDev) return { state: s, result: 'thin' };
   if (dev > wantDev) return { state: s, result: 'dense' };
   if (stop !== wantStop) return { state: s, result: 'streaked' };

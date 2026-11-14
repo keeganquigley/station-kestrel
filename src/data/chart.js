@@ -6,7 +6,8 @@ import { TARGET_BEARING } from '../puzzles/receiver.js';
 
 export function drawChart(g, W, H) {
   const scale = W / 96; // pixels per metre
-  const ox = W * 0.47, oy = H * 0.5;
+  const ox = W * 0.47,
+    oy = H * 0.5;
   const X = (x) => ox + x * scale;
   const Y = (z) => oy + (z + 4) * scale;
 
@@ -56,14 +57,17 @@ export function drawChart(g, W, H) {
   label('PLANT', X(SHED.x1) + 6, Y(6));
   label('JETTY', X(2.5), Y(38));
   // the mast and its bearing ring
-  const mx = X(MAST.x), my = Y(MAST.z), r = W * 0.15;
+  const mx = X(MAST.x),
+    my = Y(MAST.z),
+    r = W * 0.15;
   g.strokeStyle = ink;
   g.lineWidth = 1.5;
   g.beginPath();
   g.arc(mx, my, r, 0, 7);
   g.stroke();
   for (let deg = 0; deg < 360; deg += 10) {
-    const a = ((deg - 90) * Math.PI) / 180, major = deg % 30 === 0;
+    const a = ((deg - 90) * Math.PI) / 180,
+      major = deg % 30 === 0;
     g.lineWidth = major ? 2.5 : 1.2;
     g.beginPath();
     g.moveTo(mx + Math.cos(a) * r, my + Math.sin(a) * r);
@@ -78,7 +82,8 @@ export function drawChart(g, W, H) {
   label('MAST', mx - 8, my + W * 0.022, 0.02, ink, 'right');
   // the fix: one red pencil line, drawn three times over
   const b = ((TARGET_BEARING - 90) * Math.PI) / 180;
-  const vx = (ROOMS.vault.x0 + ROOMS.vault.x1) / 2, vz = (ROOMS.vault.z0 + ROOMS.vault.z1) / 2;
+  const vx = (ROOMS.vault.x0 + ROOMS.vault.x1) / 2,
+    vz = (ROOMS.vault.z0 + ROOMS.vault.z1) / 2;
   const reach = Math.hypot(vx - MAST.x, vz - MAST.z) * scale;
   g.strokeStyle = 'rgba(168,30,22,0.8)';
   g.lineWidth = 2;

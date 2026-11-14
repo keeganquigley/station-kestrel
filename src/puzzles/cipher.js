@@ -25,7 +25,7 @@ export const PAD = {
 const digitwise = (a, b, f) =>
   a
     .split('')
-    .map((ch, i) => String((((f(Number(ch), Number(b[i])) % 10) + 10) % 10)))
+    .map((ch, i) => String(((f(Number(ch), Number(b[i])) % 10) + 10) % 10))
     .join('');
 
 /** Encipher: add key to text figure by figure, no carrying. */

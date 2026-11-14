@@ -108,7 +108,9 @@ export const DOCS = {
       <p class="head">ONE-TIME KEY &mdash; SERIES K &mdash; SHEETS 01&ndash;12</p>
       <p class="small">TO DECIPHER: take KEY from TEXT, figure by figure, without borrowing.<br>Example: text 2, key 8, gives 4.</p>
       <table class="pad">
-        ${Object.entries(PAD).map(([n, groups]) => `<tr><th>${sheetLabel(Number(n))}</th>${groups.map((x) => `<td>${x}</td>`).join('')}</tr>`).join('')}
+        ${Object.entries(PAD)
+          .map(([n, groups]) => `<tr><th>${sheetLabel(Number(n))}</th>${groups.map((x) => `<td>${x}</td>`).join('')}</tr>`)
+          .join('')}
       </table>
       <p class="small">Each sheet to be struck through after use. <span class="ink">(None has been.)</span></p>`,
   },
@@ -174,7 +176,7 @@ export const SAY = {
   hunting: 'The engine note rises and falls. The bus lamp stays amber.',
   notRunning: 'The breaker goes over, but with the set stopped nothing happens.',
   drop: 'The engine begins to hunt and the bus drops out.',
-  keyTake: "A small brass key from the hook marked C.O. You take it.",
+  keyTake: 'A small brass key from the hook marked C.O. You take it.',
   drawerLocked: 'The top right-hand drawer is locked. The others hold stationery and a tin of boiled sweets.',
   drawerOpen: 'The key turns. Inside the drawer is a thin red booklet.',
   mast: (b) => `The beam swings round. The pointer reads ${String(b).padStart(3, '0')}.`,
@@ -196,7 +198,7 @@ export const SAY = {
 
 export const ITEMS = {
   orders: { name: 'Field instruction', doc: 'orders' },
-  key: { name: 'Brass key', say: "A small brass key. The tag reads C.O." },
+  key: { name: 'Brass key', say: 'A small brass key. The tag reads C.O.' },
   printout: { name: 'Printout', doc: 'printout' },
 };
 

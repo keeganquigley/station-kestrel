@@ -24,7 +24,15 @@ describe('pump', () => {
   it('never gains or loses water while pouring', () => {
     let s = Pump.initial();
     const total = () => s.levels.reduce((a, b) => a + b, 0);
-    for (const [v, dir] of [[0, 1], [1, 1], [2, -1], [0, 1], [1, 1], [2, 1], [1, -1]]) {
+    for (const [v, dir] of [
+      [0, 1],
+      [1, 1],
+      [2, -1],
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [1, -1],
+    ]) {
       s = Pump.turnValve(s, v, dir).state;
       expect(total()).toBe(Pump.CAPACITY[0]);
       s.levels.forEach((l, i) => {
@@ -104,10 +112,11 @@ describe('junction', () => {
 });
 
 describe('reply', () => {
-  const set = (code) => code.split('').reduce((s, d, i) => {
-    for (let k = 0; k < Number(d); k++) s = Reply.spin(s, i, 1);
-    return s;
-  }, Reply.initial());
+  const set = (code) =>
+    code.split('').reduce((s, d, i) => {
+      for (let k = 0; k < Number(d); k++) s = Reply.spin(s, i, 1);
+      return s;
+    }, Reply.initial());
 
   it('wants the date from chapter one, enciphered on the sheet it names', () => {
     expect(Reply.MESSAGE).toEqual(['1411', '1996']);
@@ -145,11 +154,15 @@ describe('the Subterranean Station on the map', () => {
     for (const [id, n] of Object.entries(NODES)) {
       for (const link of Object.values(n.fwd || {})) {
         const l = typeof link === 'string' ? { to: link } : link;
-        const from = n.realm || 'surface', to = NODES[l.to].realm || 'surface';
+        const from = n.realm || 'surface',
+          to = NODES[l.to].realm || 'surface';
         if (from !== to && (from === 'surface' || to === 'surface')) crossings.push([id, l.to, !!l.fade]);
       }
     }
-    expect(crossings.sort()).toEqual([['stairfoot', 'vault', true], ['vault', 'stairfoot', true]]);
+    expect(crossings.sort()).toEqual([
+      ['stairfoot', 'vault', true],
+      ['vault', 'stairfoot', true],
+    ]);
   });
 });
 

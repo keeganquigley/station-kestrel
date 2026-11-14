@@ -33,8 +33,13 @@ export function buildOps(scene) {
   put(rx, cyl(0.018, 0.02, pwr, 10), 0.52, 0.16, 0.01).rotation.x = Math.PI / 2;
   put(rx, plate(0.1, 0.035, 'MAINS'), 0.52, 0.11, 0.004);
   const knobs = [];
-  [['MHz', 1000], ['100 kHz', 100], ['10 kHz', 10]].forEach(([label, step], i) => {
-    const x = -0.46 + i * 0.2, y = -0.065;
+  [
+    ['MHz', 1000],
+    ['100 kHz', 100],
+    ['10 kHz', 10],
+  ].forEach(([label, step], i) => {
+    const x = -0.46 + i * 0.2,
+      y = -0.065;
     const k = grp(rx, x, y, 0.004);
     put(k, cyl(0.058, 0.045, mat.black, 18), 0, 0, 0.022).rotation.x = Math.PI / 2;
     put(k, box(0.008, 0.045, 0.004, mat.white), 0, 0.03, 0.047);
@@ -95,23 +100,30 @@ export function buildOps(scene) {
   // --- the clock
   const clock = grp(root, 0, F + 2.12, r.z0 + 0.07, RY.S);
   put(clock, box(1.0, 0.42, 0.12, mat.black), 0, 0, 0);
-  const face = decal(0.9, 0.32, 300, (g, W, H) => {
-    g.fillStyle = '#0c0c0c';
-    g.fillRect(0, 0, W, H);
-    const digits = STOPPED_CLOCK.replace(':', '');
-    const cw = W * 0.19, gap = W * 0.02;
-    [0, 1, 2, 3].forEach((i) => {
-      const x = W * 0.07 + i * (cw + gap) + (i > 1 ? W * 0.06 : 0);
-      g.fillStyle = '#232323';
-      g.fillRect(x, H * 0.1, cw, H * 0.8);
-      text(g, digits[i], x + cw / 2, H * 0.53, { size: H * 0.72, color: '#e9e4cf' });
+  const face = decal(
+    0.9,
+    0.32,
+    300,
+    (g, W, H) => {
       g.fillStyle = '#0c0c0c';
-      g.fillRect(x, H * 0.5 - 1, cw, 2);
-    });
-    g.fillStyle = '#e9e4cf';
-    g.fillRect(W * 0.5 - 2, H * 0.36, 5, 5);
-    g.fillRect(W * 0.5 - 2, H * 0.62, 5, 5);
-  }, { rough: 0.6 });
+      g.fillRect(0, 0, W, H);
+      const digits = STOPPED_CLOCK.replace(':', '');
+      const cw = W * 0.19,
+        gap = W * 0.02;
+      [0, 1, 2, 3].forEach((i) => {
+        const x = W * 0.07 + i * (cw + gap) + (i > 1 ? W * 0.06 : 0);
+        g.fillStyle = '#232323';
+        g.fillRect(x, H * 0.1, cw, H * 0.8);
+        text(g, digits[i], x + cw / 2, H * 0.53, { size: H * 0.72, color: '#e9e4cf' });
+        g.fillStyle = '#0c0c0c';
+        g.fillRect(x, H * 0.5 - 1, cw, 2);
+      });
+      g.fillStyle = '#e9e4cf';
+      g.fillRect(W * 0.5 - 2, H * 0.36, 5, 5);
+      g.fillRect(W * 0.5 - 2, H * 0.62, 5, 5);
+    },
+    { rough: 0.6 },
+  );
   put(clock, face, 0, 0, 0.062);
   hot(face, { id: 'clock', nodes: ['ops', 'console'], cursor: 'look', action: ['look', 'clock'] });
 
@@ -176,7 +188,11 @@ export function buildOps(scene) {
       lines.forEach((l, i) => text(g, l, W / 2, 34 + i * 40, opts));
     } else if (mode === 'faint') {
       const rr = rng(5);
-      const garble = (s) => s.split('').map((ch) => (ch === ' ' ? ' ' : rr() < 0.6 ? '.?:,'[Math.floor(rr() * 4)] : ch)).join('');
+      const garble = (s) =>
+        s
+          .split('')
+          .map((ch) => (ch === ' ' ? ' ' : rr() < 0.6 ? '.?:,'[Math.floor(rr() * 4)] : ch))
+          .join('');
       ['= K7 = K7 = K7 =', `SHEET ${sheetLabel(SHEET)}   GR 03`, CIPHER.join(' ')].forEach((l, i) => text(g, garble(l), W / 2, 34 + i * 40, { ...opts, color: 'rgba(38,42,60,0.55)' }));
     }
   };
@@ -187,14 +203,18 @@ export function buildOps(scene) {
       g.fillRect(0, 0, W, H);
       return;
     }
-    const img = g.getImageData(0, 0, W, H), d = img.data;
+    const img = g.getImageData(0, 0, W, H),
+      d = img.data;
     let s = (staticSeed = (staticSeed * 1664525 + 1013904223) >>> 0);
     for (let i = 0; i < d.length; i += 4) {
       s = (s * 1664525 + 1013904223) >>> 0;
       let v = (s >>> 24) * 0.7;
       if (lock) {
-        const p = i / 4, x = p % W, y = (p / W) | 0;
-        const cxs = x - W / 2, cys = y - H * 0.45;
+        const p = i / 4,
+          x = p % W,
+          y = (p / W) | 0;
+        const cxs = x - W / 2,
+          cys = y - H * 0.45;
         if (cxs * cxs * 3 + cys * cys < 260 || (Math.abs(cxs) < 16 && cys > 10 && cys < 30)) v *= 0.35;
       }
       d[i] = v * 0.8;

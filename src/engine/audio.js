@@ -97,7 +97,12 @@ export class Sound {
     humLP.type = 'lowpass';
     humLP.frequency.value = 420;
     humLP.connect(this.hum).connect(this.master);
-    [[1, 0.5, 'sine'], [1, 0.5, 'sine'], [2, 0.28, 'sine'], [3, 0.09, 'triangle']].forEach(([mult, level, type], i) => {
+    [
+      [1, 0.5, 'sine'],
+      [1, 0.5, 'sine'],
+      [2, 0.28, 'sine'],
+      [3, 0.09, 'triangle'],
+    ].forEach(([mult, level, type], i) => {
       const o = ctx.createOscillator();
       o.type = type;
       o.frequency.value = TUNNEL_HUM.pitch * mult + (i === 1 ? TUNNEL_HUM.beat : i === 2 ? 0.2 : 0);
@@ -174,7 +179,9 @@ export class Sound {
 
   apply() {
     if (!this.ctx) return;
-    const t = this.ctx.currentTime, a = this.amb, set = (p, v, k = 0.4) => p.setTargetAtTime(v, t, k);
+    const t = this.ctx.currentTime,
+      a = this.amb,
+      set = (p, v, k = 0.4) => p.setTargetAtTime(v, t, k);
     set(this.wind.g.gain, 0.085 * (a.wind || 0));
     set(this.sea.g.gain, 0.11 * (a.sea || 0));
     set(this.room.g.gain, 0.05 * (a.room || 0));
@@ -199,7 +206,8 @@ export class Sound {
     const run = this.engine && this.engine !== 'off';
     set(this.gen.gain, run ? 0.2 * (a.gen || 0) : 0, 0.25);
     set(this.genWobble.gain, this.engine === 'rough' ? 5 : this.engine === 'hunting' ? 2.5 : 0.2);
-    const r = this.radioState, vol = a.radio || 0;
+    const r = this.radioState,
+      vol = a.radio || 0;
     const on = r && r.on && vol > 0;
     set(this.hiss.g.gain, on ? 0.035 * vol * (1 - 0.7 * r.strength) : 0, 0.1);
     const whistling = on && r.offset !== 0 && Math.abs(r.offset) <= 100;
@@ -214,7 +222,8 @@ export class Sound {
   /** Now and then, a drop falls somewhere along the tunnel. */
   drip() {
     if (!this.ctx || Math.random() > 0.3 + 0.5 * this.dripLevel) return;
-    const f = 900 + Math.random() * 900, level = TUNNEL_MIX.drip * this.dripLevel * (0.4 + Math.random() * 0.6);
+    const f = 900 + Math.random() * 900,
+      level = TUNNEL_MIX.drip * this.dripLevel * (0.4 + Math.random() * 0.6);
     this.blip({ tone: level, f0: f, f1: f * 1.9, dur: 0.07, delay: Math.random() * 0.8 });
     this.blip({ tone: level * 0.35, f0: f * 0.5, f1: f * 0.7, dur: 0.16, delay: 0.9 });
   }
@@ -222,7 +231,9 @@ export class Sound {
   /** Now and then the boat shifts against her chains. */
   creak() {
     if (!this.ctx || Math.random() > 0.45) return;
-    const level = PEN_MIX.creak * this.creakLevel * (0.5 + Math.random() * 0.5), f = 70 + Math.random() * 50, d = Math.random() * 2;
+    const level = PEN_MIX.creak * this.creakLevel * (0.5 + Math.random() * 0.5),
+      f = 70 + Math.random() * 50,
+      d = Math.random() * 2;
     this.blip({ tone: level, f0: f, f1: f * (0.8 + Math.random() * 0.5), dur: 1.1 + Math.random(), type: 'sawtooth', delay: d, attack: 0.35 });
     this.blip({ noise: level * 0.5, dur: 0.9, filter: 'bandpass', cutoff: 320, delay: d + 0.1, attack: 0.3 });
     if (Math.random() < 0.4) this.blip({ tone: level * 1.4, f0: 120, f1: 60, dur: 0.3, delay: d + 1.5 });
@@ -233,7 +244,8 @@ export class Sound {
     let i = 0;
     this.toneTimer = setInterval(() => {
       if (!this.ctx) return;
-      const f = seq[i++ % seq.length], t = this.ctx.currentTime;
+      const f = seq[i++ % seq.length],
+        t = this.ctx.currentTime;
       if (f) {
         this.tone.frequency.setValueAtTime(f, t);
         this.toneGain.gain.cancelScheduledValues(t);

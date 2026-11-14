@@ -14,15 +14,20 @@ export function buildQuarters(parent) {
 
   /** Floor, ceiling, light and the three walls a room owns; the fourth is the tunnel wall with its door. */
   const room = (r, wallMat, walls = {}) => {
-    const w = r.x1 - r.x0, d = r.z1 - r.z0, mx = (r.x0 + r.x1) / 2, mz = (r.z0 + r.z1) / 2;
+    const w = r.x1 - r.x0,
+      d = r.z1 - r.z0,
+      mx = (r.x0 + r.x1) / 2,
+      mz = (r.z0 + r.z1) / 2;
     // the floor runs on under the door frame, so no crack opens between it and the tunnel's floor
-    const lap = 0.2, fw = w + lap;
+    const lap = 0.2,
+      fw = w + lap;
     const fl = M(new THREE.PlaneGeometry(fw, d, cuts(fw), cuts(d)), mat.lino, false, true);
     fl.geometry.attributes.uv.array.forEach((v, i, a) => (a[i] = (v * (i % 2 ? d : fw)) / 2));
     fl.rotation.x = -Math.PI / 2;
     put(root, fl, mx - Math.sign(r.x0) * (lap / 2), F + 0.005, mz);
     put(root, box(w + 0.3, 0.1, d + 0.3, mat.ceiling, 1.2), mx, F + ROOM_H + 0.05, mz);
-    const k = 0.1, far = r.x0 > 0 ? r.x1 + k / 2 : r.x0 - k / 2;
+    const k = 0.1,
+      far = r.x0 > 0 ? r.x1 + k / 2 : r.x0 - k / 2;
     wall(root, walls.N || wallMat, r.x0, r.z0 - k / 2, r.x1, r.z0 - k / 2, F, ROOM_H, k);
     wall(root, walls.S || wallMat, r.x0, r.z1 + k / 2, r.x1, r.z1 + k / 2, F, ROOM_H, k);
     wall(root, wallMat, far, r.z0 - k, far, r.z1 + k, F, ROOM_H, k);
@@ -79,12 +84,23 @@ export function buildQuarters(parent) {
   // table laid for four
   const table = grp(root, 4.25, F, -7.7);
   put(table, box(1.7, 0.05, 0.85, mat.wood, 1), 0, 0.74, 0);
-  for (const [x, z] of [[-0.78, -0.36], [0.78, -0.36], [-0.78, 0.36], [0.78, 0.36]]) put(table, box(0.06, 0.72, 0.06, mat.woodDark), x, 0.36, z);
+  for (const [x, z] of [
+    [-0.78, -0.36],
+    [0.78, -0.36],
+    [-0.78, 0.36],
+    [0.78, 0.36],
+  ])
+    put(table, box(0.06, 0.72, 0.06, mat.woodDark), x, 0.36, z);
   for (const z of [-0.64, 0.64]) {
     put(table, box(1.5, 0.05, 0.26, mat.wood, 1), 0, 0.44, z);
     for (const x of [-0.65, 0.65]) put(table, box(0.05, 0.42, 0.22, mat.woodDark), x, 0.21, z);
   }
-  for (const [x, z] of [[-0.45, -0.2], [0.45, -0.2], [-0.45, 0.2], [0.45, 0.2]]) {
+  for (const [x, z] of [
+    [-0.45, -0.2],
+    [0.45, -0.2],
+    [-0.45, 0.2],
+    [0.45, 0.2],
+  ]) {
     put(table, cyl(0.11, 0.012, mat.enamel, 16), x, 0.772, z);
     put(table, box(0.014, 0.004, 0.17, mat.chrome), x + 0.16, 0.768, z);
     put(table, box(0.014, 0.004, 0.17, mat.chrome), x - 0.16, 0.768, z);
@@ -112,11 +128,12 @@ export function buildQuarters(parent) {
       g.lineTo(10 + (i * (W - 20)) / 4, 36 + 150);
       g.stroke();
     }
-    for (let r = 0; r < 6; r++) for (let c = 0; c < 4; c++) {
-      const listening = r * 4 + c >= 24 - Math.floor((r + 1) * (r + 1) * 0.7);
-      g.fillStyle = listening ? '#8c1f17' : '#1c2a5a';
-      g.fillRect(18 + (c * (W - 20)) / 4, 46 + r * 25, listening ? 46 : 30 + ((r * 3 + c * 5) % 12), 3);
-    }
+    for (let r = 0; r < 6; r++)
+      for (let c = 0; c < 4; c++) {
+        const listening = r * 4 + c >= 24 - Math.floor((r + 1) * (r + 1) * 0.7);
+        g.fillStyle = listening ? '#8c1f17' : '#1c2a5a';
+        g.fillRect(18 + (c * (W - 20)) / 4, 46 + r * 25, listening ? 46 : 30 + ((r * 3 + c * 5) % 12), 3);
+      }
   });
   rota.rotation.y = RY.N;
   put(root, rota, 3.0, F + 1.55, K.z1 - 0.01);
@@ -131,7 +148,11 @@ export function buildQuarters(parent) {
   const pp = grp(root, K.x1 - 0.01, F + 1.2, -9.25, RY.W);
   put(pp, box(2.8, 2.05, 0.06, mat.darkMetal), 0, 0, 0.03);
   put(pp, plate(0.9, 0.09, 'SUMP PUMP - SIPHON PRIMING'), -0.85, 0.92, 0.062);
-  const TANK = [{ x: -0.85, r: 0.26, h: 1.25 }, { x: 0, r: 0.22, h: 0.95 }, { x: 0.78, r: 0.17, h: 0.66 }];
+  const TANK = [
+    { x: -0.85, r: 0.26, h: 1.25 },
+    { x: 0, r: 0.22, h: 0.95 },
+    { x: 0.78, r: 0.17, h: 0.66 },
+  ];
   const base = -0.62;
   const sights = TANK.map((t, i) => {
     put(pp, cyl(t.r, t.h, mat.genGreen, 20), t.x, base + t.h / 2, t.r + 0.07);
@@ -150,7 +171,11 @@ export function buildQuarters(parent) {
   pipe(-0.85, base, -0.85, -0.84);
   pipe(0.78, base, 0.78, -0.84);
   pipe(-0.85, -0.84, 0.78, -0.84);
-  const VALVE_AT = [[-0.4, -0.2], [0.41, -0.2], [-0.04, -0.84]];
+  const VALVE_AT = [
+    [-0.4, -0.2],
+    [0.41, -0.2],
+    [-0.04, -0.84],
+  ];
   VALVES.forEach(([a, b], i) => {
     const [x, y] = VALVE_AT[i];
     const v = grp(pp, x, y, 0.2);
@@ -189,7 +214,8 @@ export function buildQuarters(parent) {
     g.fillStyle = '#2a2018';
     g.fillRect(0, 0, W, W);
     for (let i = 0; i < 20; i++) {
-      const a0 = (i * Math.PI) / 10 - Math.PI / 20, a1 = a0 + Math.PI / 10;
+      const a0 = (i * Math.PI) / 10 - Math.PI / 20,
+        a1 = a0 + Math.PI / 10;
       g.fillStyle = i % 2 ? '#d8cfae' : '#1a1a1a';
       g.beginPath();
       g.moveTo(c, c);
@@ -217,7 +243,12 @@ export function buildQuarters(parent) {
   board.rotation.y = RY.E;
   put(root, board, B.x0 + 0.036, F + 1.68, -9.95);
   put(root, box(0.03, 0.56, 0.56, mat.woodDark), B.x0 + 0.015, F + 1.68, -9.95);
-  for (const [y, z] of [[1.78, -9.9], [1.6, -10.06], [1.71, -9.82]]) put(root, cyl(0.006, 0.14, mat.brass, 5), B.x0 + 0.09, F + y, z).rotation.z = Math.PI / 2 + 0.15;
+  for (const [y, z] of [
+    [1.78, -9.9],
+    [1.6, -10.06],
+    [1.71, -9.82],
+  ])
+    put(root, cyl(0.006, 0.14, mat.brass, 5), B.x0 + 0.09, F + y, z).rotation.z = Math.PI / 2 + 0.15;
   const chalk = decal(0.62, 0.8, 260, (g, W, H) => {
     g.fillStyle = '#20262a';
     g.fillRect(0, 0, W, H);
@@ -252,16 +283,23 @@ export function buildQuarters(parent) {
   put(player, cyl(0.045, 0.014, mat.red, 12), -0.04, 0.11, 0);
   const arm = put(player, box(0.016, 0.016, 0.2, mat.chrome), 0.17, 0.16, 0.02);
   arm.rotation.set(0.5, 0.3, 0);
-  for (let i = 0; i < 5; i++) put(root, box(0.32, 0.008, 0.32, [mat.red, mat.paper, mat.navy, mat.orange, mat.green][i]), -3.85 + (i % 2) * 0.01, F + 0.806 + i * 0.009, B.z0 + 0.27).rotation.y = i * 0.07;
+  for (let i = 0; i < 5; i++)
+    put(root, box(0.32, 0.008, 0.32, [mat.red, mat.paper, mat.navy, mat.orange, mat.green][i]), -3.85 + (i % 2) * 0.01, F + 0.806 + i * 0.009, B.z0 + 0.27).rotation.y = i * 0.07;
   put(root, box(0.42, 0.28, 0.2, mat.wood, 0.8), -3.45, F + 0.94, B.z0 + 0.2);
-  put(root, decal(0.3, 0.12, 300, (g, W, H) => {
-    g.fillStyle = '#c9b98a';
-    g.fillRect(0, 0, W, H);
-    g.fillStyle = '#222';
-    for (let x = 6; x < W; x += 9) g.fillRect(x, H * 0.55, 1.5, H * 0.3);
-    g.fillStyle = '#a3261c';
-    g.fillRect(W * 0.62, 4, 2, H - 8);
-  }), -3.45, F + 0.98, B.z0 + 0.302);
+  put(
+    root,
+    decal(0.3, 0.12, 300, (g, W, H) => {
+      g.fillStyle = '#c9b98a';
+      g.fillRect(0, 0, W, H);
+      g.fillStyle = '#222';
+      for (let x = 6; x < W; x += 9) g.fillRect(x, H * 0.55, 1.5, H * 0.3);
+      g.fillStyle = '#a3261c';
+      g.fillRect(W * 0.62, 4, 2, H - 8);
+    }),
+    -3.45,
+    F + 0.98,
+    B.z0 + 0.302,
+  );
   hot(put(root, proxy(1.7, 0.6, 0.5), -4.1, F + 0.95, B.z0 + 0.28), { id: 'records', nodes: ['mess'], cursor: 'look', action: ['look', 'records'] });
   // two armchairs
   const armchair = (x, z, ry, m) => {
@@ -322,7 +360,8 @@ export function buildQuarters(parent) {
     g.strokeStyle = '#1c2a5a';
     g.lineWidth = 2;
     for (let d = 0; d < 35; d++) {
-      const x = 12 + (d % 7) * 18, y = 46 + Math.floor(d / 7) * 26;
+      const x = 12 + (d % 7) * 18,
+        y = 46 + Math.floor(d / 7) * 26;
       g.strokeStyle = 'rgba(0,0,0,0.35)';
       g.strokeRect(x, y, 14, 18);
       if (d < 26) {
@@ -343,7 +382,13 @@ export function buildQuarters(parent) {
   const ct = grp(root, -4.9, F, -7.85);
   put(ct, box(0.92, 0.04, 0.92, mat.felt), 0, 0.72, 0);
   put(ct, box(0.96, 0.03, 0.96, mat.woodDark), 0, 0.695, 0);
-  for (const [x, z] of [[-0.4, -0.4], [0.4, -0.4], [-0.4, 0.4], [0.4, 0.4]]) put(ct, box(0.05, 0.7, 0.05, mat.woodDark), x, 0.35, z);
+  for (const [x, z] of [
+    [-0.4, -0.4],
+    [0.4, -0.4],
+    [-0.4, 0.4],
+    [0.4, 0.4],
+  ])
+    put(ct, box(0.05, 0.7, 0.05, mat.woodDark), x, 0.35, z);
   for (let hnd = 0; hnd < 4; hnd++) {
     const hand = grp(ct, 0, 0.742, 0, (hnd * Math.PI) / 2);
     for (let c = 0; c < 5; c++) {
@@ -361,8 +406,17 @@ export function buildQuarters(parent) {
   /** A double bunk along a wall. face is the compass direction it faces into the room. */
   const bunk = (z, face, lower, upper) => {
     const b = grp(root, 3.95, F, z, RY[face]);
-    for (const [x, zz] of [[-1.0, -0.4], [1.0, -0.4], [-1.0, 0.4], [1.0, 0.4]]) put(b, box(0.06, 1.95, 0.06, mat.darkMetal), x, 0.975, zz);
-    [[0.42, lower], [1.3, upper]].forEach(([y, who]) => {
+    for (const [x, zz] of [
+      [-1.0, -0.4],
+      [1.0, -0.4],
+      [-1.0, 0.4],
+      [1.0, 0.4],
+    ])
+      put(b, box(0.06, 1.95, 0.06, mat.darkMetal), x, 0.975, zz);
+    [
+      [0.42, lower],
+      [1.3, upper],
+    ].forEach(([y, who]) => {
       put(b, box(2.0, 0.06, 0.85, mat.darkMetal), 0, y, 0);
       put(b, box(1.94, 0.12, 0.8, mat.ticking, 0.5), 0, y + 0.09, 0);
       put(b, box(1.3, 0.035, 0.82, mat.wool, 0.6), 0.3, y + 0.165, 0);
@@ -382,7 +436,8 @@ export function buildQuarters(parent) {
   bunk(U.z1 - 0.45, 'N', 'lund', 'okafor');
   // four lockers, nothing taken
   ['HARLAN', 'VOSS', 'LUND', 'OKAFOR'].forEach((name, i) => {
-    const z = -20.1 + i * 0.56, x = U.x1 - 0.24;
+    const z = -20.1 + i * 0.56,
+      x = U.x1 - 0.24;
     put(root, box(0.46, 1.8, 0.52, mat.steel, 1), x, F + 0.9, z);
     const door = grp(root, x - 0.235, F, z - 0.25);
     put(door, box(0.02, 1.74, 0.5, mat.steel, 1), 0, 0.9, 0.25);

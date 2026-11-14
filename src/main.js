@@ -30,7 +30,7 @@ const sound = new Sound();
 
 const cursorSvg = (body) =>
   `url("data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><g fill='#f2ecd8' stroke='#111' stroke-width='1.6' stroke-linejoin='round'>${body}</g></svg>`
+    `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><g fill='#f2ecd8' stroke='#111' stroke-width='1.6' stroke-linejoin='round'>${body}</g></svg>`,
   )}") 16 16, pointer`;
 const ARROW = "<path d='M16 3 27 16h-6v12H11V16H5z'/>";
 const rot = (deg, body) => `<g transform='rotate(${deg} 16 16)'>${body}</g>`;
@@ -40,8 +40,12 @@ const CURSORS = {
   right: cursorSvg(rot(90, ARROW)),
   back: cursorSvg(rot(180, ARROW)),
   left: cursorSvg(rot(270, ARROW)),
-  hand: cursorSvg("<circle cx='16' cy='16' r='10' fill='none' stroke='#111' stroke-width='5'/><circle cx='16' cy='16' r='10' fill='none' stroke='#f2ecd8' stroke-width='2.4'/><circle cx='16' cy='16' r='3'/>"),
-  look: cursorSvg("<circle cx='13' cy='13' r='8' fill='none' stroke='#111' stroke-width='5'/><path d='M19 19l9 9' stroke='#111' stroke-width='6' stroke-linecap='round'/><circle cx='13' cy='13' r='8' fill='none' stroke='#f2ecd8' stroke-width='2.4'/><path d='M19 19l9 9' stroke='#f2ecd8' stroke-width='3' stroke-linecap='round'/>"),
+  hand: cursorSvg(
+    "<circle cx='16' cy='16' r='10' fill='none' stroke='#111' stroke-width='5'/><circle cx='16' cy='16' r='10' fill='none' stroke='#f2ecd8' stroke-width='2.4'/><circle cx='16' cy='16' r='3'/>",
+  ),
+  look: cursorSvg(
+    "<circle cx='13' cy='13' r='8' fill='none' stroke='#111' stroke-width='5'/><path d='M19 19l9 9' stroke='#111' stroke-width='6' stroke-linecap='round'/><circle cx='13' cy='13' r='8' fill='none' stroke='#f2ecd8' stroke-width='2.4'/><path d='M19 19l9 9' stroke='#f2ecd8' stroke-width='3' stroke-linecap='round'/>",
+  ),
   cw: cursorSvg(CURVE),
   ccw: cursorSvg(`<g transform='translate(32 0) scale(-1 1)'>${CURVE}</g>`),
   up: cursorSvg("<path d='M16 5 26 17H6z'/><rect x='8' y='21' width='16' height='5'/>"),
@@ -163,7 +167,10 @@ const game = {
 
   /** Walk to a node and arrive facing the given compass direction. instant skips the glide. */
   go(node, facing, instant = false) {
-    const s = game.state, from = here(), prev = NODES[s.node], n = NODES[node];
+    const s = game.state,
+      from = here(),
+      prev = NODES[s.node],
+      n = NODES[node];
     s.node = node;
     if (!n.cam && facing) {
       s.yaw = YAW[facing];
@@ -224,7 +231,8 @@ const { A, gates, shut } = createActions(game);
 
 /** Things that happen the first time you reach a place. */
 function arrive(node, cut = false) {
-  const s = game.state, once = (flag) => (s.flags[flag] ? false : (s.flags[flag] = true));
+  const s = game.state,
+    once = (flag) => (s.flags[flag] ? false : (s.flags[flag] = true));
   if (node === 'vault' && once('vaultSeen')) game.say(SAY.vaultEnter);
   if (node === 'stairfoot' && once('belowSeen')) game.say(SAY.belowEnter);
   if (node === 'junction' && once('lowSeen')) game.say(SAY.lowEnter);
@@ -265,7 +273,11 @@ const probe = new THREE.Vector3();
 
 /** Compass bearing and pitch of the line of sight through a point of the picture. */
 function sightThrough(x, y) {
-  probe.set(x * 2 - 1, -(y * 2 - 1), 0.5).unproject(camera).sub(camera.position).normalize();
+  probe
+    .set(x * 2 - 1, -(y * 2 - 1), 0.5)
+    .unproject(camera)
+    .sub(camera.position)
+    .normalize();
   return { bearing: norm((Math.atan2(probe.x, -probe.z) * 180) / Math.PI), pitch: (Math.asin(probe.y) * 180) / Math.PI };
 }
 
@@ -273,7 +285,8 @@ function sightThrough(x, y) {
 const passable = (link) => !(link.gate && shut[link.gate] && shut[link.gate]());
 
 function linkToward(bearing, within) {
-  let best = null, bestOff = within;
+  let best = null,
+    bestOff = within;
   for (const l of linksFrom(game.state.node)) {
     const off = Math.abs(turnBetween(l.bearing, bearing));
     if (off <= bestOff && passable(l)) {
@@ -286,7 +299,8 @@ function linkToward(bearing, within) {
 
 /** What a click at this point of the view would do. */
 function targetAt(x, y) {
-  const s = game.state, n = NODES[s.node];
+  const s = game.state,
+    n = NODES[s.node];
   if (n.cam) {
     if (y > 0.88) return { kind: 'back' };
   } else {
@@ -328,7 +342,8 @@ function follow(link) {
 
 /** Swing round to the next compass stop in the given direction (dir -1 left, +1 right). */
 function turnBy(dir, stepDeg) {
-  const s = game.state, n = NODES[s.node];
+  const s = game.state,
+    n = NODES[s.node];
   if (n.cam) return;
   const from = here();
   const steps = s.yaw / stepDeg;
@@ -340,7 +355,8 @@ function turnBy(dir, stepDeg) {
 }
 
 function step(dir) {
-  const s = game.state, n = NODES[s.node];
+  const s = game.state,
+    n = NODES[s.node];
   if (dir === 'back') {
     if (n.cam) game.go(n.back[0], n.back[1]);
     return;
@@ -383,7 +399,8 @@ canvas.addEventListener('pointerdown', (e) => {
 canvas.addEventListener('pointermove', (e) => {
   if (!usable()) return (canvas.style.cursor = 'default');
   if (drag && drag.id === e.pointerId) {
-    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    const dx = e.clientX - drag.x,
+      dy = e.clientY - drag.y;
     if (!drag.moved && Math.hypot(dx, dy) < 5) return;
     drag.moved = true;
     const s = game.state;
@@ -494,7 +511,7 @@ function showTitle() {
       begin(Store.chapterThreeState(), false);
       arrive('gallery', true);
       Store.save(game.state);
-    }
+    },
   );
 }
 

@@ -20,7 +20,9 @@ export function drawPhoto(g, W, H) {
   g.save();
   g.fillStyle = '#efe9d6'; // the border of the print
   g.fillRect(0, 0, W, H);
-  const m = 16 * u, w = W - 2 * m, h = H - 2 * m;
+  const m = 16 * u,
+    w = W - 2 * m,
+    h = H - 2 * m;
   g.translate(m, m);
   g.beginPath();
   g.rect(0, 0, w, h);
@@ -56,7 +58,10 @@ export function drawPhoto(g, W, H) {
   g.fillRect(0, wy, w, h - wy);
 
   // the boat, new paint, broadside on, bow to the right
-  const cx = w * 0.5, hy = wy - 4 * u, L = w * 0.92, hh = 34 * u;
+  const cx = w * 0.5,
+    hy = wy - 4 * u,
+    L = w * 0.92,
+    hh = 34 * u;
   const paint = g.createLinearGradient(0, hy - hh, 0, hy + hh * 0.4);
   paint.addColorStop(0, '#d9d4c2');
   paint.addColorStop(0.55, '#a7a393');
@@ -78,7 +83,10 @@ export function drawPhoto(g, W, H) {
   g.fillStyle = '#8f8b7c';
   g.fillRect(cx - L * 0.36, hy - hh - 6 * u, L * 0.68, 7 * u);
   // conning tower, with her name and number
-  const tx = cx - 20 * u, tw = 190 * u, th = 96 * u, ty = hy - hh - 6 * u - th;
+  const tx = cx - 20 * u,
+    tw = 190 * u,
+    th = 96 * u,
+    ty = hy - hh - 6 * u - th;
   const tower = g.createLinearGradient(0, ty, 0, ty + th);
   tower.addColorStop(0, '#e2ddca');
   tower.addColorStop(1, '#a9a595');

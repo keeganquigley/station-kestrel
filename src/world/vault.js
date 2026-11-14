@@ -10,7 +10,8 @@ export const LOCK_PANEL = { x: ROOMS.corr.x1 - 0.01, y: F + 1.32, z: -18.86 };
 
 export function buildVault(scene) {
   const root = grp(scene);
-  const v = ROOMS.vault, c = ROOMS.corr;
+  const v = ROOMS.vault,
+    c = ROOMS.corr;
   const R = rng(909);
 
   // --- the wall between corridor and vault, and the door
@@ -28,14 +29,26 @@ export function buildVault(scene) {
     wheel.add(s);
   }
   put(wheel, cyl(0.06, 0.1, mat.darkMetal, 12), 0, 0, -0.03).rotation.x = Math.PI / 2;
-  const stencil = decal(1.1, 0.22, 300, (g, W, H) => {
-    g.fillStyle = '#737a7d';
-    g.fillRect(0, 0, W, H);
-    text(g, 'SIGNALS VAULT', W / 2, H / 2 + 2, { size: 44, color: '#d9c23c' });
-  }, { rough: 0.5 });
+  const stencil = decal(
+    1.1,
+    0.22,
+    300,
+    (g, W, H) => {
+      g.fillStyle = '#737a7d';
+      g.fillRect(0, 0, W, H);
+      text(g, 'SIGNALS VAULT', W / 2, H / 2 + 2, { size: 44, color: '#d9c23c' });
+    },
+    { rough: 0.5 },
+  );
   stencil.rotation.y = RY.W;
   put(hinge, stencil, -0.102, 1.78, 0.76);
-  for (const [y, z] of [[0.25, 0.15], [0.25, 1.37], [2.0, 0.15], [2.0, 1.37]]) put(hinge, cyl(0.03, 0.03, mat.darkMetal, 8), -0.105, y, z).rotation.z = Math.PI / 2;
+  for (const [y, z] of [
+    [0.25, 0.15],
+    [0.25, 1.37],
+    [2.0, 0.15],
+    [2.0, 1.37],
+  ])
+    put(hinge, cyl(0.03, 0.03, mat.darkMetal, 8), -0.105, y, z).rotation.z = Math.PI / 2;
   const wheelHit = put(hinge, proxy(0.3, 0.7, 0.7), -0.2, 1.15, 0.76);
   hot(wheelHit, { id: 'vaulthandle', nodes: ['vaultlock'], cursor: 'hand', action: ['vaulthandle'] });
   const doorHit = put(root, proxy(0.3, 2.3, 2.9), c.x1 - 0.25, F + 1.15, -19.6);
@@ -50,7 +63,8 @@ export function buildVault(scene) {
   put(lp, plate(0.3, 0.05, 'SET, THEN TURN WHEEL'), -0.08, -0.25, 0.002);
   const wheels = [];
   for (let i = 0; i < 4; i++) {
-    const x = -0.195 + i * 0.13, y = 0.0;
+    const x = -0.195 + i * 0.13,
+      y = 0.0;
     const w = decal(0.11, 0.3, 500, () => {}, { rough: 0.5 });
     put(lp, w, x, y, 0.006);
     put(lp, box(0.125, 0.315, 0.008, mat.black), x, y, 0);
@@ -61,7 +75,10 @@ export function buildVault(scene) {
   put(lp, box(0.56, 0.012, 0.01, mat.red), 0, -0.052, 0.012);
 
   // --- inside
-  const w = v.x1 - v.x0, d = v.z1 - v.z0, mx = (v.x0 + v.x1) / 2, mz = (v.z0 + v.z1) / 2;
+  const w = v.x1 - v.x0,
+    d = v.z1 - v.z0,
+    mx = (v.x0 + v.x1) / 2,
+    mz = (v.z0 + v.z1) / 2;
   const fl = M(new THREE.PlaneGeometry(w, d, cuts(w), cuts(d)), mat.concreteDark, false, true);
   fl.rotation.x = -Math.PI / 2;
   put(root, fl, mx, F + 0.005, mz);
@@ -81,13 +98,17 @@ export function buildVault(scene) {
   const leds = [];
   // the middle rack on the north wall is hinged at its front east corner, and folds right back
   // across the face of its neighbour, away from where you stand: it hides the way down
-  const hingeX = v.x0 + 1.0 + 1.15 + 0.525, hingeZ = v.z0 + 0.65;
+  const hingeX = v.x0 + 1.0 + 1.15 + 0.525,
+    hingeZ = v.z0 + 0.65;
   const swing = grp(root, hingeX, 0, hingeZ);
   for (const side of [-1, 1]) {
     for (let i = 0; i < 3; i++) {
-      const x = v.x0 + 1.0 + i * 1.15, z = side < 0 ? v.z0 + 0.35 : v.z1 - 0.35;
+      const x = v.x0 + 1.0 + i * 1.15,
+        z = side < 0 ? v.z0 + 0.35 : v.z1 - 0.35;
       const swings = side < 0 && i === 1;
-      const host = swings ? swing : root, ox = swings ? hingeX : 0, oz = swings ? hingeZ : 0;
+      const host = swings ? swing : root,
+        ox = swings ? hingeX : 0,
+        oz = swings ? hingeZ : 0;
       put(host, box(1.05, 2.1, 0.6, mat.darkMetal), x - ox, F + 1.05, z - oz);
       for (let u = 0; u < 6; u++) {
         put(host, box(0.95, 0.26, 0.02, mat.steel, 1), x - ox, F + 0.3 + u * 0.31, z - side * 0.31 - oz);
@@ -101,16 +122,29 @@ export function buildVault(scene) {
   const dx = v.x0 + 1.0 + 1.15;
   put(root, box(1.12, 2.16, 0.05, mat.darkMetal), dx, F + 1.08, v.z0 + 0.025);
   const way = put(root, box(0.96, 2.04, 0.06, mat.vaultSteel, 1.2), dx, F + 1.02, v.z0 + 0.05);
-  put(way, decal(0.86, 0.3, 300, (g, W, H) => {
-    g.fillStyle = '#737a7d';
-    g.fillRect(0, 0, W, H);
-    text(g, 'SUBTERRANEAN', W / 2, H * 0.3, { size: 27, color: '#d9c23c' });
-    text(g, 'STATION', W / 2, H * 0.72, { size: 27, color: '#d9c23c' });
-  }, { rough: 0.5 }), 0, 0.5, 0.032);
+  put(
+    way,
+    decal(
+      0.86,
+      0.3,
+      300,
+      (g, W, H) => {
+        g.fillStyle = '#737a7d';
+        g.fillRect(0, 0, W, H);
+        text(g, 'SUBTERRANEAN', W / 2, H * 0.3, { size: 27, color: '#d9c23c' });
+        text(g, 'STATION', W / 2, H * 0.72, { size: 27, color: '#d9c23c' });
+      },
+      { rough: 0.5 },
+    ),
+    0,
+    0.5,
+    0.032,
+  );
   put(way, box(0.05, 0.3, 0.07, mat.chrome), 0.36, -0.05, 0.05);
   hot(way, { id: 'waydown', nodes: ['vault'], cursor: 'fwd', action: ['descend'], disabled: true });
   // bench at the far end
-  const bx = v.x1 - 0.5, top = F + 0.8;
+  const bx = v.x1 - 0.5,
+    top = F + 0.8;
   put(root, box(0.9, 0.06, 3.2, mat.steel, 1), bx, top - 0.03, mz);
   for (const z of [mz - 1.5, mz + 1.5]) put(root, box(0.85, 0.76, 0.06, mat.steel, 1), bx, F + 0.38, z);
   const face = grp(root, bx - 0.3, top, mz, RY.W);
@@ -131,15 +165,30 @@ export function buildVault(scene) {
   hot(put(face, proxy(0.8, 0.75, 0.3), -1.05, 0.38, 0), { id: 'reels', nodes: ['vault'], cursor: 'look', action: ['look', 'reels'] });
   // second receiver, with nothing plugged into it
   put(face, box(0.8, 0.42, 0.4, mat.console, 1), -0.1, 0.21, -0.1);
-  const dial2 = decal(0.36, 0.1, 300, (g, W, H) => {
-    g.fillStyle = '#0a0d0a';
-    g.fillRect(0, 0, W, H);
-    text(g, '-.---', W / 2, H / 2 + 2, { size: H * 0.8, color: '#52ff86', font: '"Courier New", monospace' });
-  }, { glow: 1.5 });
+  const dial2 = decal(
+    0.36,
+    0.1,
+    300,
+    (g, W, H) => {
+      g.fillStyle = '#0a0d0a';
+      g.fillRect(0, 0, W, H);
+      text(g, '-.---', W / 2, H / 2 + 2, { size: H * 0.8, color: '#52ff86', font: '"Courier New", monospace' });
+    },
+    { glow: 1.5 },
+  );
   put(face, dial2, -0.2, 0.3, 0.102);
   for (const x of [-0.35, -0.2, -0.05]) put(face, cyl(0.035, 0.03, mat.black, 12), x, 0.12, 0.11).rotation.x = Math.PI / 2;
   put(face, cyl(0.03, 0.02, mat.brass, 10), 0.2, 0.3, 0.105).rotation.x = Math.PI / 2;
-  line(face, [[0.2, 0.3, 0.12], [0.26, 0.1, 0.2], [0.3, 0.0, 0.3], [0.34, 0.02, 0.36]], 0x101010);
+  line(
+    face,
+    [
+      [0.2, 0.3, 0.12],
+      [0.26, 0.1, 0.2],
+      [0.3, 0.0, 0.3],
+      [0.34, 0.02, 0.36],
+    ],
+    0x101010,
+  );
   hot(put(face, proxy(0.8, 0.42, 0.3), -0.1, 0.21, 0.05), { id: 'rx2', nodes: ['vault'], cursor: 'look', action: ['look', 'rx2'] });
   // teleprinter, and forty-one days of paper
   put(face, box(0.7, 0.2, 0.5, mat.steel, 1), 0.95, 0.1, -0.05);
@@ -169,7 +218,9 @@ export function buildVault(scene) {
   });
   hot(put(root, proxy(0.8, 1.1, 2.6), v.x1 - 2.45, F + 0.55, mz), { id: 'chairs', nodes: ['vault'], cursor: 'look', action: ['look', 'chairs'] });
 
-  let spin = 0, open = false, on = false;
+  let spin = 0,
+    open = false,
+    on = false;
   return {
     sync(state) {
       on = powered(state.gen, 'vault');

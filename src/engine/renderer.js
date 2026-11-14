@@ -42,7 +42,8 @@ export function createRenderer(canvas) {
       minFilter: THREE.NearestFilter,
       magFilter: THREE.NearestFilter,
     });
-  let cur = target(), prev = target();
+  let cur = target(),
+    prev = target();
 
   const uniforms = {
     tCur: { value: cur.texture },
@@ -60,14 +61,19 @@ export function createRenderer(canvas) {
       fragmentShader: FRAG,
       depthTest: false,
       depthWrite: false,
-    })
+    }),
   );
   const postScene = new THREE.Scene();
   postScene.add(quad);
   const postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
-  let t0 = 0, dur = 0;
-  let fadeFrom = 1, fadeTo = 1, fadeT0 = 0, fadeDur = 0, fadeDone = null;
+  let t0 = 0,
+    dur = 0;
+  let fadeFrom = 1,
+    fadeTo = 1,
+    fadeT0 = 0,
+    fadeDur = 0,
+    fadeDone = null;
 
   const present = () => {
     r.setRenderTarget(null);

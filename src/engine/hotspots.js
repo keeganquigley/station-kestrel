@@ -62,12 +62,16 @@ export function pointFor(scene, camera, id, nodeId, dir = 0, edges = true) {
     obj.geometry.computeBoundingBox();
     b.copy(obj.geometry.boundingBox).applyMatrix4(obj.matrixWorld);
   }
-  let x0 = 1, y0 = 1, x1 = 0, y1 = 0;
+  let x0 = 1,
+    y0 = 1,
+    x1 = 0,
+    y1 = 0;
   const v = new THREE.Vector3();
   for (let i = 0; i < 8; i++) {
     v.set(i & 1 ? b.max.x : b.min.x, i & 2 ? b.max.y : b.min.y, i & 4 ? b.max.z : b.min.z).project(camera);
     if (v.z > 1) continue;
-    const sx = (v.x + 1) / 2, sy = (1 - v.y) / 2;
+    const sx = (v.x + 1) / 2,
+      sy = (1 - v.y) / 2;
     x0 = Math.min(x0, sx);
     y0 = Math.min(y0, sy);
     x1 = Math.max(x1, sx);
@@ -82,14 +86,16 @@ export function pointFor(scene, camera, id, nodeId, dir = 0, edges = true) {
   const good = [];
   for (let iy = 0; iy < N; iy++) {
     for (let ix = 0; ix < N; ix++) {
-      const x = x0 + ((ix + 0.5) / N) * (x1 - x0), y = y0 + ((iy + 0.5) / N) * (y1 - y0);
+      const x = x0 + ((ix + 0.5) / N) * (x1 - x0),
+        y = y0 + ((iy + 0.5) / N) * (y1 - y0);
       const p = pick(scene, camera, x, y, nodeId);
       if (p && p.hot.id === id && (!dir || p.dir === dir)) good.push([x, y]);
     }
   }
   if (!good.length) return null;
   // prefer the candidate nearest the middle of the candidates
-  const mx = good.reduce((a, p) => a + p[0], 0) / good.length, my = good.reduce((a, p) => a + p[1], 0) / good.length;
+  const mx = good.reduce((a, p) => a + p[0], 0) / good.length,
+    my = good.reduce((a, p) => a + p[1], 0) / good.length;
   good.sort((p, q) => Math.hypot(p[0] - mx, p[1] - my) - Math.hypot(q[0] - mx, q[1] - my));
   return { x: good[0][0], y: good[0][1] };
 }

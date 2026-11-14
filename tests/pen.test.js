@@ -12,7 +12,11 @@ import { clockWords } from '../src/data/documents-pen.js';
 import { LETTERHEAD, VESSEL } from '../src/data/names.js';
 import { STOPPED_CLOCK } from '../src/puzzles/receiver.js';
 
-const strip = (html) => html.replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ');
+const strip = (html) =>
+  html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&[a-z]+;/g, ' ')
+    .replace(/\s+/g, ' ');
 
 describe('darkroom', () => {
   const set = (mins, safe = true) => {
@@ -115,10 +119,11 @@ describe('tally board', () => {
 });
 
 describe('picture telegraph', () => {
-  const set = (code) => code.split('').reduce((s, d, i) => {
-    for (let k = 0; k < Number(d); k++) s = Telegraph.spin(s, i, 1);
-    return s;
-  }, Telegraph.initial());
+  const set = (code) =>
+    code.split('').reduce((s, d, i) => {
+      for (let k = 0; k < Number(d); k++) s = Telegraph.spin(s, i, 1);
+      return s;
+    }, Telegraph.initial());
 
   it('files the paper against the hull number and the tally of whoever signed', () => {
     expect(Telegraph.HULL).toMatch(/^\d{3}$/);
@@ -217,11 +222,15 @@ describe('the pen on the map', () => {
     for (const [id, n] of Object.entries(NODES)) {
       for (const link of Object.values(n.fwd || {})) {
         const l = typeof link === 'string' ? { to: link } : link;
-        const a = n.realm || 'surface', b = NODES[l.to].realm || 'surface';
+        const a = n.realm || 'surface',
+          b = NODES[l.to].realm || 'surface';
         if (a !== b && (a === 'pen' || b === 'pen')) crossings.push([id, l.to, !!l.fade]);
       }
     }
-    expect(crossings.sort()).toEqual([['beyond', 'gallery', true], ['gallery', 'beyond', true]]);
+    expect(crossings.sort()).toEqual([
+      ['beyond', 'gallery', true],
+      ['gallery', 'beyond', true],
+    ]);
   });
 
   it('every link leads somewhere, and every close-up steps back to a standing place', () => {

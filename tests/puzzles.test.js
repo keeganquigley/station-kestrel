@@ -6,10 +6,14 @@ import * as Vault from '../src/puzzles/vault.js';
 import { NODES, START, turn } from '../src/data/nodes.js';
 import { MAST, ROOMS } from '../src/world/layout.js';
 
-const run = (state, ...actions) => actions.reduce((acc, a) => {
-  const r = Gen.act(acc.state, a);
-  return { state: r.state, events: acc.events.concat(r.events) };
-}, { state, events: [] });
+const run = (state, ...actions) =>
+  actions.reduce(
+    (acc, a) => {
+      const r = Gen.act(acc.state, a);
+      return { state: r.state, events: acc.events.concat(r.events) };
+    },
+    { state, events: [] },
+  );
 
 describe('generator', () => {
   const started = () => run(Gen.initial(), 'valve', 'prime', 'prime', 'prime', 'choke', 'starter', 'choke').state;
@@ -121,7 +125,8 @@ describe('receiver', () => {
   });
 
   it('the charted bearing really does run from the mast through the vault', () => {
-    const vx = (ROOMS.vault.x0 + ROOMS.vault.x1) / 2, vz = (ROOMS.vault.z0 + ROOMS.vault.z1) / 2;
+    const vx = (ROOMS.vault.x0 + ROOMS.vault.x1) / 2,
+      vz = (ROOMS.vault.z0 + ROOMS.vault.z1) / 2;
     const bearing = (Math.atan2(vx - MAST.x, -(vz - MAST.z)) * 180) / Math.PI;
     expect(Math.abs(bearing - Rx.TARGET_BEARING)).toBeLessThan(2);
   });
@@ -154,10 +159,11 @@ describe('cipher', () => {
 });
 
 describe('vault', () => {
-  const set = (code) => code.split('').reduce((s, d, i) => {
-    for (let k = 0; k < Number(d); k++) s = Vault.spin(s, i, 1);
-    return s;
-  }, Vault.initial());
+  const set = (code) =>
+    code.split('').reduce((s, d, i) => {
+      for (let k = 0; k < Number(d); k++) s = Vault.spin(s, i, 1);
+      return s;
+    }, Vault.initial());
 
   it('opens on the combination with power', () => {
     expect(Vault.tryHandle(set(Cipher.COMBINATION), true).result).toBe('open');

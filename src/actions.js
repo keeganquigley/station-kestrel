@@ -53,24 +53,45 @@ export function createActions(game) {
       S().gen = state;
       let line = null;
       for (const e of events) {
-        if (e === 'valve') { game.sfx('valve'); line = state.valve ? SAY.valveOpen : SAY.valveShut; }
-        if (e === 'prime') { game.sfx('prime'); line = SAY.prime(state.primes); }
+        if (e === 'valve') {
+          game.sfx('valve');
+          line = state.valve ? SAY.valveOpen : SAY.valveShut;
+        }
+        if (e === 'prime') {
+          game.sfx('prime');
+          line = SAY.prime(state.primes);
+        }
         if (e === 'choke') {
           game.sfx('click');
           if (state.running) line = state.choke ? SAY.roughAgain : SAY.smooth;
           else line = state.choke ? SAY.chokeOut : SAY.chokeIn;
         }
-        if (e === 'cough') { game.sfx('cough'); line = SAY.cough; }
-        if (e === 'start') { game.sfx('start'); line = SAY.start; }
+        if (e === 'cough') {
+          game.sfx('cough');
+          line = SAY.cough;
+        }
+        if (e === 'start') {
+          game.sfx('start');
+          line = SAY.start;
+        }
         if (e === 'already') line = SAY.already;
-        if (e === 'stall') { game.sfx('stall'); line = SAY.stall; }
+        if (e === 'stall') {
+          game.sfx('stall');
+          line = SAY.stall;
+        }
         if (e === 'switch') {
           game.sfx('switch');
           const st = Gen.status(state);
           line = st === 'off' ? SAY.notRunning : st === 'rough' ? SAY.roughBus : st === 'hunting' ? SAY.hunting : line;
         }
-        if (e === 'trip') { game.sfx('trip'); line = SAY.trip; }
-        if (e === 'live') { game.sfx('live'); line = SAY.live; }
+        if (e === 'trip') {
+          game.sfx('trip');
+          line = SAY.trip;
+        }
+        if (e === 'live') {
+          game.sfx('live');
+          line = SAY.live;
+        }
         if (e === 'drop' && !events.includes('trip') && !events.includes('stall')) line = SAY.drop;
       }
       if (line) game.say(line);
@@ -290,7 +311,17 @@ export function createActions(game) {
     develop() {
       const { state, result } = Darkroom.run(S().darkroom, game.has('film'));
       S().darkroom = state;
-      const line = { nofilm: 'devNoFilm', fogged: 'devFogged', thin: 'devThin', dense: 'devDense', streaked: 'devStreaked', unfixed: 'devUnfixed', bleached: 'devBleached', good: 'devGood', already: 'devAlready' }[result];
+      const line = {
+        nofilm: 'devNoFilm',
+        fogged: 'devFogged',
+        thin: 'devThin',
+        dense: 'devDense',
+        streaked: 'devStreaked',
+        unfixed: 'devUnfixed',
+        bleached: 'devBleached',
+        good: 'devGood',
+        already: 'devAlready',
+      }[result];
       if (result !== 'nofilm' && result !== 'already') game.sfx('slosh');
       game.say(SAY[line]);
       if (result !== 'good') return;

@@ -10,7 +10,8 @@ const DOOR_H = 2.25;
 export function buildStation(scene) {
   const root = grp(scene);
   const { x0, x1, z0, z1, h } = STN;
-  const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+  const cx = (x0 + x1) / 2,
+    cz = (z0 + z1) / 2;
   const fixtures = [];
   const lights = [];
 
@@ -33,11 +34,17 @@ export function buildStation(scene) {
   put(root, box(3.6, 0.1, 0.1, mat.darkMetal), 0.95, F + DOOR_H + 0.12, z1 + 0.07);
   const leaf = put(root, box(1.56, DOOR_H, 0.08, mat.vaultSteel, 1.2), 0, F + DOOR_H / 2, z1 + 0.06);
   put(leaf, box(0.06, 0.5, 0.06, mat.darkMetal), -0.55, 0, 0.07);
-  put(leaf, decal(0.9, 0.2, 300, (g, W, H) => {
-    g.fillStyle = '#6f7477';
-    g.fillRect(0, 0, W, H);
-    text(g, 'AUTHORISED PERSONS', W / 2, H / 2, { size: 22, color: '#d9c23c' });
-  }), 0, 0.55, 0.045);
+  put(
+    leaf,
+    decal(0.9, 0.2, 300, (g, W, H) => {
+      g.fillStyle = '#6f7477';
+      g.fillRect(0, 0, W, H);
+      text(g, 'AUTHORISED PERSONS', W / 2, H / 2, { size: 22, color: '#d9c23c' });
+    }),
+    0,
+    0.55,
+    0.045,
+  );
   hot(leaf, { id: 'door', nodes: ['door'], cursor: 'hand', action: ['door'] });
   const doorLamp = lampMat(0x301010);
   put(root, box(0.16, 0.16, 0.1, doorLamp), -1.3, F + 1.9, z1 + 0.05);
@@ -59,14 +66,22 @@ export function buildStation(scene) {
   put(root, cyl(1.0, 0.5, mat.concrete, 16), 10.5, roofY + 0.2, -21);
   put(root, box(1.4, 0.7, 1.0, mat.steel), -6, roofY + 0.35, -15);
   put(root, box(0.9, 0.5, 0.9, mat.steel), 3, roofY + 0.25, -24);
-  for (const [x, z, hh] of [[-9, -12, 5], [-3.5, -13, 3.6], [14, -12.5, 4.4]]) put(root, cyl(0.025, hh, mat.darkMetal, 5, 0.008), x, roofY + hh / 2, z);
+  for (const [x, z, hh] of [
+    [-9, -12, 5],
+    [-3.5, -13, 3.6],
+    [14, -12.5, 4.4],
+  ])
+    put(root, cyl(0.025, hh, mat.darkMetal, 5, 0.008), x, roofY + hh / 2, z);
 
   // --- rooms
   const room = (r, walls, opts = {}) => {
-    const w = r.x1 - r.x0, d = r.z1 - r.z0, mx = (r.x0 + r.x1) / 2, mz = (r.z0 + r.z1) / 2;
+    const w = r.x1 - r.x0,
+      d = r.z1 - r.z0,
+      mx = (r.x0 + r.x1) / 2,
+      mz = (r.z0 + r.z1) / 2;
     const wm = opts.wall || mat.paint;
     const fl = M(new THREE.PlaneGeometry(w, d, cuts(w), cuts(d)), opts.floor || mat.lino, false, true);
-    fl.geometry.attributes.uv.array.forEach((v, i, a) => (a[i] = v * (i % 2 ? d : w) / 2));
+    fl.geometry.attributes.uv.array.forEach((v, i, a) => (a[i] = (v * (i % 2 ? d : w)) / 2));
     fl.rotation.x = -Math.PI / 2;
     put(root, fl, mx, F + 0.005, mz);
     put(root, box(w + 0.3, 0.1, d + 0.3, opts.ceil || mat.ceiling, 1.2), mx, F + CEIL + 0.05, mz);
@@ -97,7 +112,11 @@ export function buildStation(scene) {
   fixture(-7.5, -20, 14, 1.4, false);
   fixture(7.3, -20, 6, 1.0);
   // door frames
-  for (const [x, z, alongX] of [[0, -14.55, true], [-4.55, -20, false], [4.55, -20, false]]) {
+  for (const [x, z, alongX] of [
+    [0, -14.55, true],
+    [-4.55, -20, false],
+    [4.55, -20, false],
+  ]) {
     for (const s of [-0.74, 0.74]) put(root, box(alongX ? 0.08 : 0.22, 2.14, alongX ? 0.22 : 0.08, mat.darkMetal), x + (alongX ? s : 0), F + 1.07, z + (alongX ? 0 : s));
     put(root, box(alongX ? 1.56 : 0.22, 0.08, alongX ? 0.22 : 1.56, mat.darkMetal), x, F + 2.14, z);
   }

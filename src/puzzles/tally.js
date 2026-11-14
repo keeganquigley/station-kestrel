@@ -44,7 +44,8 @@ export function initial() {
 /** Turn the drum under a name to the next or the previous tally number. */
 export function spin(s, name, dir) {
   if (s.open) return s;
-  const i = TALLIES.indexOf(s.set[name]), n = TALLIES.length;
+  const i = TALLIES.indexOf(s.set[name]),
+    n = TALLIES.length;
   return { ...s, set: { ...s.set, [name]: TALLIES[(i + dir + n) % n] } };
 }
 

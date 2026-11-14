@@ -9,8 +9,11 @@ export function buildPen(parent) {
   const root = grp(parent);
   const R = rng(7007);
   const { x0, edge, x1, z0, z1, south } = PEN;
-  const ROOF = PF + PEN.roof, BED = PF + PEN.bed, SHELF = PF + PEN.shelf;
-  const midZ = (z0 + z1) / 2, len = z1 - z0;
+  const ROOF = PF + PEN.roof,
+    BED = PF + PEN.bed,
+    SHELF = PF + PEN.shelf;
+  const midZ = (z0 + z1) / 2,
+    len = z1 - z0;
 
   root.add(new THREE.HemisphereLight(0x566870, 0x101416, 1.15));
 
@@ -22,8 +25,23 @@ export function buildPen(parent) {
   put(root, box(x1 - x0 + 3, 1, south - z0 + 4, mat.cavern), (x0 + x1) / 2, ROOF + 0.5, (z0 + south) / 2); // roof
   // the built wall down the east side, with the three doors
   const doorway = (zc) => ({ a: zc - 0.7, b: zc + 0.7, y0: 0, y1: 2.05 });
-  wall(root, mat.quayWall, x1 + 0.15, z0 - 1, x1 + 0.15, south + 0.4, PF, ROOF - PF + 0.5, 0.3, Object.values(DOCK).map((r) => doorway(r.door)));
-  for (const [key, label] of [['office', 'DOCK OFFICE'], ['store', 'DIVING STORE'], ['darkroom', 'DARK ROOM']]) {
+  wall(
+    root,
+    mat.quayWall,
+    x1 + 0.15,
+    z0 - 1,
+    x1 + 0.15,
+    south + 0.4,
+    PF,
+    ROOF - PF + 0.5,
+    0.3,
+    Object.values(DOCK).map((r) => doorway(r.door)),
+  );
+  for (const [key, label] of [
+    ['office', 'DOCK OFFICE'],
+    ['store', 'DIVING STORE'],
+    ['darkroom', 'DARK ROOM'],
+  ]) {
     const zc = DOCK[key].door;
     for (const dz of [-0.74, 0.74]) put(root, box(0.36, 2.09, 0.08, mat.darkMetal), x1 + 0.15, PF + 1.045, zc + dz);
     put(root, box(0.36, 0.08, 1.56, mat.darkMetal), x1 + 0.15, PF + 2.09, zc);
@@ -73,7 +91,11 @@ export function buildPen(parent) {
   for (let z = z1 - 3; z > z0; z -= 5.5) put(root, box(0.16, 1.5, 0.3, mat.hullDark), edge - 0.08, PF - 0.75, z); // fender timbers
 
   // ---------------------------------------------------------------- gallery, rail and the iron stair
-  const SX0 = 6.4, SX1 = x1, steps = 17, rise = PEN.shelf / (steps + 1), run = 0.28;
+  const SX0 = 6.4,
+    SX1 = x1,
+    steps = 17,
+    rise = PEN.shelf / (steps + 1),
+    run = 0.28;
   for (let k = 1; k <= steps; k++) {
     const h = PEN.shelf - rise * k;
     put(root, box(SX1 - SX0, h, run, mat.quay, 2), (SX0 + SX1) / 2, PF + h / 2, z1 - run * (k - 0.5));
@@ -99,7 +121,8 @@ export function buildPen(parent) {
 
   // ---------------------------------------------------------------- lamps along the quay
   const pendant = (z, lit, power = 26) => {
-    const y = PF + 4.4, x = 4.6;
+    const y = PF + 4.4,
+      x = 4.6;
     put(root, cyl(0.012, ROOF - y, mat.black, 5), x, (ROOF + y) / 2, z);
     put(root, cyl(0.26, 0.16, mat.darkMetal, 14, 0.06), x, y + 0.02, z);
     const m = lampMat(0x55524a);
@@ -114,7 +137,11 @@ export function buildPen(parent) {
   pendant(-136, false);
   pendant(-147, true, 22);
   // cold light off the roof, enough to see her by from one end to the other
-  for (const [dz, power] of [[0.6, 62], [-6.5, 42], [6.5, 42]]) {
+  for (const [dz, power] of [
+    [0.6, 62],
+    [-6.5, 42],
+    [6.5, 42],
+  ]) {
     const l = new THREE.PointLight(0xb9c6c8, power, 24, 1.4);
     l.position.set(BOAT.x + 2.6, PF + 5.4, BOAT.z + dz);
     root.add(l);
@@ -152,8 +179,17 @@ export function buildPen(parent) {
     strut(root, [2.1, PF + 0.36, z], [BOAT.x + 1.0, BOAT.y + BOAT.r * 0.82, z + (z > BOAT.z ? -0.8 : 0.8)], 0.03, mat.hullDark);
   }
   // stores landed at the south end and never moved
-  for (const [x, z, s, m] of [[3.2, -110.4, 0.9, mat.wood], [4.25, -110.2, 0.7, mat.woodDark], [3.3, -111.5, 0.6, mat.wood]]) put(root, box(s, s * 0.8, s, m, 1), x, PF + s * 0.4, z).rotation.y = R() * 0.5;
-  for (const [x, z] of [[2.4, -112.4], [2.95, -113.1]]) put(root, cyl(0.29, 0.88, mat.blueDrum, 16), x, PF + 0.44, z);
+  for (const [x, z, s, m] of [
+    [3.2, -110.4, 0.9, mat.wood],
+    [4.25, -110.2, 0.7, mat.woodDark],
+    [3.3, -111.5, 0.6, mat.wood],
+  ])
+    put(root, box(s, s * 0.8, s, m, 1), x, PF + s * 0.4, z).rotation.y = R() * 0.5;
+  for (const [x, z] of [
+    [2.4, -112.4],
+    [2.95, -113.1],
+  ])
+    put(root, cyl(0.29, 0.88, mat.blueDrum, 16), x, PF + 0.44, z);
 
   // the cable out of the tunnel: down the wall, along the quay and into her side
   const CZ = -134.2;
@@ -174,7 +210,9 @@ export function buildPen(parent) {
   hot(put(cam, proxy(0.6, 1.7, 0.6), 0, 0.85, 0), { id: 'camera', nodes: ['quayMid'], cursor: 'hand', action: ['film'] });
 
   // ---------------------------------------------------------------- the sea gate and the beacon
-  const GW = edge - x0 - 1.2, gateY = (WATER - 1.5 + PF + 5.6) / 2, gateH = PF + 5.6 - (WATER - 1.5);
+  const GW = edge - x0 - 1.2,
+    gateY = (WATER - 1.5 + PF + 5.6) / 2,
+    gateH = PF + 5.6 - (WATER - 1.5);
   for (const s of [-1, 1]) {
     const leaf = put(root, box(GW / 2 - 0.05, gateH, 0.4, mat.gate, 2), (x0 + edge) / 2 + s * (GW / 4), gateY, z0 + 0.5);
     leaf.userData.gate = true;
@@ -189,7 +227,8 @@ export function buildPen(parent) {
   }
   hot(put(root, proxy(GW, 5.5, 0.4), (x0 + edge) / 2, PF + 2.2, z0 + 0.95), { id: 'seagate', nodes: ['quayN'], cursor: 'look', action: ['look', 'seagate'] });
 
-  const BX = 2.3, BZ = z0 + 2.2;
+  const BX = 2.3,
+    BZ = z0 + 2.2;
   put(root, cyl(0.07, 2.3, mat.darkMetal, 10), BX, PF + 1.15, BZ);
   put(root, cyl(0.2, 0.06, mat.darkMetal, 12), BX, PF + 2.3, BZ);
   put(root, cyl(0.2, 0.06, mat.darkMetal, 12), BX, PF + 2.68, BZ);
@@ -203,7 +242,8 @@ export function buildPen(parent) {
 
   // ---------------------------------------------------------------- the boat
   const boat = grp(root, BOAT.x, BOAT.y, BOAT.z);
-  const r = BOAT.r, MID = 11;
+  const r = BOAT.r,
+    MID = 11;
   const mid = M(new THREE.CylinderGeometry(r, r, MID, 24, cuts(MID)), mat.hull);
   mid.rotation.x = Math.PI / 2;
   boat.add(mid);
@@ -227,7 +267,8 @@ export function buildPen(parent) {
     for (let z = -6.2; z < 5.6; z += 0.62) put(boat, box(0.02, 0.09, 0.3, mat.black), s * 0.695, r - 0.12, z);
   }
   // conning tower
-  const ST = r + 0.12, SH = 2.0;
+  const ST = r + 0.12,
+    SH = 2.0;
   put(boat, box(0.92, SH, 2.6, mat.hull, 1.6), 0, ST + SH / 2, 0.9);
   put(boat, cyl(0.46, SH, mat.hull, 16), 0, ST + SH / 2, -0.4);
   put(boat, box(0.98, 0.06, 2.7, mat.hullDark), 0, ST + SH + 0.03, 0.88);
@@ -247,7 +288,8 @@ export function buildPen(parent) {
       g.fillRect(R() * W, R() * H, 1 + R() * 4, 1 + R() * 3);
     }
     for (let i = 0; i < 9; i++) {
-      const x = R() * W, grad = g.createLinearGradient(0, 0, 0, H);
+      const x = R() * W,
+        grad = g.createLinearGradient(0, 0, 0, H);
       grad.addColorStop(0, 'rgba(120,70,36,0)');
       grad.addColorStop(1, `rgba(120,70,36,${0.5 + R() * 0.4})`);
       g.fillStyle = grad;
@@ -270,7 +312,8 @@ export function buildPen(parent) {
   hot(put(boat, proxy(0.2, 0.6, 2.1), 0.52, ST + 1.36, 1.2), { id: 'name', nodes: ['sail'], cursor: 'look', action: ['look', 'name'] });
   hot(put(boat, proxy(0.2, 0.4, 1.0), 0.52, ST + 0.78, 1.2), { id: 'number', nodes: ['sail'], cursor: 'look', action: ['look', 'number'] });
   // the viewport in the tower
-  const PY = ST + 1.16, PZ = -0.12;
+  const PY = ST + 1.16,
+    PZ = -0.12;
   const rim = M(new THREE.TorusGeometry(0.2, 0.04, 8, 22), mat.brass);
   rim.rotation.y = Math.PI / 2;
   put(boat, rim, 0.47, PY, PZ);
@@ -290,9 +333,11 @@ export function buildPen(parent) {
   put(boat, box(0.4, 0.03, 0.03, mat.hull), 0, r + 0.37, 3.5);
   hot(put(boat, proxy(1.0, 0.6, 1.0), 0, r + 0.4, 3.5), { id: 'hatch', nodes: ['quayMid'], cursor: 'look', action: ['look', 'hatch'] });
   // weed along the waterline and hanging off the tower
-  const wl = WATER - BOAT.y, wx = Math.sqrt(r * r - wl * wl);
+  const wl = WATER - BOAT.y,
+    wx = Math.sqrt(r * r - wl * wl);
   for (let i = 0; i < 60; i++) {
-    const h = 0.25 + R() * 0.7, z = -MID / 2 + R() * MID;
+    const h = 0.25 + R() * 0.7,
+      z = -MID / 2 + R() * MID;
     for (const s of [-1, 1]) put(boat, box(0.03, h, 0.12 + R() * 0.2, mat.weed), s * (wx + 0.02 + (h > 0.6 ? 0.03 : 0)), wl + h / 2 - 0.05, z + s * 0.3);
   }
   for (let i = 0; i < 9; i++) {

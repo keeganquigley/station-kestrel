@@ -11,14 +11,21 @@ function hash(ix, iz) {
 }
 
 export function noise(x, z) {
-  const ix = Math.floor(x), iz = Math.floor(z);
-  const fx = smooth(x - ix), fz = smooth(z - iz);
-  const a = hash(ix, iz), b = hash(ix + 1, iz), c = hash(ix, iz + 1), d = hash(ix + 1, iz + 1);
+  const ix = Math.floor(x),
+    iz = Math.floor(z);
+  const fx = smooth(x - ix),
+    fz = smooth(z - iz);
+  const a = hash(ix, iz),
+    b = hash(ix + 1, iz),
+    c = hash(ix, iz + 1),
+    d = hash(ix + 1, iz + 1);
   return a + (b - a) * fx + (c - a) * fz + (a - b - c + d) * fx * fz;
 }
 
 export function fbm(x, z, octaves = 4) {
-  let v = 0, amp = 0.5, f = 1;
+  let v = 0,
+    amp = 0.5,
+    f = 1;
   for (let i = 0; i < octaves; i++) {
     v += amp * noise(x * f, z * f);
     amp *= 0.5;
@@ -29,7 +36,8 @@ export function fbm(x, z, octaves = 4) {
 
 /** 1 on the levelled plateau, falling to 0 sixteen metres beyond its edge. */
 export function plateau(x, z) {
-  const qx = Math.abs(x) - 24, qz = Math.abs(z + 9) - 21;
+  const qx = Math.abs(x) - 24,
+    qz = Math.abs(z + 9) - 21;
   const outside = Math.hypot(Math.max(qx, 0), Math.max(qz, 0));
   const d = outside + Math.min(Math.max(qx, qz), 0) - 6;
   return smooth(1 - clamp(d / 16, 0, 1));
@@ -49,7 +57,8 @@ export function terrainH(x, z) {
 }
 
 function segDist(px, pz, ax, az, bx, bz) {
-  const dx = bx - ax, dz = bz - az;
+  const dx = bx - ax,
+    dz = bz - az;
   const t = clamp(((px - ax) * dx + (pz - az) * dz) / (dx * dx + dz * dz), 0, 1);
   return Math.hypot(px - ax - dx * t, pz - az - dz * t);
 }

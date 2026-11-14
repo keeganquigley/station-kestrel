@@ -29,11 +29,17 @@ export function buildOffice(scene) {
   put(locked, cyl(0.016, 0.012, mat.brass, 10), 0.014, -0.045, 0.14).rotation.z = Math.PI / 2;
   const tray = put(locked, box(0.36, 0.03, 0.4, mat.woodDark, 0.8), -0.19, -0.08, 0);
   const pad = put(locked, box(0.2, 0.025, 0.14, mat.red), -0.16, -0.05, 0);
-  put(pad, decal(0.15, 0.06, 500, (g, W, H) => {
-    g.fillStyle = '#e4dcc2';
-    g.fillRect(0, 0, W, H);
-    text(g, 'SERIES K', W / 2, H / 2, { size: 20, color: '#222' });
-  }), 0, 0.014, 0).rotation.x = -Math.PI / 2;
+  put(
+    pad,
+    decal(0.15, 0.06, 500, (g, W, H) => {
+      g.fillStyle = '#e4dcc2';
+      g.fillRect(0, 0, W, H);
+      text(g, 'SERIES K', W / 2, H / 2, { size: 20, color: '#222' });
+    }),
+    0,
+    0.014,
+    0,
+  ).rotation.x = -Math.PI / 2;
   const drawerHit = put(desk, proxy(0.5, 0.26, 0.5), 0.55, 0.6, -0.68);
   hot(drawerHit, { id: 'drawer', nodes: ['office'], cursor: 'hand', action: ['drawer'] });
 
@@ -61,27 +67,33 @@ export function buildOffice(scene) {
   put(tw, box(0.12, 0.08, 0.4, mat.darkMetal), -0.12, 0.12, 0);
   put(tw, cyl(0.025, 0.42, mat.rubber, 8), -0.12, 0.18, 0).rotation.x = Math.PI / 2;
   // photograph
-  const photo = decal(0.2, 0.15, 500, (g, W, H) => {
-    const sky = g.createLinearGradient(0, 0, 0, H);
-    sky.addColorStop(0, '#b9c0c4');
-    sky.addColorStop(0.55, '#dcd6c4');
-    sky.addColorStop(0.56, '#6d7a80');
-    sky.addColorStop(1, '#49555a');
-    g.fillStyle = sky;
-    g.fillRect(0, 0, W, H);
-    g.fillStyle = '#5a4a38';
-    g.fillRect(0, H * 0.7, W, H * 0.08);
-    g.fillStyle = '#1e1c1a';
-    [0.28, 0.42, 0.56, 0.7].forEach((x, i) => {
-      const hh = H * (0.34 + (i % 2) * 0.04);
-      g.fillRect(W * x - 5, H * 0.72 - hh, 10, hh);
-      g.beginPath();
-      g.arc(W * x, H * 0.72 - hh - 5, 5, 0, 7);
-      g.fill();
-    });
-    g.fillStyle = 'rgba(230,224,200,0.9)';
-    g.fillRect(W * 0.62, H * 0.86, W * 0.3, 6);
-  }, { rough: 0.4 });
+  const photo = decal(
+    0.2,
+    0.15,
+    500,
+    (g, W, H) => {
+      const sky = g.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, '#b9c0c4');
+      sky.addColorStop(0.55, '#dcd6c4');
+      sky.addColorStop(0.56, '#6d7a80');
+      sky.addColorStop(1, '#49555a');
+      g.fillStyle = sky;
+      g.fillRect(0, 0, W, H);
+      g.fillStyle = '#5a4a38';
+      g.fillRect(0, H * 0.7, W, H * 0.08);
+      g.fillStyle = '#1e1c1a';
+      [0.28, 0.42, 0.56, 0.7].forEach((x, i) => {
+        const hh = H * (0.34 + (i % 2) * 0.04);
+        g.fillRect(W * x - 5, H * 0.72 - hh, 10, hh);
+        g.beginPath();
+        g.arc(W * x, H * 0.72 - hh - 5, 5, 0, 7);
+        g.fill();
+      });
+      g.fillStyle = 'rgba(230,224,200,0.9)';
+      g.fillRect(W * 0.62, H * 0.86, W * 0.3, 6);
+    },
+    { rough: 0.4 },
+  );
   const frame = grp(desk, -0.25, 0.76, -0.62, RY.E);
   frame.rotation.y = RY.E - 0.35;
   put(frame, box(0.24, 0.19, 0.015, mat.black), 0, 0.1, 0).rotation.x = -0.18;
@@ -91,13 +103,19 @@ export function buildOffice(scene) {
   seat.rotation.y = -0.9;
   put(root, seat, r.x0 + 1.7, F, -18.4);
   // a slit window above the desk, already dark
-  const win = decal(1.3, 0.4, 100, (g, W, H) => {
-    const grad = g.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, '#2b3350');
-    grad.addColorStop(1, '#b0623a');
-    g.fillStyle = grad;
-    g.fillRect(0, 0, W, H);
-  }, { glow: 0.9 });
+  const win = decal(
+    1.3,
+    0.4,
+    100,
+    (g, W, H) => {
+      const grad = g.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#2b3350');
+      grad.addColorStop(1, '#b0623a');
+      g.fillStyle = grad;
+      g.fillRect(0, 0, W, H);
+    },
+    { glow: 0.9 },
+  );
   win.rotation.y = RY.E;
   put(root, win, r.x0 + 0.01, F + 2.2, -20);
   for (const dy of [-0.23, 0.23]) put(root, box(0.06, 0.06, 1.42, mat.darkMetal), r.x0 + 0.03, F + 2.2 + dy, -20);
@@ -132,7 +150,8 @@ export function buildOffice(scene) {
     put(sh, box(2.6, 0.04, 0.36, mat.woodDark), 0, y, 0);
     let x = -1.22;
     while (x < 1.1) {
-      const w = 0.05 + R() * 0.05, hh = 0.26 + R() * 0.1;
+      const w = 0.05 + R() * 0.05,
+        hh = 0.26 + R() * 0.1;
       if (R() < 0.85) {
         const b = put(sh, box(w, hh, 0.24, spines[Math.floor(R() * spines.length)]), x + w / 2, y + 0.02 + hh / 2, 0.02);
         if (R() < 0.12) b.rotation.z = 0.2;

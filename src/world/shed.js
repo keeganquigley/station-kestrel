@@ -11,7 +11,8 @@ export const BRK_PANEL = { x: 18.5, y: F + 1.45, z: SHED.z0 + 0.1 };
 export function buildShed(scene) {
   const root = grp(scene);
   const { x0, x1, z0, z1, h } = SHED;
-  const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+  const cx = (x0 + x1) / 2,
+    cz = (z0 + z1) / 2;
 
   // shell
   put(root, box(x1 - x0 + 0.4, 0.4, z1 - z0 + 0.4, mat.concrete, 2), cx, F - 0.2, cz);
@@ -187,7 +188,8 @@ export function buildShed(scene) {
 
   return {
     sync(state) {
-      const s = state.gen, st = status(s);
+      const s = state.gen,
+        st = status(s);
       valve.rotation.z = s.valve ? 0 : -Math.PI / 2;
       choke.position.z = s.choke ? 0.1 : 0;
       sight.userData.redraw(drawSight(s.running ? PRIME_COUNT : s.primes));

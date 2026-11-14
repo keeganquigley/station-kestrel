@@ -25,7 +25,9 @@ function speckle(g, s, n, maxSize, strength) {
 
 function blotches(g, s, n, color, maxR, alpha) {
   for (let i = 0; i < n; i++) {
-    const x = R() * s, y = R() * s, r = 4 + R() * maxR;
+    const x = R() * s,
+      y = R() * s,
+      r = 4 + R() * maxR;
     const grad = g.createRadialGradient(x, y, 0, x, y, r);
     grad.addColorStop(0, color.replace('A', String(alpha * (0.4 + R() * 0.6))));
     grad.addColorStop(1, color.replace('A', '0'));
@@ -36,7 +38,10 @@ function blotches(g, s, n, color, maxR, alpha) {
 
 function streaks(g, s, n, color, alpha) {
   for (let i = 0; i < n; i++) {
-    const x = R() * s, y = R() * s * 0.6, w = 2 + R() * 10, h = s * (0.2 + R() * 0.5);
+    const x = R() * s,
+      y = R() * s * 0.6,
+      w = 2 + R() * 10,
+      h = s * (0.2 + R() * 0.5);
     const grad = g.createLinearGradient(0, y, 0, y + h);
     grad.addColorStop(0, color.replace('A', String(alpha * R())));
     grad.addColorStop(1, color.replace('A', '0'));

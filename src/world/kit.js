@@ -19,9 +19,18 @@ export const cuts = (len) => Math.max(1, Math.ceil(len / MAX_FACE));
 /** Stretch a box's UVs so a texture covers `s` metres regardless of the box size. */
 function boxUV(g, w, h, d, s) {
   const uv = g.attributes.uv;
-  const sw = cuts(w), sh = cuts(h), sd = cuts(d);
+  const sw = cuts(w),
+    sh = cuts(h),
+    sd = cuts(d);
   // BoxGeometry lays its faces out in this order: +x, -x, +y, -y, +z, -z
-  const faces = [[d, h, sd, sh], [d, h, sd, sh], [w, d, sw, sd], [w, d, sw, sd], [w, h, sw, sh], [w, h, sw, sh]];
+  const faces = [
+    [d, h, sd, sh],
+    [d, h, sd, sh],
+    [w, d, sw, sd],
+    [w, d, sw, sd],
+    [w, h, sw, sh],
+    [w, h, sw, sh],
+  ];
   let k = 0;
   for (const [fu, fv, su, sv] of faces) {
     const n = (su + 1) * (sv + 1);
@@ -56,7 +65,8 @@ export function grp(parent, x = 0, y = 0, z = 0, ry = 0) {
 
 /** A thin round bar between two points. */
 export function strut(parent, a, b, r, mat, seg = 6) {
-  const va = new THREE.Vector3(...a), vb = new THREE.Vector3(...b);
+  const va = new THREE.Vector3(...a),
+    vb = new THREE.Vector3(...b);
   const len = va.distanceTo(vb);
   const m = cyl(r, len, mat, seg);
   m.position.copy(va).add(vb).multiplyScalar(0.5);
@@ -83,7 +93,8 @@ export function wall(parent, mat, x0, z0, x1, z1, y, h, t, openings = [], uv = 2
   const s1 = alongX ? Math.max(x0, x1) : Math.max(z0, z1);
   const piece = (a, b, ya, yb) => {
     if (b - a < 1e-3 || yb - ya < 1e-3) return;
-    const len = b - a, hh = yb - ya;
+    const len = b - a,
+      hh = yb - ya;
     const m = alongX ? box(len, hh, t, mat, uv) : box(t, hh, len, mat, uv);
     m.position.set(alongX ? (a + b) / 2 : x0, y + (ya + yb) / 2, alongX ? z0 : (a + b) / 2);
     parent.add(m);
@@ -121,9 +132,7 @@ export function decal(w, h, px, draw, { glow = 0, rough = 0.85 } = {}) {
   const g = c.getContext('2d');
   draw(g, c.width, c.height);
   const tex = canvasTexture(c);
-  const mat = glow
-    ? new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color(glow, glow, glow) })
-    : new THREE.MeshStandardMaterial({ map: tex, roughness: rough });
+  const mat = glow ? new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color(glow, glow, glow) }) : new THREE.MeshStandardMaterial({ map: tex, roughness: rough });
   const m = M(new THREE.PlaneGeometry(w, h), mat, false, true);
   m.userData.redraw = (fn) => {
     fn(g, c.width, c.height);
@@ -182,7 +191,9 @@ export function meterFace(title, labels, { redFrom = null, redAt = null } = {}) 
     g.strokeStyle = '#222';
     g.lineWidth = Math.max(2, W * 0.012);
     g.strokeRect(0, 0, W, H);
-    const cx = W / 2, cy = H * 0.82, r = H * 0.6;
+    const cx = W / 2,
+      cy = H * 0.82,
+      r = H * 0.6;
     const A = (f) => -Math.PI / 2 + (f - 0.5) * 1.6;
     g.beginPath();
     g.arc(cx, cy, r, A(0), A(1));
@@ -197,7 +208,8 @@ export function meterFace(title, labels, { redFrom = null, redAt = null } = {}) 
     g.strokeStyle = '#222';
     g.lineWidth = Math.max(1.5, W * 0.01);
     labels.forEach((l, i) => {
-      const f = i / (labels.length - 1), a = A(f);
+      const f = i / (labels.length - 1),
+        a = A(f);
       g.beginPath();
       g.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
       g.lineTo(cx + Math.cos(a) * r * 1.1, cy + Math.sin(a) * r * 1.1);
@@ -243,27 +255,35 @@ export function sideOf(frame, cx, cy, axis = 'x') {
 }
 
 /** The face of a thumbwheel showing digit n, with its neighbours above and below. */
-export const wheelFace = (n, of = 10) => (g, W, H) => {
-  g.fillStyle = '#d9d4c0';
-  g.fillRect(0, 0, W, H);
-  const grad = g.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, 'rgba(0,0,0,0.75)');
-  grad.addColorStop(0.3, 'rgba(0,0,0,0)');
-  grad.addColorStop(0.7, 'rgba(0,0,0,0)');
-  grad.addColorStop(1, 'rgba(0,0,0,0.75)');
-  const f = '"Courier New", monospace';
-  text(g, String((n + 1) % of), W / 2, H * 0.14, { size: H * 0.2, color: '#555', font: f });
-  text(g, String(n), W / 2, H * 0.51, { size: H * 0.34, color: '#111', font: f });
-  text(g, String((n + of - 1) % of), W / 2, H * 0.88, { size: H * 0.2, color: '#555', font: f });
-  g.fillStyle = grad;
-  g.fillRect(0, 0, W, H);
-};
+export const wheelFace =
+  (n, of = 10) =>
+  (g, W, H) => {
+    g.fillStyle = '#d9d4c0';
+    g.fillRect(0, 0, W, H);
+    const grad = g.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, 'rgba(0,0,0,0.75)');
+    grad.addColorStop(0.3, 'rgba(0,0,0,0)');
+    grad.addColorStop(0.7, 'rgba(0,0,0,0)');
+    grad.addColorStop(1, 'rgba(0,0,0,0.75)');
+    const f = '"Courier New", monospace';
+    text(g, String((n + 1) % of), W / 2, H * 0.14, { size: H * 0.2, color: '#555', font: f });
+    text(g, String(n), W / 2, H * 0.51, { size: H * 0.34, color: '#111', font: f });
+    text(g, String((n + of - 1) % of), W / 2, H * 0.88, { size: H * 0.2, color: '#555', font: f });
+    g.fillStyle = grad;
+    g.fillRect(0, 0, W, H);
+  };
 
 export function chair(mat, legMat) {
   const g = new THREE.Group();
   put(g, box(0.44, 0.05, 0.44, mat), 0, 0.46, 0);
   put(g, box(0.44, 0.5, 0.05, mat), 0, 0.78, -0.2);
-  for (const [x, z] of [[-0.19, -0.19], [0.19, -0.19], [-0.19, 0.19], [0.19, 0.19]]) put(g, box(0.035, 0.46, 0.035, legMat), x, 0.23, z);
+  for (const [x, z] of [
+    [-0.19, -0.19],
+    [0.19, -0.19],
+    [-0.19, 0.19],
+    [0.19, 0.19],
+  ])
+    put(g, box(0.035, 0.46, 0.035, legMat), x, 0.23, z);
   return g;
 }
 

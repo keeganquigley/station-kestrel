@@ -27,7 +27,11 @@ export function buildTunnel(parent) {
   const wx = hw + 0.1;
   wall(root, mat.damp, -wx, z0 - 0.4, -wx, 6.2, WB, WH, 0.2, [doorway(QUARTERS.mess.door)]);
   wall(root, mat.damp, wx, z0 - 0.4, wx, 6.2, WB, WH, 0.2, [doorway(QUARTERS.kitchen.door), doorway(QUARTERS.bunks.door)]);
-  for (const [x, zc] of [[-hw, QUARTERS.mess.door], [hw, QUARTERS.kitchen.door], [hw, QUARTERS.bunks.door]]) {
+  for (const [x, zc] of [
+    [-hw, QUARTERS.mess.door],
+    [hw, QUARTERS.kitchen.door],
+    [hw, QUARTERS.bunks.door],
+  ]) {
     const sx = Math.sign(x);
     for (const dz of [-0.74, 0.74]) put(root, box(0.26, 2.09, 0.08, mat.darkMetal), x + sx * 0.1, UF + 1.045, zc + dz);
     put(root, box(0.26, 0.08, 1.56, mat.darkMetal), x + sx * 0.1, UF + 2.09, zc);
@@ -42,7 +46,13 @@ export function buildTunnel(parent) {
   put(root, box(2 * hw + 0.4, 0.3, drop - z0 + 0.6, mat.damp, 2), 0, LF + h + 0.15, (drop + z0 - 0.6) / 2);
   put(root, box(2 * hw + 0.4, UF - LF + 0.3, 0.3, mat.damp, 2), 0, LF + h + (UF - LF + 0.3) / 2, drop - 0.15);
   // concrete ribs
-  for (const [z, base, hh] of [[-5, UF, h], [-14, UF, h], [-23.5, UF, h], [-32, LF, h], [-38, LF, h]]) {
+  for (const [z, base, hh] of [
+    [-5, UF, h],
+    [-14, UF, h],
+    [-23.5, UF, h],
+    [-32, LF, h],
+    [-38, LF, h],
+  ]) {
     for (const s of [-1, 1]) put(root, box(0.16, hh, 0.3, mat.concreteDark, 2), s * (hw - 0.08), base + hh / 2, z);
     put(root, box(2 * hw, 0.18, 0.3, mat.concreteDark, 2), 0, base + hh - 0.09, z);
   }
@@ -59,17 +69,23 @@ export function buildTunnel(parent) {
   put(root, box(1.1, 2.14, 0.05, mat.darkMetal), 0, topY + 1.07, 6.17);
   put(root, box(0.96, 2.04, 0.06, mat.vaultSteel, 1.2), 0, topY + 1.02, 6.15);
   for (const s of [-1, 1]) put(root, box(0.04, 0.04, 4.6, mat.darkMetal), s * (hw - 0.06), UF + 1.75, 2.4).rotation.x = -Math.atan2(topY - UF, 3.92);
-  const plaque = decal(1.0, 0.62, 260, (g, W, H) => {
-    g.fillStyle = '#5b4a2c';
-    g.fillRect(0, 0, W, H);
-    g.strokeStyle = '#a58a4c';
-    g.lineWidth = 5;
-    g.strokeRect(8, 8, W - 16, H - 16);
-    text(g, 'SUBTERRANEAN', W / 2, H * 0.24, { size: 30, color: '#d8bd76' });
-    text(g, 'STATION', W / 2, H * 0.44, { size: 30, color: '#d8bd76' });
-    text(g, 'HOLLAND ISLAND', W / 2, H * 0.64, { size: 17, color: '#c4a865' });
-    text(g, 'COMPLETED 1958', W / 2, H * 0.8, { size: 17, color: '#c4a865' });
-  }, { rough: 0.45 });
+  const plaque = decal(
+    1.0,
+    0.62,
+    260,
+    (g, W, H) => {
+      g.fillStyle = '#5b4a2c';
+      g.fillRect(0, 0, W, H);
+      g.strokeStyle = '#a58a4c';
+      g.lineWidth = 5;
+      g.strokeRect(8, 8, W - 16, H - 16);
+      text(g, 'SUBTERRANEAN', W / 2, H * 0.24, { size: 30, color: '#d8bd76' });
+      text(g, 'STATION', W / 2, H * 0.44, { size: 30, color: '#d8bd76' });
+      text(g, 'HOLLAND ISLAND', W / 2, H * 0.64, { size: 17, color: '#c4a865' });
+      text(g, 'COMPLETED 1958', W / 2, H * 0.8, { size: 17, color: '#c4a865' });
+    },
+    { rough: 0.45 },
+  );
   plaque.rotation.y = RY.W;
   put(root, plaque, hw - 0.01, UF + 1.6, -2);
   hot(plaque, { id: 'plaque', nodes: ['stairfoot'], cursor: 'look', action: ['look', 'plaque'] });
@@ -100,20 +116,27 @@ export function buildTunnel(parent) {
   // ---------------------------------------------------------------- the cables
   const tags = {};
   for (const c of CORES) {
-    const y = UF + CABLE_Y[c], x = -hw + 0.035;
+    const y = UF + CABLE_Y[c],
+      x = -hw + 0.035;
     put(root, box(0.03, 0.03, 0.9 - (drop + 0.1), cableMat[c]), x, y, (0.9 + drop + 0.1) / 2); // along the upper wall
     put(root, box(0.03, UF + h + 2.6 - y, 0.03, cableMat[c]), x, (y + UF + h + 2.6) / 2, 0.9 + 0.06 * CORES.indexOf(c)); // up the stairwell
     const ly = LF + 1.92 + 0.07 * (4 - CORES.indexOf(c));
     put(root, box(0.03, 0.03, drop - 0.3 + 33.1, cableMat[c]), x, ly, (drop - 0.3 - 33.1) / 2); // along the lower wall to the junction
     if (TAGGED.includes(c)) {
-      const tag = decal(0.085, 0.055, 1400, (g, W, H) => {
-        g.fillStyle = '#b8923a';
-        g.fillRect(0, 0, W, H);
-        g.strokeStyle = '#5a4514';
-        g.lineWidth = 4;
-        g.strokeRect(3, 3, W - 6, H - 6);
-        text(g, 'T' + WIRING[c], W / 2, H / 2 + 2, { size: H * 0.66, color: '#2a2008' });
-      }, { rough: 0.4 });
+      const tag = decal(
+        0.085,
+        0.055,
+        1400,
+        (g, W, H) => {
+          g.fillStyle = '#b8923a';
+          g.fillRect(0, 0, W, H);
+          g.strokeStyle = '#5a4514';
+          g.lineWidth = 4;
+          g.strokeRect(3, 3, W - 6, H - 6);
+          text(g, 'T' + WIRING[c], W / 2, H / 2 + 2, { size: H * 0.66, color: '#2a2008' });
+        },
+        { rough: 0.4 },
+      );
       tag.rotation.y = RY.E;
       put(root, tag, x + 0.022, y, TAG_AT[c]);
       tags[c] = tag;
@@ -191,7 +214,8 @@ export function buildTunnel(parent) {
   put(sp, plate(0.34, 0.06, 'REPLY'), 0.3, 0.3, 0.132);
   const rw = [];
   for (let i = 0; i < WHEELS; i++) {
-    const x = 0.0 + i * 0.076 + (i >= WHEELS / 2 ? 0.045 : 0), y = 0.1;
+    const x = 0.0 + i * 0.076 + (i >= WHEELS / 2 ? 0.045 : 0),
+      y = 0.1;
     const w = decal(0.066, 0.2, 620, () => {}, { rough: 0.5 });
     put(sp, w, x, y, 0.136);
     put(sp, box(0.075, 0.212, 0.01, mat.black), x, y, 0.13);
@@ -219,11 +243,17 @@ export function buildTunnel(parent) {
   put(root, box(2.24, 0.14, 0.5, mat.darkMetal), 0, LF + 2.37, z0 - 0.2);
   const hinge = grp(root, -1.07, LF, z0 - 0.4);
   const slab = put(hinge, box(2.14, 2.34, 0.2, mat.vaultSteel, 1.2), 1.07, 1.17, -0.1);
-  const stencil = decal(1.5, 0.24, 240, (g, W, H) => {
-    g.fillStyle = '#737a7d';
-    g.fillRect(0, 0, W, H);
-    text(g, 'END OF WORKS 1958', W / 2, H / 2 + 2, { size: 30, color: '#d9c23c' });
-  }, { rough: 0.5 });
+  const stencil = decal(
+    1.5,
+    0.24,
+    240,
+    (g, W, H) => {
+      g.fillStyle = '#737a7d';
+      g.fillRect(0, 0, W, H);
+      text(g, 'END OF WORKS 1958', W / 2, H / 2 + 2, { size: 30, color: '#d9c23c' });
+    },
+    { rough: 0.5 },
+  );
   put(hinge, stencil, 1.07, 1.8, 0.004);
   const wheel = grp(hinge, 1.07, 1.1, 0.07);
   wheel.add(M(new THREE.TorusGeometry(0.28, 0.03, 8, 24), mat.chrome));
@@ -232,7 +262,13 @@ export function buildTunnel(parent) {
     s.rotation.z = (i * Math.PI) / 3;
     wheel.add(s);
   }
-  for (const [x, y] of [[0.2, 0.25], [1.94, 0.25], [0.2, 2.1], [1.94, 2.1]]) put(hinge, cyl(0.035, 0.03, mat.darkMetal, 8), x, y, 0.01).rotation.x = Math.PI / 2;
+  for (const [x, y] of [
+    [0.2, 0.25],
+    [1.94, 0.25],
+    [0.2, 2.1],
+    [1.94, 2.1],
+  ])
+    put(hinge, cyl(0.035, 0.03, mat.darkMetal, 8), x, y, 0.01).rotation.x = Math.PI / 2;
   hot(slab, { id: 'enddoor', nodes: ['blastdoor'], cursor: 'look', action: ['look', 'enddoor'] });
 
   // beyond it: older ground, sloping down under the sea
@@ -251,7 +287,8 @@ export function buildTunnel(parent) {
     }
     g.computeVertexNormals();
     const rock = M(g, mat.rockDark, false, false);
-    const side = i % 3, zz = -1.2 - R() * 18;
+    const side = i % 3,
+      zz = -1.2 - R() * 18;
     const sc = 0.45 + R() * 0.6;
     rock.scale.set(sc, sc * (0.7 + R() * 0.8), sc * (0.8 + R()));
     if (side === 0) put(cave, rock, -1.85 - R() * 0.2, R() * 2.6, zz);
@@ -290,10 +327,13 @@ export function buildTunnel(parent) {
     lines.forEach((l, i) => text(g, l, W / 2, 40 + i * 46, opts));
   };
 
-  let phase = 0, open = false, lastPaper = null;
+  let phase = 0,
+    open = false,
+    lastPaper = null;
   return {
     sync(state) {
-      const drained = state.pump.drained, live = state.junction.live;
+      const drained = state.pump.drained,
+        live = state.junction.live;
       open = state.reply.open;
       water.visible = !drained;
       waterHit.userData.hot.disabled = drained;

@@ -44,7 +44,10 @@ export function buildIsland(scene) {
 
   // --- light
   const sun = new THREE.DirectionalLight(0xffc592, 3.6);
-  sun.position.copy(SUN_DIR).multiplyScalar(140).add(new THREE.Vector3(0, 0, -4));
+  sun.position
+    .copy(SUN_DIR)
+    .multiplyScalar(140)
+    .add(new THREE.Vector3(0, 0, -4));
   sun.target.position.set(0, 0, -4);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
@@ -65,7 +68,7 @@ export function buildIsland(scene) {
       side: THREE.BackSide,
       depthWrite: false,
       fog: false,
-    })
+    }),
   );
   sky.userData.nopick = true;
   root.add(sky);
@@ -80,11 +83,19 @@ export function buildIsland(scene) {
   geo.rotateX(-Math.PI / 2);
   const pos = geo.attributes.position;
   const colors = new Float32Array(pos.count * 3);
-  const col = new THREE.Color(), tmp = new THREE.Color();
+  const col = new THREE.Color(),
+    tmp = new THREE.Color();
   const C = (hex) => new THREE.Color(hex);
-  const wet = C(0x2c2b29), shingle = C(0x77736a), ochre = C(0x7d6f44), moss = C(0x4e5a36), rock = C(0x5c5a56), gravel = C(0x8c8577), heath = C(0x6a4f3c);
+  const wet = C(0x2c2b29),
+    shingle = C(0x77736a),
+    ochre = C(0x7d6f44),
+    moss = C(0x4e5a36),
+    rock = C(0x5c5a56),
+    gravel = C(0x8c8577),
+    heath = C(0x6a4f3c);
   for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i), z = pos.getZ(i);
+    const x = pos.getX(i),
+      z = pos.getZ(i);
     const h = terrainH(x, z);
     pos.setY(i, h);
     const slope = Math.hypot(terrainH(x + 0.6, z) - h, terrainH(x, z + 0.6) - h) / 0.6;
@@ -107,14 +118,12 @@ export function buildIsland(scene) {
 
   // --- rocks
   const keepOut = (x, z) =>
-    pathDist(x, z) < 2.6 ||
-    (x > 13 && x < 25 && z > 1 && z < 11) ||
-    (x > -13 && x < 18 && z > -30 && z < -7) ||
-    Math.hypot(x - MAST.x, z - MAST.z) < 4 ||
-    (Math.abs(x) < 4 && z > 22);
+    pathDist(x, z) < 2.6 || (x > 13 && x < 25 && z > 1 && z < 11) || (x > -13 && x < 18 && z > -30 && z < -7) || Math.hypot(x - MAST.x, z - MAST.z) < 4 || (Math.abs(x) < 4 && z > 22);
   for (let i = 0; i < 150; i++) {
-    const a = R() * Math.PI * 2, d = 6 + R() * 62;
-    const x = Math.cos(a) * d * 1.15, z = Math.sin(a) * d - 6;
+    const a = R() * Math.PI * 2,
+      d = 6 + R() * 62;
+    const x = Math.cos(a) * d * 1.15,
+      z = Math.sin(a) * d - 6;
     const h = terrainH(x, z);
     if (keepOut(x, z) || h < -1.2) continue;
     const onFlat = plateau(x, z) > 0.98;
@@ -132,8 +141,18 @@ export function buildIsland(scene) {
     put(root, m, x, h + s * 0.12, z);
   }
   // sea stacks on the horizon
-  for (const [x, z, s] of [[-95, 70, 13], [-128, 22, 9], [70, 96, 11], [118, 60, 7], [-60, 120, 6]]) {
-    for (const [dy, w, dx] of [[0.25, 1, 0], [0.75, 0.72, 0.18], [1.25, 0.42, 0.3]]) {
+  for (const [x, z, s] of [
+    [-95, 70, 13],
+    [-128, 22, 9],
+    [70, 96, 11],
+    [118, 60, 7],
+    [-60, 120, 6],
+  ]) {
+    for (const [dy, w, dx] of [
+      [0.25, 1, 0],
+      [0.75, 0.72, 0.18],
+      [1.25, 0.42, 0.3],
+    ]) {
       const g = new THREE.IcosahedronGeometry(1, 2);
       const p = g.attributes.position;
       for (let k = 0; k < p.count; k++) {
@@ -168,7 +187,8 @@ export function buildIsland(scene) {
   const hullG = new THREE.BoxGeometry(1.7, 0.75, 4.8, 4, 2, 10);
   const hp = hullG.attributes.position;
   for (let k = 0; k < hp.count; k++) {
-    const z = hp.getZ(k), y = hp.getY(k);
+    const z = hp.getZ(k),
+      y = hp.getY(k);
     const bow = THREE.MathUtils.smoothstep(z, 0.4, 2.4);
     const keel = y < 0 ? 0.62 : 1;
     hp.setX(k, hp.getX(k) * (1 - bow * 0.92) * keel);
@@ -180,11 +200,20 @@ export function buildIsland(scene) {
   put(boat, box(1.2, 0.55, 0.9, mat.navy), 0, 0.85, 0.3);
   put(boat, box(1.1, 0.3, 0.05, mat.glass), 0, 0.98, 0.76);
   put(boat, box(0.3, 0.7, 0.35, mat.darkMetal), 0, 0.55, -2.5);
-  line(root, [[1.15, DECK + 0.3, 40.6], [1.95, 0.72, 41.2]], 0x8a7a5a);
+  line(
+    root,
+    [
+      [1.15, DECK + 0.3, 40.6],
+      [1.95, 0.72, 41.2],
+    ],
+    0x8a7a5a,
+  );
   hot(put(boat, proxy(2, 1.6, 5), 0, 0.6, 0), { id: 'boat', nodes: ['jetty'], cursor: 'look', action: ['look', 'boat'] });
 
   // --- the sign above the landing
-  const sx = 4.6, sz = 15.6, sy = terrainH(sx, sz);
+  const sx = 4.6,
+    sz = 15.6,
+    sy = terrainH(sx, sz);
   const sign = grp(root, sx, sy, sz, -0.5);
   put(sign, box(0.1, 2.5, 0.1, mat.woodDark), -1.0, 1.25, -0.06);
   put(sign, box(0.1, 2.5, 0.1, mat.woodDark), 1.0, 1.25, -0.06);
@@ -204,7 +233,8 @@ export function buildIsland(scene) {
       g.fillRect(r() * W, r() * H, 1 + r() * 5, 1 + r() * 9);
     }
     for (let i = 0; i < 14; i++) {
-      const x = r() * W, grad = g.createLinearGradient(0, 0, 0, H);
+      const x = r() * W,
+        grad = g.createLinearGradient(0, 0, 0, H);
       grad.addColorStop(0, 'rgba(96,50,24,0.5)');
       grad.addColorStop(1, 'rgba(96,50,24,0)');
       g.fillStyle = grad;
@@ -226,19 +256,31 @@ export function buildIsland(scene) {
   lampPost(2.1, -1.5, RY.W);
   const posts = [];
   for (let z = 25.5; z >= 13.5; z -= 3) {
-    const x = -1.9 + Math.sin(z) * 0.08, y = terrainH(x, z);
+    const x = -1.9 + Math.sin(z) * 0.08,
+      y = terrainH(x, z);
     put(root, box(0.09, 1.0, 0.09, mat.woodDark), x, y + 0.45, z).rotation.z = (R() - 0.5) * 0.12;
     posts.push([x, y + 0.85, z]);
   }
   line(root, posts, 0x3a3228);
   // weather screen
   const wx = grp(root, 7.2, P, -1.5, 0.3);
-  for (const [x, z] of [[-0.3, -0.25], [0.3, -0.25], [-0.3, 0.25], [0.3, 0.25]]) put(wx, box(0.05, 1.3, 0.05, mat.white), x, 0.65, z);
+  for (const [x, z] of [
+    [-0.3, -0.25],
+    [0.3, -0.25],
+    [-0.3, 0.25],
+    [0.3, 0.25],
+  ])
+    put(wx, box(0.05, 1.3, 0.05, mat.white), x, 0.65, z);
   put(wx, box(0.8, 0.6, 0.66, mat.white), 0, 1.55, 0);
   for (let i = 0; i < 5; i++) put(wx, box(0.82, 0.02, 0.68, mat.steel), 0, 1.32 + i * 0.11, 0);
   put(wx, box(0.95, 0.06, 0.8, mat.white), 0, 1.9, 0);
   // fuel drums by the plant shed
-  for (const [x, z, m, lie] of [[15.2, 10.3, mat.rust, 0], [15.95, 10.5, mat.blueDrum, 0], [15.5, 11.1, mat.rust, 0], [14.2, 10.8, mat.blueDrum, 1]]) {
+  for (const [x, z, m, lie] of [
+    [15.2, 10.3, mat.rust, 0],
+    [15.95, 10.5, mat.blueDrum, 0],
+    [15.5, 11.1, mat.rust, 0],
+    [14.2, 10.8, mat.blueDrum, 1],
+  ]) {
     const d = cyl(0.29, 0.88, m, 14);
     if (lie) d.rotation.z = Math.PI / 2;
     put(root, d, x, P + (lie ? 0.29 : 0.44), z);
@@ -247,7 +289,8 @@ export function buildIsland(scene) {
   // --- the aerial mast
   const mast = grp(root, MAST.x, P, MAST.z);
   put(mast, box(2.6, 0.3, 2.6, mat.concrete, 2), 0, 0.1, 0);
-  const H = MAST.h, bays = 7;
+  const H = MAST.h,
+    bays = 7;
   const corner = (i, y) => {
     const s = 0.62 - (0.44 * y) / H;
     return [[-s, s, s, -s][i], y + 0.25, [-s, -s, s, s][i]];
@@ -263,44 +306,70 @@ export function buildIsland(scene) {
       }
     }
   }
-  for (const [ax, az] of [[-9, -9], [9, -9], [-9, 9], [5, 10]]) {
-    line(mast, [[Math.sign(ax) * 0.3, H * 0.72, Math.sign(az) * 0.3], [ax, terrainH(MAST.x + ax, MAST.z + az) - P + 0.1, az]], 0x24262a);
+  for (const [ax, az] of [
+    [-9, -9],
+    [9, -9],
+    [-9, 9],
+    [5, 10],
+  ]) {
+    line(
+      mast,
+      [
+        [Math.sign(ax) * 0.3, H * 0.72, Math.sign(az) * 0.3],
+        [ax, terrainH(MAST.x + ax, MAST.z + az) - P + 0.1, az],
+      ],
+      0x24262a,
+    );
   }
   // the beam on top: points north when the bearing is zero
   const rotor = grp(mast, 0, H + 0.25, 0);
   put(rotor, cyl(0.045, 1.6, mat.darkMetal, 8), 0, 0.8, 0);
   const beam = grp(rotor, 0, 1.5, 0);
   strut(beam, [0, 0, -2.6], [0, 0, 1.5], 0.035, mat.darkMetal);
-  [[-2.5, 1.0], [-1.9, 1.25], [-1.2, 1.5], [-0.4, 1.8], [0.5, 2.15], [1.4, 2.5]].forEach(([z, half]) => strut(beam, [-half, 0, z], [half, 0, z], 0.018, mat.chrome, 5));
+  [
+    [-2.5, 1.0],
+    [-1.9, 1.25],
+    [-1.2, 1.5],
+    [-0.4, 1.8],
+    [0.5, 2.15],
+    [1.4, 2.5],
+  ].forEach(([z, half]) => strut(beam, [-half, 0, z], [half, 0, z], 0.018, mat.chrome, 5));
   put(beam, box(0.12, 0.12, 0.2, mat.red), 0, 0, -2.6);
 
   // rotator cabinet with its bearing dial and hand crank
   put(mast, box(0.5, 1.5, 1.0, mat.panelGrey, 1), 0.9, 1.0, 0);
   put(mast, box(0.6, 0.05, 1.1, mat.darkMetal), 0.9, 1.78, 0);
   const panel = grp(mast, 1.155, 1.1, 0, RY.E);
-  const dial = decal(0.56, 0.56, 520, (g, W) => {
-    const c = W / 2;
-    g.fillStyle = '#7c807a';
-    g.fillRect(0, 0, W, W);
-    g.fillStyle = '#ece7d2';
-    g.beginPath();
-    g.arc(c, c, c * 0.96, 0, 7);
-    g.fill();
-    g.strokeStyle = '#151515';
-    g.lineWidth = 3;
-    g.stroke();
-    for (let deg = 0; deg < 360; deg += 10) {
-      const a = ((deg - 90) * Math.PI) / 180, major = deg % 30 === 0;
-      g.lineWidth = major ? 4 : 2;
+  const dial = decal(
+    0.56,
+    0.56,
+    520,
+    (g, W) => {
+      const c = W / 2;
+      g.fillStyle = '#7c807a';
+      g.fillRect(0, 0, W, W);
+      g.fillStyle = '#ece7d2';
       g.beginPath();
-      g.moveTo(c + Math.cos(a) * c * 0.93, c + Math.sin(a) * c * 0.93);
-      g.lineTo(c + Math.cos(a) * c * (major ? 0.8 : 0.86), c + Math.sin(a) * c * (major ? 0.8 : 0.86));
+      g.arc(c, c, c * 0.96, 0, 7);
+      g.fill();
+      g.strokeStyle = '#151515';
+      g.lineWidth = 3;
       g.stroke();
-      if (major) text(g, String(deg).padStart(3, '0'), c + Math.cos(a) * c * 0.66, c + Math.sin(a) * c * 0.66, { size: 25, color: '#151515' });
-    }
-    text(g, 'N', c, c - c * 0.36, { size: 30, color: '#8c1f17' });
-    text(g, 'TRUE BEARING', c, c + c * 0.36, { size: 15, color: '#333' });
-  }, { rough: 0.5 });
+      for (let deg = 0; deg < 360; deg += 10) {
+        const a = ((deg - 90) * Math.PI) / 180,
+          major = deg % 30 === 0;
+        g.lineWidth = major ? 4 : 2;
+        g.beginPath();
+        g.moveTo(c + Math.cos(a) * c * 0.93, c + Math.sin(a) * c * 0.93);
+        g.lineTo(c + Math.cos(a) * c * (major ? 0.8 : 0.86), c + Math.sin(a) * c * (major ? 0.8 : 0.86));
+        g.stroke();
+        if (major) text(g, String(deg).padStart(3, '0'), c + Math.cos(a) * c * 0.66, c + Math.sin(a) * c * 0.66, { size: 25, color: '#151515' });
+      }
+      text(g, 'N', c, c - c * 0.36, { size: 30, color: '#8c1f17' });
+      text(g, 'TRUE BEARING', c, c + c * 0.36, { size: 15, color: '#333' });
+    },
+    { rough: 0.5 },
+  );
   put(panel, dial, -0.18, 0.2, 0.004);
   const needle = M(new THREE.BoxGeometry(0.014, 0.25, 0.006), mat.red, false, false);
   needle.geometry.translate(0, 0.095, 0);

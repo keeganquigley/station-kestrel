@@ -10,7 +10,8 @@ import { TEMPERATURE, CHART, BATHS } from '../puzzles/darkroom.js';
 import { drawPhoto } from '../data/photo.js';
 import { STOPPED_CLOCK } from '../puzzles/receiver.js';
 
-const F = PF, H = 2.5;
+const F = PF,
+  H = 2.5;
 const PAPER = '#e4dcc2';
 
 export function buildDockRooms(parent) {
@@ -18,8 +19,12 @@ export function buildDockRooms(parent) {
 
   /** Floor, ceiling and the three walls a room owns; the fourth is the quay wall with its door. */
   const room = (r, wallMat, lit = true) => {
-    const w = r.x1 - r.x0, d = r.z1 - r.z0, mx = (r.x0 + r.x1) / 2, mz = (r.z0 + r.z1) / 2;
-    const lap = 0.25, fw = w + lap; // the floor runs on under the door frame
+    const w = r.x1 - r.x0,
+      d = r.z1 - r.z0,
+      mx = (r.x0 + r.x1) / 2,
+      mz = (r.z0 + r.z1) / 2;
+    const lap = 0.25,
+      fw = w + lap; // the floor runs on under the door frame
     const fl = M(new THREE.PlaneGeometry(fw, d + 0.2, cuts(fw), cuts(d)), mat.lino, false, true);
     fl.geometry.attributes.uv.array.forEach((v, i, a) => (a[i] = (v * (i % 2 ? d : fw)) / 2));
     fl.rotation.x = -Math.PI / 2;
@@ -79,7 +84,8 @@ export function buildDockRooms(parent) {
   put(tp, plate(0.62, 0.07, 'PICTURE TELEGRAPH - RECORDS'), -0.27, 0.19, 0.062);
   const tw = [];
   for (let i = 0; i < WHEELS; i++) {
-    const x = -0.5 + i * 0.086 + (i >= HULL.length ? 0.07 : 0), y = -0.02;
+    const x = -0.5 + i * 0.086 + (i >= HULL.length ? 0.07 : 0),
+      y = -0.02;
     tw.push(wheelDecal(tp, x, y));
     hot(put(tp, proxy(0.082, 0.214, 0.06), x, y, 0.08), { id: 'twheel-' + i, nodes: ['telegraph'], cursor: 'spin', action: ['twheel', i], dir: sideOf(tp, x, y, 'y') });
   }
@@ -128,7 +134,8 @@ export function buildDockRooms(parent) {
   put(root, dchair, O.x1 - 1.3, F, -119.5);
   // a wall clock over the desk, and the routine card and a cabinet on the south wall
   const clock = decal(0.36, 0.36, 300, (g, W) => {
-    const c = W / 2, [hh, mm] = STOPPED_CLOCK.split(':').map(Number);
+    const c = W / 2,
+      [hh, mm] = STOPPED_CLOCK.split(':').map(Number);
     g.fillStyle = '#20242a';
     g.fillRect(0, 0, W, W);
     g.fillStyle = '#e7e1cc';
@@ -203,7 +210,8 @@ export function buildDockRooms(parent) {
   hot(put(root, proxy(1.5, 1.0, 0.3), BX, F + 1.4, S.z0 + 0.2), { id: 'tallyzoom', nodes: ['store'], cursor: 'zoom', action: ['go', 'tallyboard'] });
   // four lockers on the south wall, numbered like the tallies
   TALLIES.forEach((t, i) => {
-    const x = 9.9 + i * 0.62, z = S.z1 - 0.28;
+    const x = 9.9 + i * 0.62,
+      z = S.z1 - 0.28;
     put(root, box(0.56, 1.9, 0.5, mat.steel, 1), x, F + 0.95, z);
     const door = grp(root, x - 0.28, F, z - 0.255);
     put(door, box(0.56, 1.84, 0.02, mat.panelGrey), 0.28, 0.95, 0);
@@ -229,7 +237,9 @@ export function buildDockRooms(parent) {
   hot(put(root, proxy(1.8, 1.9, 0.1), 11.15, F + 0.95, S.z1 - 0.56), { id: 'divelockers', nodes: ['store'], cursor: 'look', action: ['look', 'divelockers'] });
   put(root, box(1.7, 0.42, 0.34, mat.wood, 1), 10.9, F + 0.21, S.z1 - 1.05); // changing bench
   // the property cage across the east end
-  const CX = 12.2, G0 = -130.6, G1 = -129.4;
+  const CX = 12.2,
+    G0 = -130.6,
+    G1 = -129.4;
   const mesh = (parentGrp, za, zb) => {
     // you can see through it, so you can point through it
     const bar = (m) => ((m.userData.nopick = true), m);
@@ -308,27 +318,36 @@ export function buildDockRooms(parent) {
     put(dp, plate(0.3, 0.055, b.toUpperCase()), cx, 0.16, 0.062);
     put(dp, plate(0.16, 0.04, 'MINUTES'), cx, -0.165, 0.062);
     for (const k of [0, 1]) {
-      const x = cx + (k ? 0.045 : -0.045), y = -0.01;
+      const x = cx + (k ? 0.045 : -0.045),
+        y = -0.01;
       dw.push(wheelDecal(dp, x, y));
       hot(put(dp, proxy(0.082, 0.214, 0.06), x, y, 0.08), { id: `timer-${i * 2 + k}`, nodes: ['bench'], cursor: 'spin', action: ['timer', i * 2 + k], dir: sideOf(dp, x, y, 'y') });
     }
   });
-  const thermo = decal(0.12, 0.4, 500, (g, W, HH) => {
-    g.fillStyle = '#e9e4cf';
-    g.fillRect(0, 0, W, HH);
-    g.strokeStyle = '#222';
-    g.strokeRect(1, 1, W - 2, HH - 2);
-    const lo = 10, hi = 26, Y = (t) => HH * 0.9 - ((t - lo) / (hi - lo)) * HH * 0.8;
-    g.fillStyle = '#c9c4b0';
-    g.fillRect(W * 0.28, HH * 0.08, 5, HH * 0.84);
-    g.fillStyle = '#b3261e';
-    g.fillRect(W * 0.28, Y(TEMPERATURE), 5, HH * 0.92 - Y(TEMPERATURE));
-    for (let t = lo; t <= hi; t += 2) {
-      g.fillStyle = '#222';
-      g.fillRect(W * 0.42, Y(t) - 1, t % 4 ? 5 : 9, 2);
-      text(g, String(t), W * 0.76, Y(t) + 1, { size: 12, color: '#222' });
-    }
-  }, { rough: 0.5 });
+  const thermo = decal(
+    0.12,
+    0.4,
+    500,
+    (g, W, HH) => {
+      g.fillStyle = '#e9e4cf';
+      g.fillRect(0, 0, W, HH);
+      g.strokeStyle = '#222';
+      g.strokeRect(1, 1, W - 2, HH - 2);
+      const lo = 10,
+        hi = 26,
+        Y = (t) => HH * 0.9 - ((t - lo) / (hi - lo)) * HH * 0.8;
+      g.fillStyle = '#c9c4b0';
+      g.fillRect(W * 0.28, HH * 0.08, 5, HH * 0.84);
+      g.fillStyle = '#b3261e';
+      g.fillRect(W * 0.28, Y(TEMPERATURE), 5, HH * 0.92 - Y(TEMPERATURE));
+      for (let t = lo; t <= hi; t += 2) {
+        g.fillStyle = '#222';
+        g.fillRect(W * 0.42, Y(t) - 1, t % 4 ? 5 : 9, 2);
+        text(g, String(t), W * 0.76, Y(t) + 1, { size: 12, color: '#222' });
+      }
+    },
+    { rough: 0.5 },
+  );
   put(dp, thermo, -0.9, 0, 0.062);
   hot(thermo, { id: 'thermo', nodes: ['bench'], cursor: 'look', action: ['look', 'thermo'] });
   put(dp, box(0.1, 0.16, 0.02, mat.black), 0.9, -0.03, 0.062);
@@ -382,7 +401,9 @@ export function buildDockRooms(parent) {
   // ---------------------------------------------------------------- things that change
   /** A drum showing one of the tally numbers, with its neighbours above and below. */
   const tallyFace = (n) => (g, W, HH) => {
-    const i = TALLIES.indexOf(n), k = TALLIES.length, f = '"Courier New", monospace';
+    const i = TALLIES.indexOf(n),
+      k = TALLIES.length,
+      f = '"Courier New", monospace';
     g.fillStyle = '#c7a54a';
     g.fillRect(0, 0, W, HH);
     text(g, String(TALLIES[(i + 1) % k]), W / 2, HH * 0.14, { size: HH * 0.17, color: '#5a4514', font: f });
@@ -420,7 +441,9 @@ export function buildDockRooms(parent) {
   let lastWire = null;
   return {
     sync(state) {
-      const t = state.telegraph, ty = state.tally, dr = state.darkroom;
+      const t = state.telegraph,
+        ty = state.tally,
+        dr = state.darkroom;
       t.wheels.forEach((n, i) => tw[i].userData.redraw(wheelFace(n)));
       setLamp(wireLamp, 0x35ff55, state.junction.live, 2.4);
       const wire = !t.drawn ? 'blank' : state.flags.secondSheet ? 'unsigned' : 'signed';
