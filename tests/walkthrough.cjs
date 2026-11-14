@@ -340,14 +340,268 @@ const shots = process.argv[2] || null;
     await use('final');
     await shot('14-final');
     await readAndClose('THANK YOU FOR OPENING THE DOOR');
-    await page.waitForSelector('#ending:not([hidden])', { timeout: 8000 });
-    await shot('15-ending');
+    if (!(await state()).flags.hatchOpen) fail('reading the last printout should unlatch the rack');
+    if (!(await caption()).includes('unlatches')) fail('rack caption missing: ' + (await caption()));
+    if (await page.isVisible('#ending')) fail('chapter one should no longer end the game');
+    log('chapter one hands over: the rack swings aside');
+
+    // ================================================================ chapter two
+    await face('N');
+    await page.waitForTimeout(800);
+    await shot('15-way-down');
+    await use('waydown');
+    await settle();
+    await expectAt('stairfoot', 'N');
+    if (!(await caption()).includes('humming')) fail('arrival caption below missing');
+    if ((await page.evaluate(() => window.kestrel.scene.getObjectByName('surface').visible))) fail('the surface should not be drawn underground');
+    await shot('16-stairfoot');
+    // back up the stairs and down again, on the keyboard
+    await face('S');
+    await fwd();
+    await expectAt('vault', 'S');
+    if (!(await page.evaluate(() => window.kestrel.scene.getObjectByName('surface').visible))) fail('the surface should be drawn again upstairs');
+    await face('N');
+    await fwd();
+    await expectAt('stairfoot', 'N');
+    await face('E');
+    await use('plaque');
+    if (!(await caption()).includes('SUBTERRANEAN STATION')) fail('plaque caption');
+    await face('W');
+    await use('tag-red');
+    const tagRed = (await caption()).match(/stamped T(\d)/)[1];
+    log('the stairs fade both ways; plaque and the first cable tag read');
+
+    // --- the water stops you
+    await face('N');
+    await fwd();
+    await fwd();
+    await fwd();
+    await expectAt('brink', 'N');
+    await fwd();
+    await expectAt('brink', 'N');
+    await use('water');
+    if (!(await caption()).includes('Black water')) fail('water caption');
+    await shot('17-brink-flooded');
+    await face('S');
+    await fwd();
+    await expectAt('tunnelB', 'S');
+    await face('W');
+    await use('rackzoom');
+    await expectAt('rack');
+    await use('tag-yellow');
+    const tagYellow = (await caption()).match(/stamped T(\d)/)[1];
+    await use('cables');
+    await shot('18-cable-tag');
+    await back();
+    log('flooded passage blocks the way; the yellow tag reads T' + tagYellow);
+
+    // --- bunk room: four notebooks
+    await face('E');
+    await fwd();
+    await expectAt('bunks', 'E');
+    await use('lockers');
+    await face('N');
+    await use('nb-harlan');
+    await readAndClose('not prisoners');
+    await use('nb-voss');
+    await readAndClose('on the air');
+    await shot('19-bunks');
+    await face('S');
+    await use('nb-lund');
+    const lund = await readAndClose('feed tank');
+    const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
+    const charge = WORDS.indexOf(lund.match(/wants (\w+) gallons/)[1]);
+    const feedSize = Number(lund.match(/feed tank is the (\d)/)[1]);
+    await use('nb-okafor');
+    await readAndClose('no carrying');
+    await face('W');
+    await fwd();
+    await face('S');
+    await fwd();
+    await expectAt('tunnelA', 'S');
+    log(`notebooks read: the siphon wants ${charge} gallons in the ${feedSize}`);
+
+    // --- break room: the cable schedule
+    await face('W');
+    await fwd();
+    await expectAt('mess', 'W');
+    await use('darts');
+    await use('armchairs');
+    await face('N');
+    await use('records');
+    await face('S');
+    await use('calendar');
+    await use('cards');
+    await use('schedule');
+    await shot('20-schedule');
+    const sched = await readAndClose('CABLE SCHEDULE');
+    const wiring = {};
+    for (const m of sched.matchAll(/(RED|BLUE|GREEN|YELLOW|WHITE)[\s.]+T(\d)/g)) wiring[m[1].toLowerCase()] = Number(m[2]);
+    if (Object.keys(wiring).length !== 3) fail('the schedule should give exactly three cores, gave ' + JSON.stringify(wiring));
+    if (wiring.red !== Number(tagRed)) fail('the red tag should agree with the schedule');
+    wiring.yellow = Number(tagYellow);
+    wiring.white = [1, 2, 3, 4, 5].find((t) => !Object.values(wiring).includes(t));
+    await face('E');
+    await fwd();
+    await fwd();
+    await expectAt('kitchen', 'E');
+    log('schedule gives three cores, the tag a fourth, leaving ' + JSON.stringify(wiring));
+
+    // --- kitchen: prime the pump
+    await face('S');
+    await use('rota');
+    await readAndClose('GALLEY ROTA');
+    await use('ledger');
+    await readAndClose('Four mugs');
+    await use('table');
+    await face('N');
+    await use('hooks');
+    await use('range');
+    await face('E');
+    await use('pumpzoom');
+    await expectAt('pump');
+    await shot('21-pump');
+    await use('prime');
+    if (!(await caption()).includes('charge is lost')) fail('priming with the wrong charge should fail');
+    {
+      // work it out as a player would: search the pours for the charge in the feed tank
+      const cap = [8, 5, 3], valves = [[0, 1], [1, 2], [0, 2]], feed = cap.indexOf(feedSize);
+      const start = (await state()).pump.levels;
+      const seen = new Set([start.join()]);
+      let frontier = [{ l: start, path: [] }], found = null;
+      while (frontier.length && !found) {
+        const next = [];
+        for (const { l, path: p } of frontier) {
+          if (l[feed] === charge) { found = p; break; }
+          valves.forEach(([a, b], v) => {
+            for (const dir of [-1, 1]) {
+              const [from, to] = dir < 0 ? [b, a] : [a, b];
+              const moved = Math.min(l[from], cap[to] - l[to]);
+              if (!moved) continue;
+              const n = l.slice();
+              n[from] -= moved;
+              n[to] += moved;
+              if (!seen.has(n.join())) { seen.add(n.join()); next.push({ l: n, path: p.concat([[v, dir]]) }); }
+            }
+          });
+        }
+        frontier = next;
+      }
+      if (!found) fail('no way to measure the charge');
+      for (const [v, dir] of found) await use('valve-' + v, dir);
+      if ((await state()).pump.levels[feed] !== charge) fail('tanks read ' + (await state()).pump.levels);
+      await shot('22-pump-measured');
+      await use('prime');
+      if (!(await state()).pump.drained) fail('the pump should be running');
+      log(`pump primed in ${found.length} turns of a valve; the water falls`);
+    }
+    await back();
+
+    // --- across the drained passage to the junction box
+    await face('W');
+    await fwd();
+    await face('N');
+    await fwd();
+    await fwd();
+    await fwd();
+    await expectAt('junction', 'N');
+    await shot('23-lower-level');
+    await face('W');
+    await use('jboxzoom');
+    await expectAt('jbox');
+    await use('isolator');
+    if (!(await caption()).includes('wrong terminal')) fail('isolator should refuse the wrong wiring');
+    await use('core-red', -1);
+    if ((await state()).junction.sel.red !== 5) fail('selector down from 1 should give 5');
+    await use('core-red', 1);
+    for (const [core, terminal] of Object.entries(wiring)) for (let i = 1; i < terminal; i++) await use('core-' + core, 1);
+    await shot('24-junction');
+    await use('isolator');
+    if (!(await state()).junction.live) fail('line should be live with ' + JSON.stringify((await state()).junction.sel));
+    log('junction wired from the clues; the line is live');
+    await back();
+
+    // --- the door asks, and is answered
+    await face('N');
+    await fwd();
+    await expectAt('blastdoor', 'N');
+    await use('enddoor');
+    if (!(await caption()).includes('END OF WORKS')) fail('door caption');
+    await fwd();
+    await expectAt('blastdoor', 'N');
+    await face('E');
+    await use('senderzoom');
+    await expectAt('sender');
+    await use('doorprint');
+    const asked = await readAndClose('REPLY');
+    const sheet = asked.match(/SHEET (\d\d)/)[1];
+    await use('send');
+    if (!(await caption()).includes('crosses')) fail('a wrong reply should be refused');
+    const key = padText.match(new RegExp('(?:^|\\n)\\s*' + sheet + '\\s+(\\d{4})\\s+(\\d{4})')).slice(1);
+    const reply = [plain[0], plain[1]].map((g, i) => g.split('').map((d, k) => (Number(d) + Number(key[i][k])) % 10).join('')).join('');
+    await use('rwheel-0', -1);
+    if ((await state()).reply.wheels[0] !== 9) fail('reply wheel down should give 9');
+    await use('rwheel-0', 1);
+    for (let i = 0; i < 8; i++) for (let k = 0; k < Number(reply[i]); k++) await use('rwheel-' + i, 1);
+    await shot('25-sender');
+    await use('send');
+    if (!(await state()).reply.open) fail('the door should open on ' + reply);
+    log(`door named sheet ${sheet}; ${plain[0]} ${plain[1]} enciphered to ${reply} opens it`);
+    await page.waitForTimeout(3300);
+    await settle();
+    await expectAt('blastdoor', 'N');
+    await page.waitForTimeout(400);
+    await shot('26-door-open');
+
+    // --- a reload down here resumes down here
+    await page.reload();
+    await ready();
+    await page.click('#btn-continue');
+    await settle();
+    const below = await state();
+    if (below.node !== 'blastdoor' || !below.reply.open || !below.pump.drained || !below.junction.live) fail('save did not restore chapter two');
+    if (await page.evaluate(() => window.kestrel.scene.getObjectByName('surface').visible)) fail('resuming below should draw the lower realm');
+    await use('mugs');
+    if (!(await caption()).includes('Four enamel mugs')) fail('mugs caption');
+    log('reload resumes underground with all three puzzles solved');
+
+    // --- through the door
+    await face('N');
+    await fwd();
+    await expectAt('beyond', 'N');
+    await page.waitForTimeout(1500);
+    await shot('27-beyond');
+    await page.waitForSelector('#ending:not([hidden])', { timeout: 20000 });
+    if (!(await page.innerText('#ending')).toLowerCase().includes('chapter two')) fail('ending card should say chapter two');
+    await shot('28-ending');
     log('ending plays');
     await page.click('#btn-again');
     if (!(await page.isVisible('#btn-new'))) fail('title should return after the ending');
     if (await page.isVisible('#btn-continue')) fail('a finished game should not offer Continue');
 
+    // --- a save from the old one-level demo, finished: it should reopen in the vault with the way down open
+    await page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem('station-kestrel-save-v1'));
+      for (const k of ['pump', 'junction', 'reply', 'yaw', 'pitch']) delete s[k];
+      s.node = 'vault';
+      s.facing = 'E';
+      s.flags = { vaultSeen: true, keyTaken: true, drawerOpen: true, doorOpened: true, finished: true };
+      localStorage.setItem('station-kestrel-save-v1', JSON.stringify(s));
+    });
+    await page.reload();
+    await ready();
+    if (!(await page.isVisible('#btn-continue'))) fail('an old finished save should offer Continue');
+    await page.click('#btn-continue');
+    await settle();
+    const old = await state();
+    if (old.node !== 'vault' || !old.flags.hatchOpen || !old.pump || old.pump.drained) fail('old save did not carry over: ' + JSON.stringify(old.flags));
+    await face('N');
+    if (!(await page.evaluate(() => window.kestrel.point('waydown')))) fail('the way down should be open in an old finished save');
+    log('a finished save from the old demo reopens in the vault with the way down open');
+
     // --- notebook
+    await page.reload();
+    await ready();
     await page.click('#btn-new');
     await page.click('#doc-close');
     await page.click('#btn-notes');
@@ -361,6 +615,8 @@ const shots = process.argv[2] || null;
     const audit = await page.evaluate(() => {
       const k = window.kestrel, g = k.game, missing = [], ids = [];
       g.state.gen = { valve: true, primes: 0, choke: false, running: true, breakers: { lighting: true, heating: false, ops: true, door: true, vault: true, deice: false } };
+      g.state.flags.hatchOpen = true;
+      g.state.pump.drained = true;
       const hots = [];
       const walk = (o) => {
         if (o.userData && o.userData.hot) hots.push(o.userData.hot);
@@ -371,13 +627,14 @@ const shots = process.argv[2] || null;
       scene = k.scene;
       walk(scene);
       for (const h of hots) {
-        if (h.id === 'door' || h.id === 'vaultdoor') continue; // these switch themselves off once open; exercised above
+        if (['door', 'vaultdoor', 'water', 'enddoor'].includes(h.id)) continue; // these switch themselves off once passed; exercised above
         ids.push(h.id);
         let ok = false;
         for (const n of h.nodes) {
           const node = k.nodes[n];
           for (const f of node.cam ? [null] : node.faces.split('')) {
             g.state.vault.open = n === 'vault';
+            g.state.reply.open = n === 'beyond' || h.id === 'mugs'; // the mugs are behind the door until it opens
             k.jump(n, f);
             if (k.point(h.id, h.dir ? 1 : 0) && (!h.dir || k.point(h.id, -1))) ok = true;
           }

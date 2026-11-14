@@ -121,7 +121,7 @@ export function buildQuarters(parent) {
   hot(rota, { id: 'rota', nodes: ['kitchen'], cursor: 'look', action: ['doc', 'rota'] });
   const ledger = sheet(0.3, 0.42, 16, { head: 'STORES' });
   ledger.rotation.y = RY.N;
-  put(root, ledger, 4.25, F + 1.5, K.z1 - 0.01);
+  put(root, ledger, 4.25, F + 1.5, K.z1 - 0.03);
   put(root, box(0.34, 0.46, 0.02, mat.navy), 4.25, F + 1.5, K.z1 - 0.012);
   hot(ledger, { id: 'ledger', nodes: ['kitchen'], cursor: 'look', action: ['doc', 'ledger'] });
 
@@ -159,7 +159,7 @@ export function buildQuarters(parent) {
       v.add(s);
     }
     put(pp, cyl(0.03, 0.1, mat.brass, 10), x, y, 0.15).rotation.x = Math.PI / 2;
-    put(pp, plate(0.24, 0.055, `${CAPACITY[a]}  <  >  ${CAPACITY[b]}`), x, y + (i === 2 ? 0.15 : -0.15), 0.062);
+    put(pp, plate(0.32, 0.075, `${CAPACITY[a]}  <  >  ${CAPACITY[b]}`), x, y + (i === 2 ? 0.17 : -0.17), 0.062);
     hot(put(pp, proxy(0.26, 0.22, 0.16), x, y, 0.18), { id: 'valve-' + i, nodes: ['pump'], cursor: 'shift', action: ['valve', i], dir: sideOf(pp, x, y) });
   });
   // pump body, priming lever and lamp
@@ -213,7 +213,7 @@ export function buildQuarters(parent) {
     g.fill();
   });
   board.rotation.y = RY.E;
-  put(root, board, B.x0 + 0.02, F + 1.68, -9.95);
+  put(root, board, B.x0 + 0.036, F + 1.68, -9.95);
   put(root, box(0.03, 0.56, 0.56, mat.woodDark), B.x0 + 0.015, F + 1.68, -9.95);
   for (const [y, z] of [[1.78, -9.9], [1.6, -10.06], [1.71, -9.82]]) put(root, cyl(0.006, 0.14, mat.brass, 5), B.x0 + 0.09, F + y, z).rotation.z = Math.PI / 2 + 0.15;
   const chalk = decal(0.62, 0.8, 260, (g, W, H) => {
@@ -243,15 +243,15 @@ export function buildQuarters(parent) {
   put(root, chalk, B.x0 + 0.02, F + 1.5, -8.75);
   hot(put(root, proxy(0.2, 1.0, 2.0), B.x0 + 0.12, F + 1.55, -9.4), { id: 'darts', nodes: ['mess'], cursor: 'look', action: ['look', 'darts'] });
   // sideboard with the record player and the wireless
-  put(root, box(1.7, 0.8, 0.45, mat.woodDark, 1), -4.7, F + 0.4, B.z0 + 0.25);
-  const player = grp(root, -5.1, F + 0.8, B.z0 + 0.26);
+  put(root, box(1.7, 0.8, 0.45, mat.woodDark, 1), -4.1, F + 0.4, B.z0 + 0.25);
+  const player = grp(root, -4.5, F + 0.8, B.z0 + 0.26);
   put(player, box(0.46, 0.1, 0.36, mat.navy), 0, 0.05, 0);
   put(player, cyl(0.15, 0.012, mat.black, 22), -0.04, 0.108, 0);
   put(player, cyl(0.045, 0.014, mat.red, 12), -0.04, 0.11, 0);
   const arm = put(player, box(0.016, 0.016, 0.2, mat.chrome), 0.17, 0.16, 0.02);
   arm.rotation.set(0.5, 0.3, 0);
-  for (let i = 0; i < 5; i++) put(root, box(0.32, 0.008, 0.32, [mat.red, mat.paper, mat.navy, mat.orange, mat.green][i]), -4.45 + (i % 2) * 0.01, F + 0.806 + i * 0.009, B.z0 + 0.27).rotation.y = i * 0.07;
-  put(root, box(0.42, 0.28, 0.2, mat.wood, 0.8), -4.0, F + 0.94, B.z0 + 0.2);
+  for (let i = 0; i < 5; i++) put(root, box(0.32, 0.008, 0.32, [mat.red, mat.paper, mat.navy, mat.orange, mat.green][i]), -3.85 + (i % 2) * 0.01, F + 0.806 + i * 0.009, B.z0 + 0.27).rotation.y = i * 0.07;
+  put(root, box(0.42, 0.28, 0.2, mat.wood, 0.8), -3.45, F + 0.94, B.z0 + 0.2);
   put(root, decal(0.3, 0.12, 300, (g, W, H) => {
     g.fillStyle = '#c9b98a';
     g.fillRect(0, 0, W, H);
@@ -259,8 +259,8 @@ export function buildQuarters(parent) {
     for (let x = 6; x < W; x += 9) g.fillRect(x, H * 0.55, 1.5, H * 0.3);
     g.fillStyle = '#a3261c';
     g.fillRect(W * 0.62, 4, 2, H - 8);
-  }), -4.0, F + 0.98, B.z0 + 0.302);
-  hot(put(root, proxy(1.7, 0.6, 0.5), -4.7, F + 0.95, B.z0 + 0.28), { id: 'records', nodes: ['mess'], cursor: 'look', action: ['look', 'records'] });
+  }), -3.45, F + 0.98, B.z0 + 0.302);
+  hot(put(root, proxy(1.7, 0.6, 0.5), -4.1, F + 0.95, B.z0 + 0.28), { id: 'records', nodes: ['mess'], cursor: 'look', action: ['look', 'records'] });
   // two armchairs
   const armchair = (x, z, ry, m) => {
     const a = grp(root, x, F, z, ry);
@@ -269,7 +269,7 @@ export function buildQuarters(parent) {
     for (const s of [-1, 1]) put(a, box(0.14, 0.24, 0.62, m), s * 0.3, 0.5, 0);
   };
   armchair(-6.5, -11.2, 0.5, mat.wool);
-  armchair(-2.6, -11.3, -0.4, mat.rust);
+  armchair(-2.6, -11.3, -0.4, mat.navy);
   hot(put(root, proxy(0.8, 0.9, 0.8), -6.5, F + 0.5, -11.2), { id: 'armchairs', nodes: ['mess'], cursor: 'look', action: ['look', 'armchairs'] });
   put(root, cyl(0.2, 0.75, mat.black, 12), -6.75, F + 0.375, -7.0);
   put(root, cyl(0.05, 1.75, mat.darkMetal, 8), -6.75, F + 1.62, -7.0);

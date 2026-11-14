@@ -79,9 +79,9 @@ export function buildVault(scene) {
   root.add(work);
   // equipment racks along both side walls
   const leds = [];
-  // the middle rack on the north wall is hinged at its front west corner, and folds right back
-  // across the face of its neighbour: it hides the way down
-  const hingeX = v.x0 + 1.0 + 1.15 - 0.525, hingeZ = v.z0 + 0.65;
+  // the middle rack on the north wall is hinged at its front east corner, and folds right back
+  // across the face of its neighbour, away from where you stand: it hides the way down
+  const hingeX = v.x0 + 1.0 + 1.15 + 0.525, hingeZ = v.z0 + 0.65;
   const swing = grp(root, hingeX, 0, hingeZ);
   for (const side of [-1, 1]) {
     for (let i = 0; i < 3; i++) {
@@ -183,7 +183,7 @@ export function buildVault(scene) {
       work.intensity = on && open ? 3.5 : 0;
       leds.forEach(([m, hex, p]) => setLamp(m, hex, on && p > 0.25, 3));
       const unlatched = !!state.flags.hatchOpen;
-      swing.rotation.y = unlatched ? -2.95 : 0;
+      swing.rotation.y = unlatched ? 2.95 : 0;
       way.userData.hot.disabled = !unlatched;
     },
     tick() {

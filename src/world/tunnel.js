@@ -94,7 +94,8 @@ export function buildTunnel(parent) {
   lamp(-19, UF + h, true);
   lamp(-25.4, UF + h, true, 0xffe2b0, 7);
   lamp(-34, LF + h, true, 0xffd9a0, 6, 10);
-  const doorLamp = lamp(-42.4, LF + h, true, 0xff4030, 4, 8);
+  lamp(-38.6, LF + h, true, 0xffe2b0, 5, 9);
+  const doorLamp = lamp(-43.1, LF + h, true, 0xff5a40, 2.2, 6);
 
   // ---------------------------------------------------------------- the cables
   const tags = {};
@@ -217,7 +218,7 @@ export function buildTunnel(parent) {
   const stencil = decal(1.5, 0.24, 240, (g, W, H) => {
     g.fillStyle = '#737a7d';
     g.fillRect(0, 0, W, H);
-    text(g, 'END OF WORKS 1958', W / 2, H / 2 + 2, { size: 40, color: '#d9c23c' });
+    text(g, 'END OF WORKS 1958', W / 2, H / 2 + 2, { size: 30, color: '#d9c23c' });
   }, { rough: 0.5 });
   put(hinge, stencil, 1.07, 1.8, 0.004);
   const wheel = grp(hinge, 1.07, 1.1, 0.07);
@@ -264,6 +265,9 @@ export function buildTunnel(parent) {
   });
   put(mugs, box(0.006, 0.13, 0.006, mat.chrome), 0.15, 0.09, 0).rotation.z = 0.35;
   hot(put(mugs, proxy(1.1, 0.24, 0.3), 0, 0.1, 0.02), { id: 'mugs', nodes: ['blastdoor', 'beyond'], cursor: 'look', action: ['look', 'mugs'] });
+  const dimRock = new THREE.PointLight(0x6f8f96, 1.6, 12, 1.4); // enough to see the rock by
+  dimRock.position.set(0, 2.0, -3.5);
+  cave.add(dimRock);
   const glow = new THREE.PointLight(0x7fffd8, 0, 18, 1.3);
   glow.position.set(0, 1.0, -17);
   cave.add(glow);
@@ -298,7 +302,7 @@ export function buildTunnel(parent) {
       setLamp(sendLamp, open ? 0x35ff55 : 0xffa020, live, 2.4);
       hinge.rotation.y = open ? 1.45 : 0;
       slab.userData.hot.disabled = open;
-      doorLamp.intensity = open ? 1.5 : 4;
+      doorLamp.intensity = open ? 1.2 : 2.2;
       if (!open) {
         glow.intensity = 0;
         orbMat.color.setHex(0x000000);
