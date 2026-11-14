@@ -24,3 +24,20 @@ export const DIRS = { N: [0, -1], E: [1, 0], S: [0, 1], W: [-1, 0] };
 
 /** rotation.y that makes an object built facing +z face the given compass direction. */
 export const RY = { S: 0, E: Math.PI / 2, N: Math.PI, W: -Math.PI / 2 };
+
+// ---- The Subterranean Station ----
+// Built far below and well clear of the island, so neither realm can ever show in the other.
+// You only get between them by the fade on the stairs.
+
+export const UF = -40; // floor of the upper tunnel and the three rooms
+export const LF = UF - 0.8; // floor of the lower stretch, under water until the pump is primed
+export const ROOM_H = 2.5;
+
+/** The tunnel runs north from the stair foot (z1) to the blast door (z0). hw is half its width. */
+export const TUNNEL = { hw: 1.5, h: 2.6, z0: -44, z1: 0, steps: -28, wall: 0.2 };
+
+export const QUARTERS = {
+  kitchen: { x0: 1.7, x1: 7.2, z0: -12, z1: -6.5, door: -9 },
+  mess: { x0: -7.2, x1: -1.7, z0: -12, z1: -6.5, door: -9 },
+  bunks: { x0: 1.7, x1: 7.2, z0: -22, z1: -16.5, door: -19 },
+};
