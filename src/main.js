@@ -210,9 +210,9 @@ const game = {
     });
   },
 
-  /** The end of chapter two. */
+  /** The end of chapter three, and of the story so far. */
   finish() {
-    game.state.flags.finished2 = true;
+    game.state.flags.finished3 = true;
     Store.save(game.state);
     game.playing = false;
     renderer.fade(0, 2600, () => ui.ending(showTitle));
@@ -228,11 +228,19 @@ function arrive(node, cut = false) {
   if (node === 'vault' && once('vaultSeen')) game.say(SAY.vaultEnter);
   if (node === 'stairfoot' && once('belowSeen')) game.say(SAY.belowEnter);
   if (node === 'junction' && once('lowSeen')) game.say(SAY.lowEnter);
-  // the ending belongs to walking through the door, not to a test or a tour cutting straight there
-  if (node === 'beyond' && !s.flags.finished2 && !cut) {
+  if (node === 'beyond' && once('beyondSeen')) {
     game.say(SAY.beyond1);
-    game.after(4200, () => game.say(SAY.beyond2));
-    game.after(9000, () => game.finish());
+    const still = (line) => () => game.state.node === 'beyond' && game.say(line);
+    game.after(4200, still(SAY.beyond2));
+    game.after(8400, still(SAY.beyondDown));
+  }
+  if (node === 'gallery' && once('penSeen')) game.say(SAY.penEnter);
+  if (node === 'quayMid' && !s.flags.lampOn && once('quaySeen')) game.say(SAY.quayFirst);
+  // the ending belongs to walking out onto the quay, not to a test or a tour cutting straight there
+  if (node === 'quayMid' && s.flags.lampOn && !s.flags.finished3 && !cut) {
+    game.say(SAY.end1);
+    game.after(4600, () => game.say(SAY.end2));
+    game.after(9600, () => game.finish());
   }
 }
 
@@ -447,7 +455,7 @@ function begin(state, fresh) {
   renderer.fade(1, 1200);
   ui.say('');
   game.changed(900);
-  if (state.node === 'beyond') arrive('beyond'); // resumed on the far side of the door
+  if (state.node === 'quayMid') arrive('quayMid'); // resumed on the quay with the lamp already lit
   if (fresh) game.read('orders', () => ui.say('Holland Island, an hour before dark. The boat has already put about.'));
 }
 
@@ -467,7 +475,7 @@ function showTitle() {
   ui.inventory({ inv: [] });
   ui.say('');
   ui.title(
-    !!saved && !saved.flags.finished2,
+    !!saved && !saved.flags.finished3,
     () => {
       Store.clear();
       begin(Store.newState(), true);
@@ -478,6 +486,13 @@ function showTitle() {
       Store.clear();
       begin(Store.chapterTwoState(), false);
       arrive('stairfoot', true);
+      Store.save(game.state);
+    },
+    () => {
+      // or to the gallery above the pen, with chapters one and two counted as played
+      Store.clear();
+      begin(Store.chapterThreeState(), false);
+      arrive('gallery', true);
       Store.save(game.state);
     }
   );

@@ -5,6 +5,7 @@ import { SCHEDULE, STOPPED_CLOCK } from '../puzzles/receiver.js';
 import { CIPHER, PAD, SHEET, sheetLabel } from '../puzzles/cipher.js';
 import { drawChart } from './chart.js';
 import { BELOW_DOCS, BELOW_LOOK, BELOW_SAY } from './documents-below.js';
+import { PEN_DOCS, PEN_LOOK, PEN_SAY, PEN_ITEMS } from './documents-pen.js';
 
 const khz = (n) => n.toLocaleString('en-GB');
 
@@ -203,5 +204,11 @@ export const ITEMS = {
 Object.assign(DOCS, BELOW_DOCS);
 Object.assign(LOOK, BELOW_LOOK);
 Object.assign(SAY, BELOW_SAY);
+
+// chapter three
+Object.assign(DOCS, PEN_DOCS);
+Object.assign(LOOK, PEN_LOOK);
+Object.assign(SAY, PEN_SAY);
+Object.assign(ITEMS, PEN_ITEMS);
 
 export { BREAKERS };

@@ -6,6 +6,9 @@ import * as Vault from './puzzles/vault.js';
 import * as Pump from './puzzles/pump.js';
 import * as Junction from './puzzles/junction.js';
 import * as Reply from './puzzles/reply.js';
+import * as Darkroom from './puzzles/darkroom.js';
+import * as Tally from './puzzles/tally.js';
+import * as Telegraph from './puzzles/telegraph.js';
 import { LOOK, SAY } from './data/documents.js';
 
 export function createActions(game) {
@@ -253,6 +256,129 @@ export function createActions(game) {
       if (S().reply.open) return game.read('comedown');
       if (S().junction.live) return game.read('challenge');
       game.say(SAY.doorPaperDead);
+    },
+
+    // ---------------------------------------------------------------- chapter three
+
+    film() {
+      if (S().flags.filmTaken) return game.say(LOOK.cameraEmpty);
+      S().flags.filmTaken = true;
+      game.give('film');
+      game.sfx('drawer');
+      game.say(SAY.filmTake);
+      game.changed();
+    },
+
+    timer(index, dir) {
+      S().darkroom = Darkroom.spin(S().darkroom, index, dir);
+      game.sfx('wheel');
+      game.changed(60);
+    },
+
+    safelight() {
+      S().darkroom = Darkroom.toggleLight(S().darkroom);
+      game.sfx('switch');
+      game.say(S().darkroom.safe ? SAY.safeOn : SAY.safeOff);
+      game.changed(260);
+    },
+
+    develop() {
+      const { state, result } = Darkroom.run(S().darkroom, game.has('film'));
+      S().darkroom = state;
+      const line = { nofilm: 'devNoFilm', fogged: 'devFogged', thin: 'devThin', dense: 'devDense', streaked: 'devStreaked', unfixed: 'devUnfixed', bleached: 'devBleached', good: 'devGood', already: 'devAlready' }[result];
+      if (result !== 'nofilm' && result !== 'already') game.sfx('slosh');
+      game.say(SAY[line]);
+      if (result !== 'good') return;
+      S().inv = S().inv.filter((i) => i !== 'film');
+      game.give('photo');
+      game.changed(500);
+      game.after(1600, () => {
+        if (S().node === 'bench') game.read('photo');
+      });
+    },
+
+    tally(name, dir) {
+      S().tally = Tally.spin(S().tally, name, dir);
+      game.sfx('tally');
+      game.changed(60);
+    },
+
+    cagebar() {
+      const { state, result } = Tally.pullBar(S().tally);
+      S().tally = state;
+      if (result === 'open') {
+        game.sfx('cage');
+        game.say(SAY.barOpen);
+        game.changed(500);
+        game.after(2600, () => {
+          if (S().node === 'tallyboard') game.go('store', 'E');
+        });
+      } else if (result === 'held') {
+        game.sfx('clunk');
+        game.say(SAY.barHeld);
+      } else {
+        game.say(SAY.barAlready);
+      }
+    },
+
+    /** Things inside the property cage: out of reach until the bar is drawn. */
+    cage(what) {
+      if (!S().tally.open) return game.say(SAY.cageShut);
+      if (what === 'casualty') return game.read('casualty');
+      game.say(LOOK[what]);
+    },
+
+    twheel(index, dir) {
+      S().telegraph = Telegraph.spin(S().telegraph, index, dir);
+      game.sfx('wheel');
+      game.changed(60);
+    },
+
+    call() {
+      const { state, result } = Telegraph.call(S().telegraph, S().junction.live);
+      S().telegraph = state;
+      if (result === 'drawn') {
+        game.sfx('telegraph');
+        game.say(SAY.callDrawn);
+        game.changed(900);
+        game.after(2600, () => {
+          if (S().node === 'telegraph') A.wirepaper();
+        });
+      } else if (result === 'nil') {
+        game.sfx('telegraph');
+        game.say(SAY.callNil);
+      } else if (result === 'unknown') {
+        game.sfx('clunk');
+        game.say(SAY.callUnknown);
+      } else {
+        game.say(result === 'dead' ? SAY.callDead : SAY.callAlready);
+      }
+    },
+
+    /** The sheet on the telegraph drum: first the waiver, then the one that follows it. */
+    wirepaper() {
+      const f = S().flags;
+      if (!S().telegraph.drawn) return game.say(SAY.wireBlank);
+      if (!f.secondSheet) {
+        return game.read('waiver', () => {
+          if (f.secondSheet) return;
+          f.secondSheet = true;
+          game.sfx('telegraph');
+          game.say(SAY.second);
+          game.changed(700);
+        });
+      }
+      game.read('second', () => {
+        if (f.lampOn) return;
+        f.lampOn = true;
+        game.sfx('lamp');
+        game.say(SAY.lampHint);
+        game.changed(400);
+      });
+    },
+
+    viewport() {
+      game.say(S().flags.lampOn ? LOOK.viewportLit : LOOK.viewport);
     },
   };
 

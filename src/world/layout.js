@@ -41,3 +41,22 @@ export const QUARTERS = {
   mess: { x0: -7.2, x1: -1.7, z0: -12, z1: -6.5, door: -9 },
   bunks: { x0: 1.7, x1: 7.2, z0: -22, z1: -16.5, door: -19 },
 };
+
+// ---- Berth K7 ----
+// The pen under the island: a sea cave with a quay down one side. A third realm, further down
+// again, reached only by the fade at the bottom of the rock passage.
+
+export const PF = -90; // top of the quay
+export const WATER = PF - 1.1;
+
+/** The cavern. x0 is the west rock face, edge the quay's edge, x1 the built wall the rooms open off. */
+export const PEN = { x0: -11, edge: 1.5, x1: 8, z0: -152, z1: -108, south: -103, roof: 9, bed: -4.5, shelf: 3.6 };
+
+/** The boat lies bow north, toward the sea gate. y is the height of her axis. */
+export const BOAT = { x: -3.2, z: -130, len: 18, r: 1.55, y: WATER + 0.35 };
+
+export const DOCK = {
+  office: { x0: 8.3, x1: 13.5, z0: -120.75, z1: -115.25, door: -118 },
+  store: { x0: 8.3, x1: 13.5, z0: -132.75, z1: -127.25, door: -130 },
+  darkroom: { x0: 8.3, x1: 13.5, z0: -144.75, z1: -139.25, door: -142 },
+};

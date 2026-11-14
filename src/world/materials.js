@@ -236,6 +236,54 @@ export function buildMaterials() {
     rockDark: std({ color: 0x34383a, roughness: 1, flatShading: true }),
     deepWater: new THREE.MeshStandardMaterial({ color: 0x0b1719, roughness: 0.06, metalness: 0.5, transparent: true, opacity: 0.94 }),
   });
+
+  // --- Berth K7
+  const hull = tex(256, (g, s) => {
+    g.fillStyle = '#4b352b';
+    g.fillRect(0, 0, s, s);
+    speckle(g, s, 6000, 3, 0.16);
+    blotches(g, s, 60, 'rgba(150,84,40,A)', 26, 0.55);
+    blotches(g, s, 40, 'rgba(28,18,14,A)', 30, 0.6);
+    blotches(g, s, 26, 'rgba(60,84,62,A)', 22, 0.4);
+    streaks(g, s, 30, 'rgba(22,14,10,A)', 0.55);
+    streaks(g, s, 14, 'rgba(170,110,60,A)', 0.4);
+    g.fillStyle = 'rgba(0,0,0,0.3)'; // plate seams
+    for (let y = 0; y < s; y += 64) g.fillRect(0, y, s, 2);
+    for (let x = 0; x < s; x += 128) g.fillRect(x, 0, 2, s);
+  });
+  hull.repeat.set(3, 2);
+  const stone = tex(256, (g, s) => {
+    g.fillStyle = '#5c625f';
+    g.fillRect(0, 0, s, s);
+    speckle(g, s, 6000, 2, 0.12);
+    blotches(g, s, 30, 'rgba(20,26,24,A)', 44, 0.4);
+    blotches(g, s, 12, 'rgba(120,124,120,A)', 30, 0.2);
+    g.fillStyle = 'rgba(0,0,0,0.35)'; // laid in courses
+    for (let y = 0; y < s; y += 64) g.fillRect(0, y, s, 3);
+    for (let y = 0, k = 0; y < s; y += 64, k++) for (let x = (k % 2) * 64; x < s; x += 128) g.fillRect(x, y, 3, 64);
+  });
+  const canvas = tex(64, (g, s) => {
+    g.fillStyle = '#8a8266';
+    g.fillRect(0, 0, s, s);
+    g.fillStyle = 'rgba(40,36,24,0.25)';
+    for (let i = 0; i < s; i += 4) {
+      g.fillRect(i, 0, 1, s);
+      g.fillRect(0, i, s, 1);
+    }
+    speckle(g, s, 500, 2, 0.1);
+  });
+  Object.assign(mat, {
+    hull: std({ map: hull, roughness: 0.85, metalness: 0.1 }),
+    hullDark: std({ map: hull, color: 0x6a6a6a, roughness: 0.9 }),
+    weed: std({ color: 0x1a2a1f, roughness: 1 }),
+    quay: std({ map: stone, roughness: 0.7 }),
+    quayWall: std({ map: stone, color: 0x9a9a9a, roughness: 0.85 }),
+    cavern: std({ color: 0x2a2f31, roughness: 1, flatShading: true }),
+    gate: std({ map: corrugated, color: 0x777777, roughness: 0.8, metalness: 0.2 }),
+    canvas: std({ map: canvas, roughness: 1 }),
+    sack: std({ color: 0x8a8266, roughness: 1 }),
+    penWater: new THREE.MeshStandardMaterial({ color: 0x07110f, roughness: 0.05, metalness: 0.55, transparent: true, opacity: 0.96 }),
+  });
   return mat;
 }
 

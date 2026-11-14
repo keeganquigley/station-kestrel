@@ -10,6 +10,12 @@
  * Each place then scales these by the numbers in its `amb` entry in src/data/nodes.js.
  */
 export const TUNNEL_MIX = { air: 0.055, hum: 0.026, whirr: 0.01, drip: 0.12, deep: 0.05 };
+/**
+ * The pen adds two things to whatever of the tunnel's sound its places ask for:
+ *   lap    water against the quay, slow and low
+ *   creak  how loud the boat is when she shifts at her chains
+ */
+export const PEN_MIX = { lap: 0.085, creak: 0.07 };
 /** Pitch of the hum, in Hz, and how far apart its two voices sit (which sets how slowly it beats). */
 export const TUNNEL_HUM = { pitch: 82, beat: 0.35 };
 
@@ -81,6 +87,10 @@ export class Sound {
     this.whirr = bed('bandpass', 880, 9);
     lfo(0.07, 26, this.whirr.f.frequency);
     lfo(0.11, 0.25, this.whirr.swell.gain);
+    // the pen: water moving against stone
+    this.lap = bed('lowpass', 260, 0.5);
+    lfo(0.19, 0.6, this.lap.swell.gain);
+    lfo(0.043, 70, this.lap.f.frequency);
     this.hum = ctx.createGain();
     this.hum.gain.value = 0;
     const humLP = ctx.createBiquadFilter();
@@ -173,6 +183,13 @@ export class Sound {
     set(this.whirr.g.gain, TUNNEL_MIX.whirr * 6 * (a.whirr || 0), 0.6);
     set(this.hum.gain, TUNNEL_MIX.hum * (a.hum || 0), 0.6);
     set(this.deep.gain, TUNNEL_MIX.deep * (a.deep || 0), 1.5);
+    set(this.lap.g.gain, PEN_MIX.lap * (a.lap || 0), 0.8);
+    this.creakLevel = a.creak || 0;
+    if (this.creakLevel > 0 && !this.creakTimer) this.creakTimer = setInterval(() => this.creak(), 5200);
+    if (this.creakLevel <= 0 && this.creakTimer) {
+      clearInterval(this.creakTimer);
+      this.creakTimer = null;
+    }
     this.dripLevel = a.drip || 0;
     if (this.dripLevel > 0 && !this.dripTimer) this.dripTimer = setInterval(() => this.drip(), 1700);
     if (this.dripLevel <= 0 && this.dripTimer) {
@@ -200,6 +217,15 @@ export class Sound {
     const f = 900 + Math.random() * 900, level = TUNNEL_MIX.drip * this.dripLevel * (0.4 + Math.random() * 0.6);
     this.blip({ tone: level, f0: f, f1: f * 1.9, dur: 0.07, delay: Math.random() * 0.8 });
     this.blip({ tone: level * 0.35, f0: f * 0.5, f1: f * 0.7, dur: 0.16, delay: 0.9 });
+  }
+
+  /** Now and then the boat shifts against her chains. */
+  creak() {
+    if (!this.ctx || Math.random() > 0.45) return;
+    const level = PEN_MIX.creak * this.creakLevel * (0.5 + Math.random() * 0.5), f = 70 + Math.random() * 50, d = Math.random() * 2;
+    this.blip({ tone: level, f0: f, f1: f * (0.8 + Math.random() * 0.5), dur: 1.1 + Math.random(), type: 'sawtooth', delay: d, attack: 0.35 });
+    this.blip({ noise: level * 0.5, dur: 0.9, filter: 'bandpass', cutoff: 320, delay: d + 0.1, attack: 0.3 });
+    if (Math.random() < 0.4) this.blip({ tone: level * 1.4, f0: 120, f1: 60, dur: 0.3, delay: d + 1.5 });
   }
 
   startTones() {
@@ -300,6 +326,21 @@ export class Sound {
         b({ tone: 0.2, f0: 55, f1: 40, dur: 2.6, type: 'sawtooth', delay: 2.3, attack: 0.5 });
         b({ noise: 0.08, dur: 2.4, filter: 'bandpass', cutoff: 260, delay: 2.3, attack: 0.6 });
         break;
+      case 'slosh': b({ noise: 0.16, dur: 0.7, filter: 'bandpass', cutoff: 900, attack: 0.12 }); b({ noise: 0.12, dur: 0.6, filter: 'bandpass', cutoff: 500, delay: 0.5, attack: 0.15 }); b({ noise: 0.1, dur: 0.6, filter: 'bandpass', cutoff: 1300, delay: 1.0, attack: 0.15 }); break;
+      case 'tally': b({ tone: 0.09, f0: 1900, f1: 1700, dur: 0.16 }); b({ tone: 0.05, f0: 2800, f1: 2600, dur: 0.12, delay: 0.03 }); b({ noise: 0.14, dur: 0.02, filter: 'highpass', cutoff: 2600 }); break;
+      case 'cage':
+        b({ tone: 0.4, f0: 100, f1: 50, dur: 0.28 });
+        b({ noise: 0.22, dur: 0.06, cutoff: 700 });
+        b({ noise: 0.12, dur: 1.3, filter: 'bandpass', cutoff: 1500, delay: 0.5, attack: 0.2 });
+        for (let i = 0; i < 9; i++) b({ noise: 0.1, dur: 0.03, filter: 'highpass', cutoff: 2000, delay: 0.55 + i * 0.13 });
+        b({ tone: 0.3, f0: 85, f1: 45, dur: 0.22, delay: 1.8 });
+        break;
+      case 'telegraph':
+        b({ tone: 0.05, f0: 150, f1: 150, dur: 2.4, type: 'sawtooth', attack: 0.3 });
+        b({ noise: 0.07, dur: 2.4, filter: 'bandpass', cutoff: 2400, attack: 0.3 });
+        for (let i = 0; i < 16; i++) b({ noise: 0.11, dur: 0.05, filter: 'highpass', cutoff: 3000, delay: 0.25 + i * 0.13 });
+        break;
+      case 'lamp': b({ tone: 0.2, f0: 70, f1: 60, dur: 1.6, attack: 0.5 }); b({ tone: 0.07, f0: 420, f1: 430, dur: 2.2, delay: 0.3, attack: 0.8 }); b({ noise: 0.2, dur: 0.04, filter: 'highpass', cutoff: 1500 }); break;
       default:
     }
   }

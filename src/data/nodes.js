@@ -1,11 +1,12 @@
 // Where you can stand, which way you can face, and where a step forward takes you.
-import { P, FLOOR, SHED_FLOOR, EYE, DECK, MAST, UF, LF } from '../world/layout.js';
+import { P, FLOOR, SHED_FLOOR, EYE, DECK, MAST, UF, LF, PF, PEN, BOAT, DOCK } from '../world/layout.js';
 import { terrainH } from '../world/terrain.js';
 
 const out = (x, z) => [x, terrainH(x, z) + EYE, z];
 const inn = (x, z) => [x, FLOOR + EYE, z];
 const up = (x, z) => [x, UF + EYE, z]; // upper tunnel and rooms
 const low = (x, z) => [x, LF + EYE, z]; // lower stretch
+const quay = (x, z) => [x, PF + EYE, z]; // the pen
 
 /**
  * pos/fwd            a standing place: look around freely, click toward a link to walk it.
@@ -15,7 +16,7 @@ const low = (x, z) => [x, LF + EYE, z]; // lower stretch
  * tilt               look up (+) or down (-) on a given facing
  * amb                how loud each background sound is here
  * live               something on screen moves, so keep redrawing
- * realm              'below' for the Subterranean Station; everything else is the surface
+ * realm              'below' for the Subterranean Station, 'pen' for Berth K7; everything else is the surface
  *
  * A link is a node id, or { to, face, gate, fade }. gate names a check in actions.js;
  * fade crosses between the realms with a fade to black instead of a glide.
@@ -25,7 +26,13 @@ const TUNNEL_AMB = { air: 1, hum: 1, whirr: 1, drip: 0.25 };
 const ROOM_AMB = { air: 0.6, hum: 0.75, whirr: 0.3 };
 const LOW_AMB = { air: 1, hum: 1.1, whirr: 0.7, drip: 0.7 };
 
-const below = (nodes) => Object.fromEntries(Object.entries(nodes).map(([id, n]) => [id, { ...n, realm: 'below' }]));
+// The pen: the tunnel's hum carried on quietly, under water lapping against stone.
+const PEN_AMB = { air: 0.5, hum: 0.4, lap: 1, creak: 1 };
+const DOCK_AMB = { air: 0.35, hum: 0.45, lap: 0.3, creak: 0.3 };
+
+const inRealm = (realm) => (nodes) => Object.fromEntries(Object.entries(nodes).map(([id, n]) => [id, { ...n, realm }]));
+const below = inRealm('below');
+const pen = inRealm('pen');
 
 export const NODES = {
   jetty: { pos: [0, DECK + EYE, 38], faces: 'NESW', fwd: { N: 'path' }, tilt: { N: 0.02 }, amb: { wind: 0.7, sea: 1 } },
@@ -59,7 +66,21 @@ export const NODES = {
     jbox: { cam: [-0.28, LF + 1.42, -33.5], look: [-1.5, LF + 1.36, -33.5], back: ['junction', 'W'], amb: LOW_AMB },
     blastdoor: { pos: low(0, -41.0), faces: 'NESW', fwd: { S: 'junction', N: { to: 'beyond', gate: 'blast' } }, amb: LOW_AMB, live: true },
     sender: { cam: [0.2, LF + 1.42, -41.45], look: [1.5, LF + 1.36, -41.45], back: ['blastdoor', 'E'], amb: LOW_AMB },
-    beyond: { pos: low(0, -45.6), faces: 'NS', fwd: { S: 'blastdoor' }, tilt: { N: -0.16, S: -0.3 }, amb: { ...LOW_AMB, deep: 1 }, live: true },
+    beyond: { pos: low(0, -45.6), faces: 'NS', fwd: { S: 'blastdoor', N: { to: 'gallery', fade: true } }, tilt: { N: -0.16, S: -0.3 }, amb: { ...LOW_AMB, deep: 1 }, live: true },
+  }),
+  ...pen({
+    gallery: { pos: [7.0, PF + PEN.shelf + EYE, -106.3], faces: 'NESW', fwd: { N: 'quayS', S: { to: 'beyond', fade: true } }, tilt: { N: -0.24, W: -0.2, E: 0.02 }, amb: PEN_AMB, live: true },
+    quayS: { pos: quay(5, DOCK.office.door), faces: 'NESW', fwd: { S: 'gallery', N: 'quayMid', E: 'dockoffice' }, tilt: { N: -0.1, S: 0.16, W: -0.1 }, amb: PEN_AMB, live: true },
+    quayMid: { pos: quay(5, DOCK.store.door), faces: 'NESW', fwd: { S: 'quayS', N: 'quayN', E: 'store' }, tilt: { W: -0.04, N: -0.06 }, amb: PEN_AMB, live: true },
+    sail: { cam: [1.15, PF + 1.8, BOAT.z + 0.6], look: [BOAT.x + 0.46, PF + 1.86, BOAT.z + 0.6], back: ['quayMid', 'W'], amb: PEN_AMB, live: true },
+    quayN: { pos: quay(5, DOCK.darkroom.door), faces: 'NESW', fwd: { S: 'quayMid', E: 'darkroom' }, tilt: { N: 0.04, W: -0.06 }, amb: PEN_AMB, live: true },
+    dockoffice: { pos: quay(10.6, DOCK.office.door), faces: 'NESW', fwd: { W: 'quayS' }, tilt: { N: -0.14, E: -0.16, S: -0.06 }, amb: DOCK_AMB },
+    telegraph: { cam: [11.2, PF + 1.42, DOCK.office.z0 + 1.5], look: [11.2, PF + 1.06, DOCK.office.z0 + 0.3], back: ['dockoffice', 'N'], amb: DOCK_AMB },
+    store: { pos: quay(10.6, DOCK.store.door), faces: 'NESW', fwd: { W: 'quayMid' }, tilt: { N: -0.06, S: -0.1, E: -0.1 }, amb: DOCK_AMB },
+    tallyboard: { cam: [10.4, PF + 1.45, DOCK.store.z0 + 1.35], look: [10.4, PF + 1.4, DOCK.store.z0], back: ['store', 'N'], amb: DOCK_AMB },
+    cage: { cam: [11.45, PF + 1.42, DOCK.store.door], look: [13.2, PF + 1.12, DOCK.store.door], back: ['store', 'E'], amb: DOCK_AMB },
+    darkroom: { pos: quay(10.6, DOCK.darkroom.door), faces: 'NESW', fwd: { W: 'quayN' }, tilt: { N: -0.14, E: -0.04, S: -0.06 }, amb: DOCK_AMB },
+    bench: { cam: [10.9, PF + 1.5, DOCK.darkroom.z0 + 1.55], look: [10.9, PF + 1.14, DOCK.darkroom.z0 + 0.3], back: ['darkroom', 'N'], amb: DOCK_AMB },
   }),
 };
 

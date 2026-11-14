@@ -294,6 +294,69 @@ body {
   object-fit: contain;
 }
 
+.paper.photo {
+  width: 430px;
+  padding: 12px 14px;
+  background: #d9d2bd;
+}
+
+.paper.photo canvas {
+  display: block;
+  width: 400px;
+  height: 280px;
+  margin: 0 auto 8px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+}
+
+.paper .aside {
+  font-style: italic;
+  color: #3d3a32;
+}
+
+.paper.form {
+  background: #ece6d2;
+  font-family: 'Courier New', Courier, monospace;
+  border-top: 3px double #23211c;
+}
+
+.paper.form .letterhead {
+  margin: 0 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #23211c;
+  font: bold 24px Georgia, 'Times New Roman', serif;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.paper table.form {
+  width: 100%;
+}
+
+.paper table.form td {
+  padding: 2px 8px 2px 0;
+  vertical-align: bottom;
+}
+
+.paper table.form td:nth-child(odd) {
+  width: 1%;
+  white-space: nowrap;
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+.paper table.form td:nth-child(even) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.45);
+}
+
+.paper .blank {
+  display: inline-block;
+  min-width: 120px;
+}
+
+.paper td.blank {
+  display: table-cell;
+}
+
 .paper.notebook ul {
   list-style: none;
   margin: 0;
@@ -359,7 +422,8 @@ body {
 
 .title-buttons {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
   justify-content: center;
 }
 

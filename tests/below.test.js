@@ -145,7 +145,8 @@ describe('the Subterranean Station on the map', () => {
     for (const [id, n] of Object.entries(NODES)) {
       for (const link of Object.values(n.fwd || {})) {
         const l = typeof link === 'string' ? { to: link } : link;
-        if ((NODES[l.to].realm || 'surface') !== (n.realm || 'surface')) crossings.push([id, l.to, !!l.fade]);
+        const from = n.realm || 'surface', to = NODES[l.to].realm || 'surface';
+        if (from !== to && (from === 'surface' || to === 'surface')) crossings.push([id, l.to, !!l.fade]);
       }
     }
     expect(crossings.sort()).toEqual([['stairfoot', 'vault', true], ['vault', 'stairfoot', true]]);
