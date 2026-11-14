@@ -14,7 +14,7 @@ export const DOCS = {
     html: `
       <p class="head">OFFICE OF SIGNALS OVERSIGHT<br>FIELD INSTRUCTION 96/311</p>
       <p class="right">14 November 1996</p>
-      <p>SUBJECT: Station KESTREL, Hollund Island</p>
+      <p>SUBJECT: Station KESTREL, Holland Island</p>
       <p>1. Station KESTREL was struck from the establishment in March 1991. Fuel and ration indents in its name have nevertheless continued to be drawn, most recently in September of this year.</p>
       <p>2. The station has now missed three scheduled check-ins.</p>
       <p>3. You will proceed by boat, establish the condition of the site and the whereabouts of its complement of four (Cdr. A. HARLAN commanding), and secure any signals material found.</p>
@@ -76,7 +76,7 @@ export const DOCS = {
       <p class="faint">(There are no further entries.)</p>`,
   },
   chart: {
-    title: 'D/F plot, Hollund Island',
+    title: 'D/F plot, Holland Island',
     kind: 'chart',
     html: `<canvas width="560" height="392"></canvas>`,
     draw: (canvas) => drawChart(canvas.getContext('2d'), canvas.width, canvas.height),
@@ -162,7 +162,9 @@ export const SAY = {
   chokeIn: 'Choke home.',
   cough: 'She turns over, coughs, and dies. The prime is lost.',
   start: 'She catches. Running, but rough, and the bulb overhead is flickering.',
-  smooth: 'The engine settles to an even note.',
+  smooth: 'Choke home. The engine settles to an even note.',
+  roughAgain: 'Choke out. The engine roughens again.',
+  roughBus: 'The set is running too rough to hold the bus. The choke is still out.',
   stall: 'Starved of fuel, the engine runs down and stops.',
   already: 'She is already running.',
   trip: `Over ${RATING} amps. Every breaker on the board trips out together.`,

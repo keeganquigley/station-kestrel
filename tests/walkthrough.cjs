@@ -83,9 +83,10 @@ const shots = process.argv[2] || null;
 
     // --- title
     if (await page.isVisible('#btn-continue')) fail('Continue offered with no save');
+    if (!(await page.innerText('#title')).includes('Holland Island')) fail('title should say Holland Island');
     await shot('01-title');
     await page.click('#btn-new');
-    await readAndClose('FIELD INSTRUCTION 96/311');
+    if ((await readAndClose('FIELD INSTRUCTION 96/311')).includes('Hollund')) fail('old spelling in the orders');
     await expectAt('jetty', 'N');
     log('new game starts on the jetty with the orders in hand');
     await shot('02-jetty');
@@ -153,10 +154,27 @@ const shots = process.argv[2] || null;
     await use('choke');
     await use('starter');
     if (!(await state()).gen.running) fail('generator should be running');
+    if (!(await caption()).includes('rough')) fail('starting should say she runs rough');
+    await shot('04a-generator-choke-out');
+    // leave the choke out and try the breakers: the game should say why the bus stays dark
+    await back();
+    await face('N');
+    await use('panel');
+    await use('breaker-lighting');
+    if (!(await caption()).includes('choke is still out')) fail('breaker panel should mention the choke: ' + (await caption()));
+    await use('breaker-lighting');
+    await back();
+    await face('E');
+    await use('genset');
     await use('choke');
     if ((await state()).gen.choke) fail('choke should be home');
+    if (!(await caption()).startsWith('Choke home')) fail('pushing the choke in should say so: ' + (await caption()));
     await shot('04-generator');
-    log('generator starts only by the card');
+    await use('choke');
+    if (!(await state()).gen.choke || !(await caption()).startsWith('Choke out')) fail('pulling the choke out again should say so: ' + (await caption()));
+    await use('choke');
+    if ((await state()).gen.choke || !(await caption()).startsWith('Choke home')) fail('choke should go home again');
+    log('generator starts only by the card; the choke says where it is');
     await clickView(0.5, 0.95); // bottom edge steps back
     await expectAt('shed', 'E');
 

@@ -98,7 +98,7 @@ export function drawChart(g, W, H) {
   g.strokeStyle = ink;
   g.lineWidth = 2;
   g.strokeRect(W * 0.03, H * 0.05, W * 0.3, H * 0.13);
-  label('HOLLUND ISLAND', W * 0.045, H * 0.095, 0.03);
+  label('HOLLAND ISLAND', W * 0.045, H * 0.095, 0.03);
   label('D/F PLOT - TARGET K-7', W * 0.045, H * 0.145, 0.02);
   g.beginPath();
   g.moveTo(W * 0.93, H * 0.2);

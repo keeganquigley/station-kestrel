@@ -49,7 +49,11 @@ export function createActions(game) {
       for (const e of events) {
         if (e === 'valve') { game.sfx('valve'); line = state.valve ? SAY.valveOpen : SAY.valveShut; }
         if (e === 'prime') { game.sfx('prime'); line = SAY.prime(state.primes); }
-        if (e === 'choke') { game.sfx('click'); line = state.choke ? SAY.chokeOut : state.running ? SAY.smooth : SAY.chokeIn; }
+        if (e === 'choke') {
+          game.sfx('click');
+          if (state.running) line = state.choke ? SAY.roughAgain : SAY.smooth;
+          else line = state.choke ? SAY.chokeOut : SAY.chokeIn;
+        }
         if (e === 'cough') { game.sfx('cough'); line = SAY.cough; }
         if (e === 'start') { game.sfx('start'); line = SAY.start; }
         if (e === 'already') line = SAY.already;
@@ -57,7 +61,7 @@ export function createActions(game) {
         if (e === 'switch') {
           game.sfx('switch');
           const st = Gen.status(state);
-          line = st === 'off' ? SAY.notRunning : st === 'hunting' ? SAY.hunting : line;
+          line = st === 'off' ? SAY.notRunning : st === 'rough' ? SAY.roughBus : st === 'hunting' ? SAY.hunting : line;
         }
         if (e === 'trip') { game.sfx('trip'); line = SAY.trip; }
         if (e === 'live') { game.sfx('live'); line = SAY.live; }

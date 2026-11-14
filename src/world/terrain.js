@@ -1,4 +1,4 @@
-// Height field for Hollund Island. No DOM or Three.js here so the node graph can use it too.
+// Height field for Holland Island. No DOM or Three.js here so the node graph can use it too.
 import { P } from './layout.js';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));

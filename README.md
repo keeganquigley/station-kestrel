@@ -4,7 +4,7 @@ A point-and-click mystery for the browser, in the manner of the mid-90s slidesho
 adventures: fixed standing places you can look around from, nobody about, and machines that
 have to be understood before they will work.
 
-**Hollund Island, 14 November 1996.** A listening post that closed on paper five
+**Holland Island, 14 November 1996.** A listening post that closed on paper five
 years ago has gone on drawing fuel, and has now missed three check-ins. You are
 sent alone to find out why.
 

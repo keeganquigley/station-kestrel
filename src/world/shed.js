@@ -80,6 +80,8 @@ export function buildShed(scene) {
   const choke = grp(gp, 0.14, -0.07, 0);
   put(choke, cyl(0.012, 0.16, mat.chrome, 8), 0, 0, 0).rotation.x = Math.PI / 2;
   put(choke, cyl(0.045, 0.03, mat.black, 12), 0, 0, 0.085).rotation.x = Math.PI / 2;
+  // a red flange on the shaft: inside the panel when the knob is home, standing proud when it is out
+  put(choke, cyl(0.07, 0.012, mat.red, 18), 0, 0, -0.03).rotation.x = Math.PI / 2;
   label('CHOKE', 0.14);
   hot(put(gp, proxy(0.2, 0.2, 0.3), 0.14, -0.07, 0.1), { id: 'choke', nodes: ['gen'], cursor: 'hand', action: ['gen', 'choke'] });
   // starter
@@ -187,10 +189,10 @@ export function buildShed(scene) {
     sync(state) {
       const s = state.gen, st = status(s);
       valve.rotation.z = s.valve ? 0 : -Math.PI / 2;
-      choke.position.z = s.choke ? 0.07 : 0;
+      choke.position.z = s.choke ? 0.1 : 0;
       sight.userData.redraw(drawSight(s.running ? PRIME_COUNT : s.primes));
       volts.userData.set(meterAngle(st === 'off' ? 0 : st === 'rough' ? 0.42 : 230 / 300));
-      setLamp(runMat, 0x35ff55, s.running);
+      setLamp(runMat, st === 'rough' ? 0xffa020 : 0x35ff55, s.running);
       for (const b of BREAKERS) levers[b.id].rotation.x = s.breakers[b.id] ? -0.55 : 0.55;
       amps.userData.set(meterAngle(load(s) / 60));
       setLamp(busMat, st === 'live' ? 0x35ff55 : 0xffa020, st === 'live' || st === 'hunting', st === 'live' ? 2.5 : 1.2);

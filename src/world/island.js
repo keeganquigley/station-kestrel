@@ -195,7 +195,7 @@ export function buildIsland(scene) {
     g.lineWidth = 10;
     g.strokeRect(10, 10, W - 20, H - 20);
     text(g, 'STATION KESTREL', W / 2, H * 0.22, { size: 50, color: '#1a1a1a' });
-    text(g, 'HOLLUND ISLAND', W / 2, H * 0.4, { size: 30, color: '#1a1a1a' });
+    text(g, 'HOLLAND ISLAND', W / 2, H * 0.4, { size: 30, color: '#1a1a1a' });
     text(g, 'RESTRICTED', W / 2, H * 0.62, { size: 54, color: '#7d1d16' });
     text(g, 'NO LANDING WITHOUT AUTHORITY', W / 2, H * 0.82, { size: 24, color: '#1a1a1a' });
     const r = rng(11);

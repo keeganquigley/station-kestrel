@@ -411,7 +411,7 @@ function begin(state, fresh) {
   renderer.fade(1, 1200);
   ui.say('');
   game.changed(900);
-  if (fresh) game.read('orders', () => ui.say('Hollund Island, an hour before dark. The boat has already put about.'));
+  if (fresh) game.read('orders', () => ui.say('Holland Island, an hour before dark. The boat has already put about.'));
 }
 
 function showTitle() {
