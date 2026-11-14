@@ -9,7 +9,7 @@
  *   deep   the note that rises past the last door
  * Each place then scales these by the numbers in its `amb` entry in src/data/nodes.js.
  */
-export const TUNNEL_MIX = { air: 0.075, hum: 0.05, whirr: 0.014, drip: 0.12, deep: 0.05 };
+export const TUNNEL_MIX = { air: 0.055, hum: 0.026, whirr: 0.01, drip: 0.12, deep: 0.05 };
 /** Pitch of the hum, in Hz, and how far apart its two voices sit (which sets how slowly it beats). */
 export const TUNNEL_HUM = { pitch: 82, beat: 0.35 };
 
