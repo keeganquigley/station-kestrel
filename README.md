@@ -8,8 +8,13 @@ have to be understood before they will work.
 years ago has gone on drawing fuel, and has now missed three check-ins. You are
 sent alone to find out why.
 
-This is a one-level demo: one island, three interlocking puzzles and a finale,
-about 15 to 20 minutes.
+Two chapters so far, about 15 to 20 minutes each:
+
+1. **The station.** The island, the plant shed and the listening post on top of
+   it. Three interlocking puzzles and a vault.
+2. **The Subterranean Station.** What is under the vault: a long tunnel, the
+   crew's kitchen, break room and bunks, three more puzzles, and the door at the
+   end of the works.
 
 ## Play
 
@@ -54,13 +59,21 @@ src/
   puzzles/         the rules of each puzzle, as plain functions with no rendering
   data/            the node graph, every readable paper, the wall chart
   engine/          renderer, picking, sound, save, on-screen interface
-  world/           the island, built area by area
+  world/           the island and the Subterranean Station, built area by area
 tests/
-  puzzles.test.js  rules, clues and the node graph
+  puzzles.test.js  chapter one: rules, clues and the node graph
+  below.test.js    chapter two: the same for the pump, the junction box and the door
   walkthrough.cjs  plays the whole demo in a real browser
   seethrough.cjs   checks no wall lets the one behind it show, at the angles that matter
   tour.cjs         screenshots every view
 ```
+
+The surface and the Subterranean Station are two separate groups in one scene.
+Only the one you are standing in is drawn, and the stairs between them are a fade.
+
+The tunnel's constant hum is three synthesised layers (air, hum, whirr). Their
+levels are the `TUNNEL_MIX` numbers at the top of `src/engine/audio.js`, and each
+place scales them in its `amb` entry in `src/data/nodes.js`.
 
 Clues are generated from the same constants the puzzles check against (the
 schedule in the log, the pad, the bearing on the chart), so a clue cannot drift

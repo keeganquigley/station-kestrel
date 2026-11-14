@@ -207,6 +207,10 @@ export function buildTunnel(parent) {
   const sendLamp = lampMat(0x22281f);
   put(sp, cyl(0.026, 0.03, sendLamp, 12), 0.45, -0.2, 0.145).rotation.x = Math.PI / 2;
   put(sp, plate(0.16, 0.045, 'LINE'), 0.45, -0.3, 0.132);
+  const readingLamp = new THREE.PointLight(0xfff0d0, 2.6, 3.6, 1.5); // so the sender can be read in more than red
+  readingLamp.position.set(hw - 0.75, LF + 2.05, SZ);
+  root.add(readingLamp);
+  put(root, box(0.2, 0.06, 0.3, mat.darkMetal), hw - 0.12, LF + 2.12, SZ);
   hot(put(root, proxy(0.3, 1.0, 1.5), hw - 0.16, LF + 1.36, SZ), { id: 'senderzoom', nodes: ['blastdoor'], cursor: 'zoom', action: ['go', 'sender'] });
 
   // ---------------------------------------------------------------- the end of the works
@@ -265,7 +269,7 @@ export function buildTunnel(parent) {
   });
   put(mugs, box(0.006, 0.13, 0.006, mat.chrome), 0.15, 0.09, 0).rotation.z = 0.35;
   hot(put(mugs, proxy(1.1, 0.24, 0.3), 0, 0.1, 0.02), { id: 'mugs', nodes: ['blastdoor', 'beyond'], cursor: 'look', action: ['look', 'mugs'] });
-  const dimRock = new THREE.PointLight(0x6f8f96, 1.6, 12, 1.4); // enough to see the rock by
+  const dimRock = new THREE.PointLight(0x6f8f96, 3.2, 13, 1.4); // enough to see the rock by
   dimRock.position.set(0, 2.0, -3.5);
   cave.add(dimRock);
   const glow = new THREE.PointLight(0x7fffd8, 0, 18, 1.3);

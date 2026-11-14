@@ -104,8 +104,8 @@ export function buildVault(scene) {
   put(way, decal(0.86, 0.3, 300, (g, W, H) => {
     g.fillStyle = '#737a7d';
     g.fillRect(0, 0, W, H);
-    text(g, 'SUBTERRANEAN', W / 2, H * 0.3, { size: 34, color: '#d9c23c' });
-    text(g, 'STATION', W / 2, H * 0.72, { size: 34, color: '#d9c23c' });
+    text(g, 'SUBTERRANEAN', W / 2, H * 0.3, { size: 27, color: '#d9c23c' });
+    text(g, 'STATION', W / 2, H * 0.72, { size: 27, color: '#d9c23c' });
   }, { rough: 0.5 }), 0, 0.5, 0.032);
   put(way, box(0.05, 0.3, 0.07, mat.chrome), 0.36, -0.05, 0.05);
   hot(way, { id: 'waydown', nodes: ['vault'], cursor: 'fwd', action: ['descend'], disabled: true });

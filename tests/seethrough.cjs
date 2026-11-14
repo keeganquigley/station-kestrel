@@ -59,10 +59,43 @@ const { chromium } = require('playwright');
     }
     return { bad: out, views };
   });
+  // Underground there is nothing outside the walls at all, so any gap shows the empty background.
+  // Paint that background magenta and sweep every standing place through the whole range of view.
+  const voids = await page.evaluate(() => {
+    const k = window.kestrel, g = k.game, out = [];
+    k.renderer.three.setClearColor(0xff00ff, 1);
+    g.state.flags.hatchOpen = true;
+    g.state.pump.drained = true;
+    const c2 = document.createElement('canvas');
+    c2.width = 640;
+    c2.height = 400;
+    const ctx = c2.getContext('2d', { willReadFrequently: true });
+    let views = 0;
+    for (const [node, n] of Object.entries(k.nodes)) {
+      if (n.realm !== 'below' || n.cam) continue;
+      g.state.reply.open = node === 'blastdoor' || node === 'beyond';
+      for (const pitch of [-42, 0, 42]) {
+        for (let yaw = 0; yaw < 360; yaw += 45) {
+          k.jump(node, 'N', yaw, pitch);
+          ctx.drawImage(document.getElementById('view'), 0, 0);
+          const d = ctx.getImageData(0, 0, 640, 400).data;
+          let hits = 0;
+          for (let i = 0; i < d.length; i += 16) if (d[i] > 150 && d[i + 1] < 70 && d[i + 2] > 150) hits++;
+          if (hits > 2) out.push(`${node} yaw ${yaw} pitch ${pitch}: a gap shows the void (${hits * 4} px)`);
+          views++;
+        }
+      }
+    }
+    k.renderer.three.setClearColor(0x000000, 1);
+    return { bad: out, views };
+  });
+  bad.push(...voids.bad);
+
   await browser.close();
   if (bad.length) {
     console.log(`SEE-THROUGH FOUND in ${bad.length} views:\n` + bad.slice(0, 12).join('\n'));
     process.exit(1);
   }
   console.log(`no see-through: ${views} views checked from corridor, office and vault`);
+  console.log(`no gaps underground: ${voids.views} views checked from every standing place below`);
 })();
