@@ -15,10 +15,12 @@ export function buildQuarters(parent) {
   /** Floor, ceiling, light and the three walls a room owns; the fourth is the tunnel wall with its door. */
   const room = (r, wallMat, walls = {}) => {
     const w = r.x1 - r.x0, d = r.z1 - r.z0, mx = (r.x0 + r.x1) / 2, mz = (r.z0 + r.z1) / 2;
-    const fl = M(new THREE.PlaneGeometry(w, d, cuts(w), cuts(d)), mat.lino, false, true);
-    fl.geometry.attributes.uv.array.forEach((v, i, a) => (a[i] = (v * (i % 2 ? d : w)) / 2));
+    // the floor runs on under the door frame, so no crack opens between it and the tunnel's floor
+    const lap = 0.2, fw = w + lap;
+    const fl = M(new THREE.PlaneGeometry(fw, d, cuts(fw), cuts(d)), mat.lino, false, true);
+    fl.geometry.attributes.uv.array.forEach((v, i, a) => (a[i] = (v * (i % 2 ? d : fw)) / 2));
     fl.rotation.x = -Math.PI / 2;
-    put(root, fl, mx, F + 0.005, mz);
+    put(root, fl, mx - Math.sign(r.x0) * (lap / 2), F + 0.005, mz);
     put(root, box(w + 0.3, 0.1, d + 0.3, mat.ceiling, 1.2), mx, F + ROOM_H + 0.05, mz);
     const k = 0.1, far = r.x0 > 0 ? r.x1 + k / 2 : r.x0 - k / 2;
     wall(root, walls.N || wallMat, r.x0, r.z0 - k / 2, r.x1, r.z0 - k / 2, F, ROOM_H, k);

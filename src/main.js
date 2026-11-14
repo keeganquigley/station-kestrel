@@ -171,7 +171,7 @@ const game = {
       s.facing = facing;
     }
     sound.sfx('step');
-    arrive(node);
+    arrive(node, instant);
     syncAll();
     if (instant || !game.playing) {
       move = null;
@@ -223,12 +223,13 @@ const ui = new UI(game);
 const { A, gates, shut } = createActions(game);
 
 /** Things that happen the first time you reach a place. */
-function arrive(node) {
+function arrive(node, cut = false) {
   const s = game.state, once = (flag) => (s.flags[flag] ? false : (s.flags[flag] = true));
   if (node === 'vault' && once('vaultSeen')) game.say(SAY.vaultEnter);
   if (node === 'stairfoot' && once('belowSeen')) game.say(SAY.belowEnter);
   if (node === 'junction' && once('lowSeen')) game.say(SAY.lowEnter);
-  if (node === 'beyond' && !s.flags.finished2) {
+  // the ending belongs to walking through the door, not to a test or a tour cutting straight there
+  if (node === 'beyond' && !s.flags.finished2 && !cut) {
     game.say(SAY.beyond1);
     game.after(4200, () => game.say(SAY.beyond2));
     game.after(9000, () => game.finish());
@@ -446,6 +447,7 @@ function begin(state, fresh) {
   renderer.fade(1, 1200);
   ui.say('');
   game.changed(900);
+  if (state.node === 'beyond') arrive('beyond'); // resumed on the far side of the door
   if (fresh) game.read('orders', () => ui.say('Holland Island, an hour before dark. The boat has already put about.'));
 }
 
