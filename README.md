@@ -101,7 +101,7 @@ answer.
 npm test
 ```
 
-That runs the unit tests: the rules of all nine puzzles, that each set of clues
+That runs the unit tests: the rules of every puzzle, that each set of clues
 allows exactly one answer, and that the three chapters join up on the map.
 
 The browser tests need [Playwright](https://playwright.dev) installed and the
