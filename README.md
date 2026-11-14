@@ -19,8 +19,8 @@ Three chapters, about 15 to 20 minutes each:
    pen, one very old boat alongside, a dock office, a diving store and a
    darkroom. Three last puzzles, and the paperwork for a sailing.
 
-The title screen can start at chapter two or three with the earlier ones
-counted as solved.
+The chapters run on from one another without a break. The title screen can
+also start at chapter two or three, with the earlier ones counted as solved.
 
 ## Play
 
@@ -54,16 +54,17 @@ Everything is generated in code. There are no image, model or sound files.
 - **Pictures** are a real 3D scene (Three.js) seen from fixed standing places,
   drawn at 640x400 and scaled up with hard pixels, a reduced palette and an
   ordered dither.
-- **Textures, labels, dials, papers and the wall chart** are painted on canvases
-  at start-up.
-- **Sound** is synthesised with Web Audio: wind, sea, the diesel, the receiver.
+- **Textures, labels, dials, papers, the wall chart and the photograph** are
+  painted on canvases at start-up.
+- **Sound** is synthesised with Web Audio: wind, sea, the diesel, the receiver,
+  the hum of the tunnel, water against the quay.
 
 ```
 src/
   main.js          input, movement, the game loop
   actions.js       what each clickable thing does
   puzzles/         the rules of each puzzle, as plain functions with no rendering
-  data/            the node graph, every readable paper, the wall chart
+  data/            the node graph, every readable paper, the wall chart, the photograph
   engine/          renderer, picking, sound, save, on-screen interface
   world/           the island, the Subterranean Station and the pen, built area by area
 tests/
@@ -71,13 +72,15 @@ tests/
   below.test.js    chapter two: the same for the pump, the junction box and the door
   pen.test.js      chapter three: the darkroom, the tally board, the telegraph and its papers
   walkthrough.cjs  plays all three chapters in a real browser
-  seethrough.cjs   checks no wall lets the one behind it show, at the angles that matter
+  seethrough.cjs   checks no wall lets the one behind it show, and that nothing underground has a gap
   tour.cjs         screenshots every view
 ```
 
 The surface, the Subterranean Station and the pen are three separate groups in
-one scene. Only the one you are standing in is drawn, and the ways between them
-(the stairs, the rock passage) are fades.
+one scene, all built when the page opens. Only the one you are standing in is
+drawn and lit. The ways between them (the stairs, the rock passage) are fades:
+the picture goes to black, the camera is cut to the other group, and the picture
+comes back. Nothing is loaded.
 
 The tunnel's constant hum is three synthesised layers (air, hum, whirr). Their
 levels are the `TUNNEL_MIX` numbers at the top of `src/engine/audio.js`, and each
@@ -88,14 +91,18 @@ Chapter three borrows two names from the real world, for the letterhead on one
 paper and the name on the boat. Both are in `src/data/names.js` and nowhere else.
 
 Clues are generated from the same constants the puzzles check against (the
-schedule in the log, the pad, the bearing on the chart), so a clue cannot drift
-out of step with its answer.
+schedule in the log, the pad, the bearing on the chart, the developing times,
+the number in the photograph), so a clue cannot drift out of step with its
+answer.
 
 ## Tests
 
 ```bash
 npm test
 ```
+
+That runs the unit tests: the rules of all nine puzzles, that each set of clues
+allows exactly one answer, and that the three chapters join up on the map.
 
 The browser tests need [Playwright](https://playwright.dev) installed and the
 built game being served:
