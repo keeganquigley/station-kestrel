@@ -61,7 +61,7 @@ const { chromium } = require('playwright');
   });
   // Underground there is nothing outside the walls at all, so any gap shows the empty background.
   // Paint that background magenta and sweep every standing place through the whole range of view.
-  const voids = await page.evaluate(() => {
+  const sweep = (realm) => page.evaluate((realm) => {
     const k = window.kestrel, g = k.game, out = [];
     k.renderer.three.setClearColor(0xff00ff, 1);
     g.state.flags.hatchOpen = true;
@@ -72,7 +72,7 @@ const { chromium } = require('playwright');
     const ctx = c2.getContext('2d', { willReadFrequently: true });
     let views = 0;
     for (const [node, n] of Object.entries(k.nodes)) {
-      if (n.realm !== 'below' || n.cam) continue;
+      if (n.realm !== realm || n.cam) continue;
       g.state.reply.open = node === 'blastdoor' || node === 'beyond';
       for (const pitch of [-42, 0, 42]) {
         for (let yaw = 0; yaw < 360; yaw += 45) {
@@ -88,8 +88,10 @@ const { chromium } = require('playwright');
     }
     k.renderer.three.setClearColor(0x000000, 1);
     return { bad: out, views };
-  });
-  bad.push(...voids.bad);
+  }, realm);
+  const voids = await sweep('below');
+  const pen = await sweep('pen');
+  bad.push(...voids.bad, ...pen.bad);
 
   await browser.close();
   if (bad.length) {
@@ -98,4 +100,5 @@ const { chromium } = require('playwright');
   }
   console.log(`no see-through: ${views} views checked from corridor, office and vault`);
   console.log(`no gaps underground: ${voids.views} views checked from every standing place below`);
+  console.log(`no gaps in the pen: ${pen.views} views checked from every standing place there`);
 })();

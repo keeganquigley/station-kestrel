@@ -348,6 +348,11 @@ body {
   border-bottom: 1px solid rgba(0, 0, 0, 0.45);
 }
 
+.paper .signature {
+  font-size: 17px;
+  line-height: 1;
+}
+
 .paper .blank {
   display: inline-block;
   min-width: 120px;

@@ -8,13 +8,19 @@ have to be understood before they will work.
 years ago has gone on drawing fuel, and has now missed three check-ins. You are
 sent alone to find out why.
 
-Two chapters so far, about 15 to 20 minutes each:
+Three chapters, about 15 to 20 minutes each:
 
 1. **The station.** The island, the plant shed and the listening post on top of
    it. Three interlocking puzzles and a vault.
 2. **The Subterranean Station.** What is under the vault: a long tunnel, the
    crew's kitchen, break room and bunks, three more puzzles, and the door at the
    end of the works.
+3. **Berth K7.** What is beyond the door: a sea cave fitted out as a submarine
+   pen, one very old boat alongside, a dock office, a diving store and a
+   darkroom. Three last puzzles, and the paperwork for a sailing.
+
+The title screen can start at chapter two or three with the earlier ones
+counted as solved.
 
 ## Play
 
@@ -59,21 +65,27 @@ src/
   puzzles/         the rules of each puzzle, as plain functions with no rendering
   data/            the node graph, every readable paper, the wall chart
   engine/          renderer, picking, sound, save, on-screen interface
-  world/           the island and the Subterranean Station, built area by area
+  world/           the island, the Subterranean Station and the pen, built area by area
 tests/
   puzzles.test.js  chapter one: rules, clues and the node graph
   below.test.js    chapter two: the same for the pump, the junction box and the door
-  walkthrough.cjs  plays the whole demo in a real browser
+  pen.test.js      chapter three: the darkroom, the tally board, the telegraph and its papers
+  walkthrough.cjs  plays all three chapters in a real browser
   seethrough.cjs   checks no wall lets the one behind it show, at the angles that matter
   tour.cjs         screenshots every view
 ```
 
-The surface and the Subterranean Station are two separate groups in one scene.
-Only the one you are standing in is drawn, and the stairs between them are a fade.
+The surface, the Subterranean Station and the pen are three separate groups in
+one scene. Only the one you are standing in is drawn, and the ways between them
+(the stairs, the rock passage) are fades.
 
 The tunnel's constant hum is three synthesised layers (air, hum, whirr). Their
 levels are the `TUNNEL_MIX` numbers at the top of `src/engine/audio.js`, and each
-place scales them in its `amb` entry in `src/data/nodes.js`.
+place scales them in its `amb` entry in `src/data/nodes.js`. The pen adds water
+against the quay and the boat shifting at her chains: `PEN_MIX`, same file.
+
+Chapter three borrows two names from the real world, for the letterhead on one
+paper and the name on the boat. Both are in `src/data/names.js` and nowhere else.
 
 Clues are generated from the same constants the puzzles check against (the
 schedule in the log, the pad, the bearing on the chart), so a clue cannot drift
@@ -101,4 +113,4 @@ npm run seethrough
 ```
 
 `tests/walkthrough.cjs` contains the full solution, so do not read it if you
-want to play first.
+want to play first. Set `KESTREL_FROM3=1` to play only chapter three.

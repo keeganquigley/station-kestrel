@@ -162,7 +162,7 @@ export const PEN_DOCS = {
     html: release({
       sailing: SAILING,
       party: 'four (4)',
-      signature: `<span class="ink">${INITIAL[SIGNED_BY]}</span>`,
+      signature: `<span class="ink signature">${INITIAL[SIGNED_BY]}</span>`,
       tally: OWNER[SIGNED_BY],
       aside: 'Drawn a line at a time by the stylus, signature and all. It is the hand from the notebook on the upper bunk.',
     }),
@@ -182,7 +182,6 @@ export const PEN_DOCS = {
 };
 
 export const PEN_LOOK = {
-  passage: 'The way back up, to the door and the four mugs.',
   berth: 'BERTH K7, in paint on the stone. The signal never had a call sign. It had an address.',
   cable: 'The cable from the tunnel, every core of it, across the quay and into her side through a gland. Whatever has been sending is aboard.',
   cameraEmpty: 'A camera on a tripod, aimed at the boat. The back hangs open and the spool is gone.',

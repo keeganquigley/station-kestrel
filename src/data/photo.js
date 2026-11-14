@@ -56,7 +56,7 @@ export function drawPhoto(g, W, H) {
   g.fillRect(0, wy, w, h - wy);
 
   // the boat, new paint, broadside on, bow to the right
-  const cx = w * 0.5, hy = wy - 6 * u, L = w * 0.86, hh = 46 * u;
+  const cx = w * 0.5, hy = wy - 4 * u, L = w * 0.92, hh = 34 * u;
   const paint = g.createLinearGradient(0, hy - hh, 0, hy + hh * 0.4);
   paint.addColorStop(0, '#d9d4c2');
   paint.addColorStop(0.55, '#a7a393');

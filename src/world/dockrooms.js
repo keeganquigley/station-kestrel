@@ -168,12 +168,12 @@ export function buildDockRooms(parent) {
   routine.rotation.y = RY.N;
   put(root, routine, 10.9, F + 1.5, O.z1 - 0.012);
   hot(routine, { id: 'routine', nodes: ['dockoffice'], cursor: 'look', action: ['doc', 'routine'] });
-  put(root, box(0.5, 1.35, 0.6, mat.steel, 1), 12.6, F + 0.675, O.z1 - 0.33);
+  put(root, box(0.5, 1.35, 0.6, mat.steel, 1), 11.75, F + 0.675, O.z1 - 0.33);
   for (let i = 0; i < 4; i++) {
-    put(root, box(0.44, 0.28, 0.02, mat.panelGrey), 12.6, F + 0.2 + i * 0.32, O.z1 - 0.64);
-    put(root, box(0.12, 0.02, 0.02, mat.chrome), 12.6, F + 0.26 + i * 0.32, O.z1 - 0.655);
+    put(root, box(0.44, 0.28, 0.02, mat.panelGrey), 11.75, F + 0.2 + i * 0.32, O.z1 - 0.64);
+    put(root, box(0.12, 0.02, 0.02, mat.chrome), 11.75, F + 0.26 + i * 0.32, O.z1 - 0.655);
   }
-  hot(put(root, proxy(0.5, 1.35, 0.1), 12.6, F + 0.675, O.z1 - 0.66), { id: 'cabinet', nodes: ['dockoffice'], cursor: 'look', action: ['look', 'cabinet'] });
+  hot(put(root, proxy(0.5, 1.35, 0.1), 11.75, F + 0.675, O.z1 - 0.66), { id: 'cabinet', nodes: ['dockoffice'], cursor: 'look', action: ['look', 'cabinet'] });
 
   // ================================================================ diving store
   const S = DOCK.store;
@@ -231,8 +231,10 @@ export function buildDockRooms(parent) {
   // the property cage across the east end
   const CX = 12.2, G0 = -130.6, G1 = -129.4;
   const mesh = (parentGrp, za, zb) => {
-    for (let z = za; z <= zb + 1e-6; z += 0.1) put(parentGrp, box(0.012, 2.3, 0.012, mat.darkMetal), 0, 1.15, z);
-    for (const y of [0.04, 0.78, 1.52, 2.28]) put(parentGrp, box(0.03, 0.04, zb - za + 0.03, mat.darkMetal), 0, y, (za + zb) / 2);
+    // you can see through it, so you can point through it
+    const bar = (m) => ((m.userData.nopick = true), m);
+    for (let z = za; z <= zb + 1e-6; z += 0.1) put(parentGrp, bar(box(0.012, 2.3, 0.012, mat.darkMetal)), 0, 1.15, z);
+    for (const y of [0.04, 0.78, 1.52, 2.28]) put(parentGrp, bar(box(0.03, 0.04, zb - za + 0.03, mat.darkMetal)), 0, y, (za + zb) / 2);
   };
   const fixed = grp(root, CX, F, 0);
   mesh(fixed, S.z0 + 0.03, G0);
@@ -256,21 +258,20 @@ export function buildDockRooms(parent) {
     tag.rotation.y = RY.W;
     put(root, tag, S.x1 - 0.4, F + 1.07, z);
   });
-  put(root, box(0.3, 0.5, 0.8, mat.woodDark, 1), 12.72, F + 0.25, -130);
-  put(root, box(0.34, 0.03, 0.86, mat.felt), 12.72, F + 0.515, -130);
+  put(root, box(0.3, 0.78, 0.8, mat.woodDark, 1), 12.72, F + 0.39, -130);
+  put(root, box(0.34, 0.03, 0.86, mat.felt), 12.72, F + 0.795, -130);
   for (let i = 0; i < 4; i++) {
-    put(root, cyl(0.035, 0.012, mat.chrome, 12), 12.72, F + 0.54, -130.3 + i * 0.2);
-    put(root, cyl(0.029, 0.014, mat.paper, 12), 12.72, F + 0.541, -130.3 + i * 0.2);
-    put(root, box(0.02, 0.006, 0.17, mat.woodDark), 12.72, F + 0.534, -130.3 + i * 0.2).rotation.y = Math.PI / 2;
+    put(root, cyl(0.035, 0.012, mat.chrome, 12), 12.72, F + 0.82, -130.3 + i * 0.2);
+    put(root, cyl(0.029, 0.014, mat.paper, 12), 12.72, F + 0.821, -130.3 + i * 0.2);
+    put(root, box(0.02, 0.006, 0.17, mat.woodDark), 12.72, F + 0.814, -130.3 + i * 0.2).rotation.y = Math.PI / 2;
   }
   const clip = sheet(0.26, 0.36, 12, { head: 'CASUALTY RETURN' });
   clip.rotation.y = RY.W;
   put(root, clip, S.x1 - 0.026, F + 1.72, -130);
   put(root, box(0.02, 0.4, 0.3, mat.woodDark), S.x1 - 0.011, F + 1.72, -130);
-  // helper boxes this side of the mesh, so the bars never swallow a click
-  hot(put(root, proxy(0.06, 0.46, 1.3), CX - 0.12, F + 1.12, -130), { id: 'effects', nodes: ['cage'], cursor: 'look', action: ['cage', 'effects'] });
-  hot(put(root, proxy(0.06, 0.3, 1.0), CX - 0.12, F + 0.6, -130), { id: 'watches', nodes: ['cage'], cursor: 'look', action: ['cage', 'watches'] });
-  hot(put(root, proxy(0.06, 0.44, 0.36), CX - 0.12, F + 1.72, -130), { id: 'casualty', nodes: ['cage'], cursor: 'look', action: ['cage', 'casualty'] });
+  hot(put(root, proxy(0.4, 0.5, 1.3), S.x1 - 0.3, F + 1.14, -130), { id: 'effects', nodes: ['cage'], cursor: 'look', action: ['cage', 'effects'] });
+  hot(put(root, proxy(0.36, 0.14, 0.9), 12.72, F + 0.86, -130), { id: 'watches', nodes: ['cage'], cursor: 'look', action: ['cage', 'watches'] });
+  hot(put(root, proxy(0.1, 0.44, 0.34), S.x1 - 0.06, F + 1.72, -130), { id: 'casualty', nodes: ['cage'], cursor: 'look', action: ['cage', 'casualty'] });
   hot(put(root, proxy(0.1, 2.3, 1.4), CX - 0.16, F + 1.15, -130), { id: 'cagezoom', nodes: ['store'], cursor: 'zoom', action: ['go', 'cage'] });
   const cageLight = new THREE.PointLight(0xffe9c8, 3.5, 3.2, 1.5);
   cageLight.position.set(12.75, F + 2.1, -130);

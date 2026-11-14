@@ -40,6 +40,9 @@ const fs = require('fs');
       s.pump.drained = lower;
       s.junction.live = n === 'sender' || n === 'beyond';
       s.reply.open = n === 'beyond';
+      // chapter three: the print on the line and the cage open, so everything in them can be seen
+      s.darkroom.printed = true;
+      s.tally.open = n === 'cage';
       const odd = { NE: [45, 0], SE: [135, 0], SW: [225, 0], NW: [315, 0], UP: [20, 40], DN: [200, -40] }[f];
       if (odd) window.kestrel.jump(n, 'N', odd[0], odd[1]);
       else window.kestrel.jump(n, f);

@@ -129,7 +129,6 @@ export const BELOW_LOOK = {
   water: 'Black water over the lower steps, quite still. Deeper than your boots, and the tunnel goes on under it.',
   enddoor: 'A blast door, stencilled END OF WORKS 1958. Past here nobody dug.',
   mugs: 'Four enamel mugs set down in a row at the threshold. One still has a spoon in it.',
-  deep: 'The floor is rock now, and it goes down. The cables go down with it.',
 };
 
 export const BELOW_SAY = {

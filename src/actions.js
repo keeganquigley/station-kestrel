@@ -260,6 +260,11 @@ export function createActions(game) {
 
     // ---------------------------------------------------------------- chapter three
 
+    /** The rock passage between the blast door and the pen, either way. */
+    passage(node, facing) {
+      game.fadeTo(node, facing);
+    },
+
     film() {
       if (S().flags.filmTaken) return game.say(LOOK.cameraEmpty);
       S().flags.filmTaken = true;

@@ -95,7 +95,7 @@ export function buildPen(parent) {
   note.rotation.z = -0.12;
   put(root, note, SX0 - 0.2, SHELF + 0.86, z1 + 0.135);
   hot(put(root, proxy(0.34, 0.4, 0.12), SX0 - 0.2, SHELF + 0.86, z1 + 0.14), { id: 'note-okafor', nodes: ['gallery'], cursor: 'look', action: ['doc', 'note-okafor'] });
-  hot(put(root, proxy(1.9, 2.3, 0.3), 6.95, SHELF + 1.2, south + 0.6), { id: 'passage', nodes: ['gallery'], cursor: 'look', action: ['look', 'passage'] });
+  hot(put(root, proxy(1.9, 2.3, 0.3), 6.95, SHELF + 1.2, south + 0.6), { id: 'passage', nodes: ['gallery'], cursor: 'fwd', action: ['passage', 'beyond', 'S'] });
 
   // ---------------------------------------------------------------- lamps along the quay
   const pendant = (z, lit, power = 26) => {
@@ -166,7 +166,7 @@ export function buildPen(parent) {
   hot(put(root, proxy(1.6, 0.16, 0.5), 3.0, PF + 0.06, CZ), { id: 'cable', nodes: ['quayMid'], cursor: 'look', action: ['look', 'cable'] });
 
   // the camera on its tripod, facing her
-  const cam = grp(root, 2.75, PF, -127.5);
+  const cam = grp(root, 2.75, PF, -128.7);
   for (const a of [0.4, 2.5, 4.6]) strut(cam, [Math.cos(a) * 0.42, 0, Math.sin(a) * 0.42], [0, 1.28, 0], 0.014, mat.woodDark);
   put(cam, box(0.3, 0.2, 0.22, mat.black), 0, 1.4, 0);
   put(cam, cyl(0.055, 0.14, mat.chrome, 12), -0.2, 1.4, 0).rotation.z = Math.PI / 2;

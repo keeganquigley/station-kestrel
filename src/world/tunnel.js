@@ -277,7 +277,7 @@ export function buildTunnel(parent) {
   cave.add(glow);
   const orbMat = new THREE.MeshBasicMaterial({ color: 0x000000, fog: false });
   const orb = put(cave, M(new THREE.SphereGeometry(0.16, 12, 8), orbMat, false, false), 0, 0.85, -19.4);
-  hot(put(cave, proxy(3.4, 2.4, 0.4), 0, 1.2, -6), { id: 'deep', nodes: ['beyond'], cursor: 'look', action: ['look', 'deep'] });
+  hot(put(cave, proxy(3.4, 2.4, 0.4), 0, 1.2, -6), { id: 'deep', nodes: ['beyond'], cursor: 'fwd', action: ['passage', 'gallery', 'N'] });
 
   // ---------------------------------------------------------------- things that change
   const drawPaper = (mode) => (g, W, H) => {
