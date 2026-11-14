@@ -2,14 +2,13 @@
 import * as THREE from 'three';
 import { FLOOR as F, ROOMS, RY } from './layout.js';
 import { mat, lampMat, setLamp } from './materials.js';
-import { M, box, cyl, put, grp, decal, text, hot, proxy, chair, rng } from './kit.js';
+import { box, cyl, put, grp, decal, text, hot, proxy, chair, rng } from './kit.js';
 import { busLive } from '../puzzles/generator.js';
 import { drawChart } from '../data/chart.js';
 
 export function buildOffice(scene) {
   const root = grp(scene);
   const r = ROOMS.office;
-  const top = F + 0.76;
 
   // --- desk against the west wall; you see it from the sitter's side
   const desk = grp(root, r.x0 + 0.45, F, -20);

@@ -9,7 +9,6 @@ import { STOPPED_CLOCK } from '../puzzles/receiver.js';
 
 const WORD = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 const TIMES = { 1: 'once', 2: 'twice', 3: 'three times' };
-const cap = (s) => s[0].toUpperCase() + s.slice(1);
 
 /** "16:50" as a watch face would be read aloud: "ten to five". */
 export function clockWords(hhmm) {

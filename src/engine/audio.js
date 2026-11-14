@@ -284,6 +284,7 @@ export class Sound {
 
   sfx(name) {
     const b = (o) => this.blip(o);
+    // prettier-ignore
     switch (name) {
       case 'click': b({ noise: 0.25, dur: 0.03, filter: 'highpass', cutoff: 1800 }); break;
       case 'switch': b({ noise: 0.3, dur: 0.04, filter: 'highpass', cutoff: 1200 }); b({ tone: 0.3, f0: 140, f1: 70, dur: 0.09 }); break;

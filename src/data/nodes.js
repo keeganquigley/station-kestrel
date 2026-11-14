@@ -34,6 +34,7 @@ const inRealm = (realm) => (nodes) => Object.fromEntries(Object.entries(nodes).m
 const below = inRealm('below');
 const pen = inRealm('pen');
 
+// prettier-ignore
 export const NODES = {
   jetty: { pos: [0, DECK + EYE, 38], faces: 'NESW', fwd: { N: 'path' }, tilt: { N: 0.02 }, amb: { wind: 0.7, sea: 1 } },
   path: { pos: out(0, 21), faces: 'NESW', fwd: { N: 'yard', S: 'jetty' }, tilt: { N: 0.06, S: -0.1 }, amb: { wind: 0.85, sea: 0.6 } },

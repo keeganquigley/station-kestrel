@@ -18,7 +18,7 @@ export function buildVault(scene) {
   for (const z of [-20.75, -19.25]) put(root, box(0.5, 2.3, 0.14, mat.darkMetal), 10.4, F + 1.15, z);
   put(root, box(0.5, 0.14, 1.64, mat.darkMetal), 10.4, F + 2.27, -20);
   const hinge = grp(root, c.x1 - 0.1, F, -20.76);
-  const slab = put(hinge, box(0.2, 2.24, 1.52, mat.vaultSteel, 1.2), 0, 1.12, 0.76);
+  put(hinge, box(0.2, 2.24, 1.52, mat.vaultSteel, 1.2), 0, 1.12, 0.76);
   for (const y of [0.4, 1.12, 1.84]) put(hinge, cyl(0.045, 0.24, mat.darkMetal, 8), -0.1, y, 0.0);
   const wheel = grp(hinge, -0.16, 1.15, 0.76, RY.W);
   wheel.add(M(new THREE.TorusGeometry(0.26, 0.028, 8, 24), mat.chrome));

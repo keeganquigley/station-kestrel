@@ -990,10 +990,7 @@ const shots = process.argv[2] || null;
         if (o.userData && o.userData.hot) hots.push(o.userData.hot);
         o.children.forEach(walk);
       };
-      let scene = null;
-      // find the scene by walking up from any hotspot the engine can find
-      scene = k.scene;
-      walk(scene);
+      walk(k.scene);
       for (const h of hots) {
         if (['door', 'vaultdoor', 'water', 'enddoor'].includes(h.id)) continue; // these switch themselves off once passed; exercised above
         ids.push(h.id);

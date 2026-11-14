@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { FLOOR as F, STN, ROOMS, CEIL, RY } from './layout.js';
 import { mat, lampMat, setLamp } from './materials.js';
-import { M, box, cyl, put, grp, wall, decal, text, plate, hot, proxy, rng, cuts } from './kit.js';
+import { M, box, cyl, put, grp, wall, decal, text, hot, proxy, rng, cuts } from './kit.js';
 import { busLive } from '../puzzles/generator.js';
 
 const DOOR_H = 2.25;

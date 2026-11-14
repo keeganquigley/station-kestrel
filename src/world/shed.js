@@ -1,6 +1,6 @@
 // The plant shed: diesel set, breaker panel, workbench.
 import * as THREE from 'three';
-import { P, SHED, SHED_FLOOR as F, RY } from './layout.js';
+import { SHED, SHED_FLOOR as F, RY } from './layout.js';
 import { mat, lampMat, setLamp } from './materials.js';
 import { M, box, cyl, put, grp, wall, decal, text, plate, gauge, meterFace, meterAngle, hot, proxy } from './kit.js';
 import { BREAKERS, RATING, PRIME_COUNT, load, status } from '../puzzles/generator.js';

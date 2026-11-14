@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # minor and patch updates arrive together in one pull request
+      everything:
+        update-types: [minor, patch]
+    # major versions come one at a time: a new Three.js can change lighting and colour,
+    # which no test will catch, so each one wants looking at
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']
