@@ -3,6 +3,9 @@
 import * as Gen from './puzzles/generator.js';
 import * as Rx from './puzzles/receiver.js';
 import * as Vault from './puzzles/vault.js';
+import * as Pump from './puzzles/pump.js';
+import * as Junction from './puzzles/junction.js';
+import * as Reply from './puzzles/reply.js';
 import { LOOK, SAY } from './data/documents.js';
 
 export function createActions(game) {
@@ -157,9 +160,99 @@ export function createActions(game) {
       }
     },
 
+    /** The vault teleprinter's last word. Reading it is what unlatches the way down. */
     final() {
       game.sfx('print');
-      game.read('final', () => game.finish());
+      game.read('final', () => {
+        if (S().flags.hatchOpen) return;
+        S().flags.hatchOpen = true;
+        game.sfx('rack');
+        game.say(SAY.hatch);
+        game.changed(700);
+      });
+    },
+
+    // ---------------------------------------------------------------- chapter two
+
+    descend() {
+      if (S().flags.hatchOpen) game.fadeTo('stairfoot', 'N');
+    },
+
+    valve(index, dir) {
+      const { state, moved } = Pump.turnValve(S().pump, index, dir);
+      S().pump = state;
+      game.sfx(moved ? 'pour' : 'click');
+      game.say(S().pump.drained ? SAY.primeAlready : moved ? SAY.pour(moved) : SAY.pourNone);
+      game.changed();
+    },
+
+    prime() {
+      const { state, result } = Pump.prime(S().pump);
+      S().pump = state;
+      if (result === 'drained') {
+        game.sfx('drain');
+        game.say(SAY.primeDone);
+      } else if (result === 'lost') {
+        game.sfx('gulp');
+        game.say(SAY.primeLost);
+      } else {
+        game.say(SAY.primeAlready);
+      }
+      game.changed(400);
+    },
+
+    core(name, dir) {
+      S().junction = Junction.spin(S().junction, name, dir);
+      game.sfx('wheel');
+      game.changed(60);
+    },
+
+    isolator() {
+      const { state, result } = Junction.throwIsolator(S().junction);
+      S().junction = state;
+      if (result === 'live') {
+        game.sfx('isolator');
+        game.sfx('farprint');
+        game.say(SAY.isolLive);
+      } else if (result === 'fault') {
+        game.sfx('trip');
+        game.say(SAY.isolFault);
+      } else {
+        game.say(SAY.isolAlready);
+      }
+      game.changed();
+    },
+
+    rwheel(index, dir) {
+      S().reply = Reply.spin(S().reply, index, dir);
+      game.sfx('wheel');
+      game.changed(60);
+    },
+
+    send() {
+      const { state, result } = Reply.send(S().reply, S().junction.live);
+      S().reply = state;
+      if (result === 'open') {
+        game.sfx('print');
+        game.sfx('blast');
+        game.say(SAY.sendOpen);
+        game.changed(900);
+        game.after(3000, () => {
+          if (S().node === 'sender') game.go('blastdoor', 'N');
+        });
+      } else if (result === 'dead') {
+        game.sfx('click');
+        game.say(SAY.sendDead);
+      } else if (result === 'wrong') {
+        game.sfx('print');
+        game.say(SAY.sendWrong);
+      }
+    },
+
+    doorprint() {
+      if (S().reply.open) return game.read('comedown');
+      if (S().junction.live) return game.read('challenge');
+      game.say(SAY.doorPaperDead);
     },
   };
 
@@ -171,7 +264,18 @@ export function createActions(game) {
       return SAY.doorDead;
     },
     vault: () => (S().vault.open ? null : false), // false: not passable, and say nothing
+    hatch: () => (S().flags.hatchOpen ? null : false),
+    water: () => (S().pump.drained ? null : false),
+    blast: () => (S().reply.open ? null : false),
   };
 
-  return { A, gates };
+  /** Ways that are shut for now. While one is shut, pointing along it shows no walk-forward arrow. */
+  const shut = {
+    vault: () => !S().vault.open,
+    hatch: () => !S().flags.hatchOpen,
+    water: () => !S().pump.drained,
+    blast: () => !S().reply.open,
+  };
+
+  return { A, gates, shut };
 }

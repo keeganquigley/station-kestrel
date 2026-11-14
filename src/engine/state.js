@@ -2,6 +2,9 @@
 import * as Gen from '../puzzles/generator.js';
 import * as Rx from '../puzzles/receiver.js';
 import * as Vault from '../puzzles/vault.js';
+import * as Pump from '../puzzles/pump.js';
+import * as Junction from '../puzzles/junction.js';
+import * as Reply from '../puzzles/reply.js';
 import { START, NODES } from '../data/nodes.js';
 
 const KEY = 'station-kestrel-save-v1';
@@ -17,6 +20,10 @@ export function newState() {
     gen: Gen.initial(),
     rx: Rx.initial(),
     vault: Vault.initial(),
+    // chapter two
+    pump: Pump.initial(),
+    junction: Junction.initial(),
+    reply: Reply.initial(),
   };
 }
 

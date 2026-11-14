@@ -184,6 +184,58 @@ export function buildMaterials() {
     water: std({ map: water, color: 0x3b6470, roughness: 0.42, metalness: 0.1 }),
     blueDrum: std({ color: 0x2c4a63, roughness: 0.6, metalness: 0.2 }),
   });
+
+  // --- the Subterranean Station
+  const tile = tex(128, (g, s) => {
+    g.fillStyle = '#c9cbc2';
+    g.fillRect(0, 0, s, s);
+    speckle(g, s, 900, 2, 0.05);
+    g.fillStyle = 'rgba(70,74,70,0.7)';
+    for (let i = 0; i < s; i += 32) {
+      g.fillRect(i, 0, 2, s);
+      g.fillRect(0, i, s, 2);
+    }
+    blotches(g, s, 8, 'rgba(90,80,50,A)', 30, 0.2);
+  });
+  const ticking = tex(64, (g, s) => {
+    g.fillStyle = '#c8c2ae';
+    g.fillRect(0, 0, s, s);
+    g.fillStyle = '#56607a';
+    for (let x = 4; x < s; x += 16) g.fillRect(x, 0, 3, s);
+  });
+  const wool = tex(64, (g, s) => {
+    g.fillStyle = '#5d665c';
+    g.fillRect(0, 0, s, s);
+    speckle(g, s, 1500, 2, 0.12);
+  });
+  const dampWall = tex(256, (g, s) => {
+    g.fillStyle = '#7f8684';
+    g.fillRect(0, 0, s, s);
+    speckle(g, s, 5000, 2, 0.1);
+    blotches(g, s, 26, 'rgba(40,48,46,A)', 46, 0.32);
+    streaks(g, s, 22, 'rgba(24,30,28,A)', 0.5);
+    streaks(g, s, 6, 'rgba(120,80,40,A)', 0.3);
+    g.fillStyle = 'rgba(0,0,0,0.22)';
+    g.fillRect(0, s / 2, s, 2);
+    g.fillRect(0, 0, s, 2);
+    g.fillRect(0, 0, 2, s);
+  });
+  Object.assign(mat, {
+    damp: std({ map: dampWall }),
+    dampFloor: std({ map: dampWall, color: 0x767a78, roughness: 0.75 }),
+    wetFloor: std({ map: dampWall, color: 0x3c4443, roughness: 0.3 }),
+    tile: std({ map: tile, roughness: 0.4 }),
+    enamel: std({ color: 0xdcd9cc, roughness: 0.3 }),
+    ticking: std({ map: ticking }),
+    wool: std({ map: wool, roughness: 1 }),
+    felt: std({ color: 0x2f5a3c, roughness: 1 }),
+    cream: std({ map: paint, color: 0xe8dfc4 }),
+    blue: std({ color: 0x2a56a8, roughness: 0.6 }),
+    yellow: std({ color: 0xd1b12a, roughness: 0.6 }),
+    copper: std({ color: 0xb06a3a, roughness: 0.4, metalness: 0.5 }),
+    rockDark: std({ color: 0x34383a, roughness: 1, flatShading: true }),
+    deepWater: new THREE.MeshStandardMaterial({ color: 0x0b1719, roughness: 0.06, metalness: 0.5, transparent: true, opacity: 0.94 }),
+  });
   return mat;
 }
 

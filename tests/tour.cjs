@@ -32,7 +32,14 @@ const fs = require('fs');
   for (const [node, face] of views) {
     if (only && !only.includes(node)) continue;
     await page.evaluate(([n, f]) => {
-      if (n === 'vault' || n === 'corridor') window.kestrel.game.state.vault.open = n === 'vault';
+      const s = window.kestrel.game.state;
+      if (n === 'vault' || n === 'corridor') s.vault.open = n === 'vault';
+      // chapter two: show each place in the state you would normally first see it
+      s.flags.hatchOpen = true;
+      const lower = ['junction', 'jbox', 'blastdoor', 'sender', 'beyond'].includes(n);
+      s.pump.drained = lower;
+      s.junction.live = n === 'sender' || n === 'beyond';
+      s.reply.open = n === 'beyond';
       const odd = { NE: [45, 0], SE: [135, 0], SW: [225, 0], NW: [315, 0], UP: [20, 40], DN: [200, -40] }[f];
       if (odd) window.kestrel.jump(n, 'N', odd[0], odd[1]);
       else window.kestrel.jump(n, f);

@@ -5,7 +5,7 @@ import { pick, pointFor } from './engine/hotspots.js';
 import * as Store from './engine/state.js';
 import { Sound } from './engine/audio.js';
 import { UI } from './engine/ui.js';
-import { NODES, START, ORDER } from './data/nodes.js';
+import { NODES, START, ORDER, realmOf } from './data/nodes.js';
 import { ITEMS, SAY } from './data/documents.js';
 import { EYE } from './world/layout.js';
 import { terrainH } from './world/terrain.js';
@@ -94,12 +94,15 @@ function linksFrom(nodeId) {
   return Object.entries(n.fwd).map(([face, link]) => {
     const l = typeof link === 'string' ? { to: link } : link;
     const t = NODES[l.to];
-    return { ...l, face: l.face || face, bearing: bearingTo(n.pos, t.pos || t.look) };
+    // a fade leads to the other realm, which is nowhere near: point it the way the link is labelled
+    return { ...l, face: l.face || face, bearing: l.fade ? YAW[face] : bearingTo(n.pos, t.pos || t.look) };
   });
 }
 
 // ---------------------------------------------------------------- camera moves
 let move = null; // a glide or a turn in progress
+let fading = false; // walking the stairs between the realms
+const busy = () => !!move || fading;
 let lookDirty = false;
 const timers = new Set();
 
@@ -168,10 +171,7 @@ const game = {
       s.facing = facing;
     }
     sound.sfx('step');
-    if (node === 'vault' && !s.flags.vaultSeen) {
-      s.flags.vaultSeen = true;
-      game.say(SAY.vaultEnter);
-    }
+    arrive(node);
     syncAll();
     if (instant || !game.playing) {
       move = null;
@@ -181,7 +181,8 @@ const game = {
     }
     const to = poseOf(s);
     const dist = from.pos.distanceTo(to.pos);
-    startMove(from, to, clamp(380 + dist * 90, 480, 1700), !prev.cam && !n.cam);
+    const outdoors = realmOf(node) === 'surface' && !prev.realm;
+    startMove(from, to, clamp(380 + dist * 90, 480, 1700), outdoors && !prev.cam && !n.cam);
   },
 
   /** Call after any change to state: redraws, re-mixes the sound and saves. */
@@ -198,8 +199,20 @@ const game = {
     ui.sound(!sound.muted);
   },
 
+  /** Take the stairs: fade out, change realm, fade in. */
+  fadeTo(node, facing, sfx = 'stairs') {
+    if (fading) return;
+    fading = true;
+    sound.sfx(sfx);
+    renderer.fade(0, Math.max(40, 900 * api.timeScale), () => {
+      game.go(node, facing, true);
+      renderer.fade(1, Math.max(40, 1100 * api.timeScale), () => (fading = false));
+    });
+  },
+
+  /** The end of chapter two. */
   finish() {
-    game.state.flags.finished = true;
+    game.state.flags.finished2 = true;
     Store.save(game.state);
     game.playing = false;
     renderer.fade(0, 2600, () => ui.ending(showTitle));
@@ -207,7 +220,20 @@ const game = {
 };
 
 const ui = new UI(game);
-const { A, gates } = createActions(game);
+const { A, gates, shut } = createActions(game);
+
+/** Things that happen the first time you reach a place. */
+function arrive(node) {
+  const s = game.state, once = (flag) => (s.flags[flag] ? false : (s.flags[flag] = true));
+  if (node === 'vault' && once('vaultSeen')) game.say(SAY.vaultEnter);
+  if (node === 'stairfoot' && once('belowSeen')) game.say(SAY.belowEnter);
+  if (node === 'junction' && once('lowSeen')) game.say(SAY.lowEnter);
+  if (node === 'beyond' && !s.flags.finished2) {
+    game.say(SAY.beyond1);
+    game.after(4200, () => game.say(SAY.beyond2));
+    game.after(9000, () => game.finish());
+  }
+}
 
 function syncAll() {
   world.sync(game.state);
@@ -234,7 +260,8 @@ function sightThrough(x, y) {
   return { bearing: norm((Math.atan2(probe.x, -probe.z) * 180) / Math.PI), pitch: (Math.asin(probe.y) * 180) / Math.PI };
 }
 
-const passable = (link) => !(link.gate === 'vault' && !game.state.vault.open);
+/** A way that is shut does not even show the walk-forward arrow. */
+const passable = (link) => !(link.gate && shut[link.gate] && shut[link.gate]());
 
 function linkToward(bearing, within) {
   let best = null, bestOff = within;
@@ -275,6 +302,7 @@ function cursorFor(t) {
   const c = t.hot.cursor;
   if (c === 'turn') return t.dir > 0 ? CURSORS.cw : CURSORS.ccw;
   if (c === 'spin') return t.dir > 0 ? CURSORS.up : CURSORS.down;
+  if (c === 'shift') return t.dir > 0 ? CURSORS.right : CURSORS.left;
   return CURSORS[c] || CURSORS.hand;
 }
 
@@ -285,6 +313,7 @@ function follow(link) {
     if (refusal === false) return;
     if (refusal) return game.say(refusal);
   }
+  if (link.fade) return game.fadeTo(link.to, link.face);
   game.go(link.to, link.face);
 }
 
@@ -349,7 +378,7 @@ canvas.addEventListener('pointermove', (e) => {
     if (!drag.moved && Math.hypot(dx, dy) < 5) return;
     drag.moved = true;
     const s = game.state;
-    if (NODES[s.node].cam || move) return;
+    if (NODES[s.node].cam || busy()) return;
     // the picture follows the pointer, as if you had taken hold of it
     const r = canvas.getBoundingClientRect();
     s.yaw = norm(drag.yaw - (dx / r.width) * HFOV);
@@ -359,7 +388,7 @@ canvas.addEventListener('pointermove', (e) => {
     canvas.style.cursor = 'grabbing';
     return;
   }
-  if (!move) canvas.style.cursor = cursorFor(targetAt(...viewXY(e)));
+  if (!busy()) canvas.style.cursor = cursorFor(targetAt(...viewXY(e)));
 });
 
 function release(e, cancelled) {
@@ -370,10 +399,10 @@ function release(e, cancelled) {
   if (!usable()) return;
   if (d.moved) {
     Store.save(game.state);
-  } else if (!cancelled && !move) {
+  } else if (!cancelled && !busy()) {
     act(targetAt(...viewXY(e)));
   }
-  if (!move) canvas.style.cursor = cursorFor(targetAt(...viewXY(e)));
+  if (!busy()) canvas.style.cursor = cursorFor(targetAt(...viewXY(e)));
 }
 canvas.addEventListener('pointerup', (e) => release(e, false));
 canvas.addEventListener('pointercancel', (e) => release(e, true));
@@ -384,7 +413,7 @@ window.addEventListener('keydown', (e) => {
   const dir = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'fwd', ArrowDown: 'back' }[e.key];
   if (!dir) return;
   e.preventDefault();
-  if (!move) step(dir);
+  if (!busy()) step(dir);
 });
 
 // ---------------------------------------------------------------- start, title, loop
@@ -403,7 +432,13 @@ function begin(state, fresh) {
     state.pitch = composedPitch(n, state.facing);
   }
   state.pitch = clamp(state.pitch, -PITCH_LIMIT, PITCH_LIMIT);
+  if (state.flags.finished && !state.flags.finished2) {
+    // a save that reached the old end of the demo: the vault now has a way on
+    delete state.flags.finished;
+    state.flags.hatchOpen = true;
+  }
   game.state = state;
+  fading = false;
   game.playing = true;
   move = null;
   drag = null;
@@ -421,7 +456,7 @@ function showTitle() {
   drag = null;
   const saved = Store.load();
   // the title sits over a view of the island from the water
-  world.sync(saved || Store.newState());
+  world.sync({ ...(saved || Store.newState()), node: START.node });
   camera.position.set(13, 3.2, 62);
   camera.lookAt(-2, 5.5, -10);
   camera.updateMatrixWorld();
@@ -430,7 +465,7 @@ function showTitle() {
   ui.inventory({ inv: [] });
   ui.say('');
   ui.title(
-    !!saved && !saved.flags.finished,
+    !!saved && !saved.flags.finished2,
     () => {
       Store.clear();
       begin(Store.newState(), true);
@@ -469,7 +504,7 @@ const api = {
   /** Multiplies the length of every glide and turn. Tests set it low. */
   timeScale: 1,
   /** True while the camera is gliding or turning. */
-  busy: () => !!move,
+  busy,
   /** Screen point (0..1) that triggers a hotspot from the current view, or null. */
   point: (id, dir = 0) => pointFor(scene, camera, id, game.state.node, dir, !NODES[game.state.node].cam),
   /** Cut straight to a node, optionally at an exact yaw and pitch in degrees. */

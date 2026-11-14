@@ -1,5 +1,18 @@
 // All sound is synthesised here with Web Audio. Nothing is loaded from a file.
 
+/**
+ * The mix of the Subterranean Station's constant sound. Change these to taste:
+ *   air    the hush of ventilation        (raise for more "white noise")
+ *   hum    the low, slowly beating tone   (lower if it sounds buzzy or boomy)
+ *   whirr  the fans, a narrow higher band (lower if it sounds whiny)
+ *   drip   how loud each drip is
+ *   deep   the note that rises past the last door
+ * Each place then scales these by the numbers in its `amb` entry in src/data/nodes.js.
+ */
+export const TUNNEL_MIX = { air: 0.075, hum: 0.05, whirr: 0.014, drip: 0.12, deep: 0.05 };
+/** Pitch of the hum, in Hz, and how far apart its two voices sit (which sets how slowly it beats). */
+export const TUNNEL_HUM = { pitch: 82, beat: 0.35 };
+
 export class Sound {
   constructor() {
     this.ctx = null;
@@ -61,6 +74,45 @@ export class Sound {
     this.hiss = bed('bandpass', 2100, 0.5);
     this.vaultBed = bed('lowpass', 70, 2);
 
+    // the Subterranean Station: air, hum and whirr
+    this.air = bed('lowpass', 520, 0.2);
+    lfo(0.05, 0.22, this.air.swell.gain);
+    lfo(0.031, 90, this.air.f.frequency);
+    this.whirr = bed('bandpass', 880, 9);
+    lfo(0.07, 26, this.whirr.f.frequency);
+    lfo(0.11, 0.25, this.whirr.swell.gain);
+    this.hum = ctx.createGain();
+    this.hum.gain.value = 0;
+    const humLP = ctx.createBiquadFilter();
+    humLP.type = 'lowpass';
+    humLP.frequency.value = 420;
+    humLP.connect(this.hum).connect(this.master);
+    [[1, 0.5, 'sine'], [1, 0.5, 'sine'], [2, 0.28, 'sine'], [3, 0.09, 'triangle']].forEach(([mult, level, type], i) => {
+      const o = ctx.createOscillator();
+      o.type = type;
+      o.frequency.value = TUNNEL_HUM.pitch * mult + (i === 1 ? TUNNEL_HUM.beat : i === 2 ? 0.2 : 0);
+      const g = ctx.createGain();
+      g.gain.value = level;
+      o.connect(g).connect(humLP);
+      o.start();
+    });
+    this.deep = ctx.createGain();
+    this.deep.gain.value = 0;
+    this.deep.connect(this.master);
+    const deepSwell = ctx.createGain(); // rises and falls like the light does
+    deepSwell.gain.value = 0.5;
+    deepSwell.connect(this.deep);
+    [87, 130.5, 174.4].forEach((f, i) => {
+      const o = ctx.createOscillator();
+      o.type = 'sine';
+      o.frequency.value = f;
+      const g = ctx.createGain();
+      g.gain.value = [0.6, 0.3, 0.2][i];
+      o.connect(g).connect(deepSwell);
+      o.start();
+    });
+    lfo(0.11, 0.45, deepSwell.gain);
+
     // diesel
     this.gen = ctx.createGain();
     this.gen.gain.value = 0;
@@ -117,6 +169,16 @@ export class Sound {
     set(this.sea.g.gain, 0.11 * (a.sea || 0));
     set(this.room.g.gain, 0.05 * (a.room || 0));
     set(this.vaultBed.g.gain, 0.5 * (a.vault || 0));
+    set(this.air.g.gain, TUNNEL_MIX.air * (a.air || 0), 0.6);
+    set(this.whirr.g.gain, TUNNEL_MIX.whirr * 6 * (a.whirr || 0), 0.6);
+    set(this.hum.gain, TUNNEL_MIX.hum * (a.hum || 0), 0.6);
+    set(this.deep.gain, TUNNEL_MIX.deep * (a.deep || 0), 1.5);
+    this.dripLevel = a.drip || 0;
+    if (this.dripLevel > 0 && !this.dripTimer) this.dripTimer = setInterval(() => this.drip(), 1700);
+    if (this.dripLevel <= 0 && this.dripTimer) {
+      clearInterval(this.dripTimer);
+      this.dripTimer = null;
+    }
     const run = this.engine && this.engine !== 'off';
     set(this.gen.gain, run ? 0.2 * (a.gen || 0) : 0, 0.25);
     set(this.genWobble.gain, this.engine === 'rough' ? 5 : this.engine === 'hunting' ? 2.5 : 0.2);
@@ -130,6 +192,14 @@ export class Sound {
     if (tones && !this.toneTimer) this.startTones();
     if (!tones && this.toneTimer) this.stopTones();
     this.toneVol = tones ? vol * (0.02 + 0.05 * r.strength) : 0;
+  }
+
+  /** Now and then, a drop falls somewhere along the tunnel. */
+  drip() {
+    if (!this.ctx || Math.random() > 0.3 + 0.5 * this.dripLevel) return;
+    const f = 900 + Math.random() * 900, level = TUNNEL_MIX.drip * this.dripLevel * (0.4 + Math.random() * 0.6);
+    this.blip({ tone: level, f0: f, f1: f * 1.9, dur: 0.07, delay: Math.random() * 0.8 });
+    this.blip({ tone: level * 0.35, f0: f * 0.5, f1: f * 0.7, dur: 0.16, delay: 0.9 });
   }
 
   startTones() {
@@ -212,6 +282,23 @@ export class Sound {
         for (let i = 0; i < 4; i++) { b({ tone: 0.4, f0: 85, f1: 42, dur: 0.22, delay: i * 0.3 }); b({ noise: 0.2, dur: 0.05, cutoff: 600, delay: i * 0.3 }); }
         b({ tone: 0.22, f0: 62, f1: 44, dur: 2.2, type: 'sawtooth', delay: 1.3, attack: 0.4 });
         b({ noise: 0.07, dur: 2.0, filter: 'bandpass', cutoff: 300, delay: 1.3, attack: 0.5 });
+        break;
+      case 'stairs': for (let i = 0; i < 7; i++) b({ noise: 0.17 - i * 0.015, dur: 0.12, cutoff: 300 - i * 20, delay: i * 0.24 }); break;
+      case 'rack': b({ tone: 0.4, f0: 95, f1: 45, dur: 0.3 }); b({ noise: 0.22, dur: 0.07, cutoff: 700 }); b({ tone: 0.12, f0: 210, f1: 150, dur: 1.2, type: 'sawtooth', delay: 0.35, attack: 0.2 }); b({ noise: 0.06, dur: 1.2, filter: 'bandpass', cutoff: 500, delay: 0.35, attack: 0.3 }); break;
+      case 'pour': b({ noise: 0.16, dur: 0.9, filter: 'bandpass', cutoff: 1300, attack: 0.15 }); b({ noise: 0.1, dur: 0.9, filter: 'bandpass', cutoff: 420, attack: 0.2 }); b({ tone: 0.05, f0: 260, f1: 520, dur: 0.8, attack: 0.2 }); break;
+      case 'gulp': for (let i = 0; i < 3; i++) b({ tone: 0.3, f0: 120 - i * 20, f1: 50, dur: 0.22, delay: i * 0.2 }); b({ noise: 0.2, dur: 1.1, filter: 'bandpass', cutoff: 700, delay: 0.55, attack: 0.1 }); break;
+      case 'drain':
+        for (let i = 0; i < 9; i++) b({ tone: 0.26, f0: 70, f1: 46, dur: 0.16, delay: 0.2 + i * 0.36 });
+        b({ noise: 0.16, dur: 3.6, filter: 'bandpass', cutoff: 520, attack: 0.6 });
+        b({ noise: 0.1, dur: 3.2, filter: 'bandpass', cutoff: 1500, delay: 0.5, attack: 0.8 });
+        b({ tone: 0.06, f0: 300, f1: 110, dur: 3.4, delay: 0.3, attack: 0.5 });
+        break;
+      case 'isolator': b({ tone: 0.45, f0: 110, f1: 45, dur: 0.28 }); b({ noise: 0.3, dur: 0.06, filter: 'highpass', cutoff: 900 }); b({ tone: 0.07, f0: 100, f1: 100, dur: 0.9, type: 'square', delay: 0.1, attack: 0.1 }); break;
+      case 'farprint': for (let i = 0; i < 20; i++) b({ noise: 0.05, dur: 0.03, filter: 'bandpass', cutoff: 1100 + (i % 4) * 150, delay: 0.9 + i * 0.075 }); break;
+      case 'blast':
+        for (let i = 0; i < 5; i++) { b({ tone: 0.42, f0: 80, f1: 38, dur: 0.24, delay: 0.5 + i * 0.34 }); b({ noise: 0.2, dur: 0.05, cutoff: 600, delay: 0.5 + i * 0.34 }); }
+        b({ tone: 0.2, f0: 55, f1: 40, dur: 2.6, type: 'sawtooth', delay: 2.3, attack: 0.5 });
+        b({ noise: 0.08, dur: 2.4, filter: 'bandpass', cutoff: 260, delay: 2.3, attack: 0.6 });
         break;
       default:
     }

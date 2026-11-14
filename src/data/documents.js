@@ -4,6 +4,7 @@ import { BREAKERS, RATING, PRIME_COUNT } from '../puzzles/generator.js';
 import { SCHEDULE, STOPPED_CLOCK } from '../puzzles/receiver.js';
 import { CIPHER, PAD, SHEET, sheetLabel } from '../puzzles/cipher.js';
 import { drawChart } from './chart.js';
+import { BELOW_DOCS, BELOW_LOOK, BELOW_SAY } from './documents-below.js';
 
 const khz = (n) => n.toLocaleString('en-GB');
 
@@ -197,5 +198,10 @@ export const ITEMS = {
   key: { name: 'Brass key', say: "A small brass key. The tag reads C.O." },
   printout: { name: 'Printout', doc: 'printout' },
 };
+
+// chapter two
+Object.assign(DOCS, BELOW_DOCS);
+Object.assign(LOOK, BELOW_LOOK);
+Object.assign(SAY, BELOW_SAY);
 
 export { BREAKERS };

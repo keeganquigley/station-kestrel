@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { FLOOR as F, ROOMS, CEIL, RY } from './layout.js';
 import { mat, lampMat, setLamp } from './materials.js';
-import { M, box, cyl, put, grp, wall, line, decal, text, plate, hot, proxy, sideOf, chair, rng, cuts } from './kit.js';
+import { M, box, cyl, put, grp, wall, line, decal, text, plate, hot, proxy, sideOf, chair, rng, cuts, wheelFace } from './kit.js';
 import { powered } from '../puzzles/generator.js';
 import { CIPHER } from '../puzzles/cipher.js';
 
@@ -79,18 +79,36 @@ export function buildVault(scene) {
   root.add(work);
   // equipment racks along both side walls
   const leds = [];
+  // the middle rack on the north wall is hinged at its front west corner, and folds right back
+  // across the face of its neighbour: it hides the way down
+  const hingeX = v.x0 + 1.0 + 1.15 - 0.525, hingeZ = v.z0 + 0.65;
+  const swing = grp(root, hingeX, 0, hingeZ);
   for (const side of [-1, 1]) {
     for (let i = 0; i < 3; i++) {
       const x = v.x0 + 1.0 + i * 1.15, z = side < 0 ? v.z0 + 0.35 : v.z1 - 0.35;
-      put(root, box(1.05, 2.1, 0.6, mat.darkMetal), x, F + 1.05, z);
+      const swings = side < 0 && i === 1;
+      const host = swings ? swing : root, ox = swings ? hingeX : 0, oz = swings ? hingeZ : 0;
+      put(host, box(1.05, 2.1, 0.6, mat.darkMetal), x - ox, F + 1.05, z - oz);
       for (let u = 0; u < 6; u++) {
-        put(root, box(0.95, 0.26, 0.02, mat.steel, 1), x, F + 0.3 + u * 0.31, z - side * 0.31);
+        put(host, box(0.95, 0.26, 0.02, mat.steel, 1), x - ox, F + 0.3 + u * 0.31, z - side * 0.31 - oz);
         const m = lampMat(0x1a1a1a);
-        put(root, box(0.03, 0.03, 0.02, m), x - 0.38 + R() * 0.2, F + 0.3 + u * 0.31, z - side * 0.325);
+        put(host, box(0.03, 0.03, 0.02, m), x - 0.38 + R() * 0.2 - ox, F + 0.3 + u * 0.31, z - side * 0.325 - oz);
         leds.push([m, R() < 0.5 ? 0xff5030 : 0x40ff70, R()]);
       }
     }
   }
+  // the steel door behind it
+  const dx = v.x0 + 1.0 + 1.15;
+  put(root, box(1.12, 2.16, 0.05, mat.darkMetal), dx, F + 1.08, v.z0 + 0.025);
+  const way = put(root, box(0.96, 2.04, 0.06, mat.vaultSteel, 1.2), dx, F + 1.02, v.z0 + 0.05);
+  put(way, decal(0.86, 0.3, 300, (g, W, H) => {
+    g.fillStyle = '#737a7d';
+    g.fillRect(0, 0, W, H);
+    text(g, 'SUBTERRANEAN', W / 2, H * 0.3, { size: 34, color: '#d9c23c' });
+    text(g, 'STATION', W / 2, H * 0.72, { size: 34, color: '#d9c23c' });
+  }, { rough: 0.5 }), 0, 0.5, 0.032);
+  put(way, box(0.05, 0.3, 0.07, mat.chrome), 0.36, -0.05, 0.05);
+  hot(way, { id: 'waydown', nodes: ['vault'], cursor: 'fwd', action: ['descend'], disabled: true });
   // bench at the far end
   const bx = v.x1 - 0.5, top = F + 0.8;
   put(root, box(0.9, 0.06, 3.2, mat.steel, 1), bx, top - 0.03, mz);
@@ -151,28 +169,12 @@ export function buildVault(scene) {
   });
   hot(put(root, proxy(0.8, 1.1, 2.6), v.x1 - 2.45, F + 0.55, mz), { id: 'chairs', nodes: ['vault'], cursor: 'look', action: ['look', 'chairs'] });
 
-  const drawWheel = (n) => (g, W, H) => {
-    g.fillStyle = '#d9d4c0';
-    g.fillRect(0, 0, W, H);
-    const grad = g.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, 'rgba(0,0,0,0.75)');
-    grad.addColorStop(0.3, 'rgba(0,0,0,0)');
-    grad.addColorStop(0.7, 'rgba(0,0,0,0)');
-    grad.addColorStop(1, 'rgba(0,0,0,0.75)');
-    const f = '"Courier New", monospace';
-    text(g, String((n + 1) % 10), W / 2, H * 0.14, { size: H * 0.2, color: '#555', font: f });
-    text(g, String(n), W / 2, H * 0.51, { size: H * 0.34, color: '#111', font: f });
-    text(g, String((n + 9) % 10), W / 2, H * 0.88, { size: H * 0.2, color: '#555', font: f });
-    g.fillStyle = grad;
-    g.fillRect(0, 0, W, H);
-  };
-
   let spin = 0, open = false, on = false;
   return {
     sync(state) {
       on = powered(state.gen, 'vault');
       open = state.vault.open;
-      state.vault.wheels.forEach((n, i) => wheels[i].userData.redraw(drawWheel(n)));
+      state.vault.wheels.forEach((n, i) => wheels[i].userData.redraw(wheelFace(n)));
       hinge.rotation.y = open ? -1.72 : 0;
       doorHit.userData.hot.disabled = open;
       setLamp(lockLamp, open ? 0x35ff55 : 0xffa020, on, 2.4);
@@ -180,6 +182,9 @@ export function buildVault(scene) {
       setLamp(redMat, 0xff3020, on, 3);
       work.intensity = on && open ? 3.5 : 0;
       leds.forEach(([m, hex, p]) => setLamp(m, hex, on && p > 0.25, 3));
+      const unlatched = !!state.flags.hatchOpen;
+      swing.rotation.y = unlatched ? -2.95 : 0;
+      way.userData.hot.disabled = !unlatched;
     },
     tick() {
       if (!on) return false;

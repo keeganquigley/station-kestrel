@@ -53,7 +53,7 @@ export function buildIsland(scene) {
   sun.shadow.normalBias = 0.06;
   scene.add(sun, sun.target);
   scene.add(new THREE.HemisphereLight(0x93a4d0, 0x5a4c40, 2.3));
-  scene.fog = new THREE.FogExp2(0x5d5f78, 0.0075);
+  const fog = new THREE.FogExp2(0x5d5f78, 0.0075);
 
   // --- sky
   const sky = new THREE.Mesh(
@@ -325,6 +325,7 @@ export function buildIsland(scene) {
   put(mast, box(0.1, 0.1, 0.1, lamp), 0, H + 0.3, 0);
 
   return {
+    fog,
     sync(state) {
       const b = (state.rx.bearing * Math.PI) / 180;
       rotor.rotation.y = -b;

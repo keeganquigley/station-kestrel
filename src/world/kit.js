@@ -242,6 +242,23 @@ export function sideOf(frame, cx, cy, axis = 'x') {
   };
 }
 
+/** The face of a thumbwheel showing digit n, with its neighbours above and below. */
+export const wheelFace = (n, of = 10) => (g, W, H) => {
+  g.fillStyle = '#d9d4c0';
+  g.fillRect(0, 0, W, H);
+  const grad = g.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, 'rgba(0,0,0,0.75)');
+  grad.addColorStop(0.3, 'rgba(0,0,0,0)');
+  grad.addColorStop(0.7, 'rgba(0,0,0,0)');
+  grad.addColorStop(1, 'rgba(0,0,0,0.75)');
+  const f = '"Courier New", monospace';
+  text(g, String((n + 1) % of), W / 2, H * 0.14, { size: H * 0.2, color: '#555', font: f });
+  text(g, String(n), W / 2, H * 0.51, { size: H * 0.34, color: '#111', font: f });
+  text(g, String((n + of - 1) % of), W / 2, H * 0.88, { size: H * 0.2, color: '#555', font: f });
+  g.fillStyle = grad;
+  g.fillRect(0, 0, W, H);
+};
+
 export function chair(mat, legMat) {
   const g = new THREE.Group();
   put(g, box(0.44, 0.05, 0.44, mat), 0, 0.46, 0);
