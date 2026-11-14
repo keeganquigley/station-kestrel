@@ -599,6 +599,32 @@ const shots = process.argv[2] || null;
     if (!(await page.evaluate(() => window.kestrel.point('waydown')))) fail('the way down should be open in an old finished save');
     log('a finished save from the old demo reopens in the vault with the way down open');
 
+    // --- the title screen's Chapter two button skips straight below
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    await ready();
+    if (await page.isVisible('#btn-continue')) fail('Continue offered with no save');
+    await page.click('#btn-ch2');
+    await settle();
+    await expectAt('stairfoot', 'N');
+    const ch2 = await state();
+    if (!ch2.flags.hatchOpen || !ch2.vault.open || !ch2.docs.includes('pad') || ch2.pump.drained) fail('chapter two start is not set up: ' + JSON.stringify(ch2.flags));
+    if (!(await caption()).includes('humming')) fail('chapter two should open with its arrival caption');
+    if (await page.evaluate(() => window.kestrel.scene.getObjectByName('surface').visible)) fail('chapter two should start underground');
+    await page.click('#btn-notes');
+    if (!(await page.innerText('#doc-paper')).includes('One-time key')) fail('the code booklet should be in the notebook');
+    await page.click('#doc-close');
+    await face('S');
+    await fwd();
+    await expectAt('vault', 'S');
+    await face('W');
+    await fwd();
+    await expectAt('corridor', 'W');
+    await page.reload();
+    await ready();
+    if (!(await page.isVisible('#btn-continue'))) fail('a chapter two start should be saved');
+    log('Chapter two button starts at the foot of the stairs with chapter one solved, and the way back up works');
+
     // --- notebook
     await page.reload();
     await ready();

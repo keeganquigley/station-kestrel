@@ -472,7 +472,14 @@ function showTitle() {
       Store.clear();
       begin(Store.newState(), true);
     },
-    () => begin(saved, false)
+    () => begin(saved, false),
+    () => {
+      // skip straight to the foot of the stairs, with chapter one counted as played
+      Store.clear();
+      begin(Store.chapterTwoState(), false);
+      arrive('stairfoot', true);
+      Store.save(game.state);
+    }
   );
 }
 

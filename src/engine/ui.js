@@ -102,7 +102,7 @@ export class UI {
     $('btn-sound').textContent = on ? 'Sound: on' : 'Sound: off';
   }
 
-  title(hasSave, onNew, onContinue) {
+  title(hasSave, onNew, onContinue, onChapterTwo) {
     $('title').hidden = false;
     $('ending').hidden = true;
     $('btn-continue').hidden = !hasSave;
@@ -113,6 +113,10 @@ export class UI {
     $('btn-continue').onclick = () => {
       $('title').hidden = true;
       onContinue();
+    };
+    $('btn-ch2').onclick = () => {
+      $('title').hidden = true;
+      onChapterTwo();
     };
   }
 

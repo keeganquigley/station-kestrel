@@ -359,8 +359,12 @@ body {
 
 .title-buttons {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: center;
+}
+
+.title-buttons .btn.big {
+  padding: 7px 12px;
 }
 
 .title-card .how {

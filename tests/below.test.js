@@ -4,6 +4,11 @@ import * as Junction from '../src/puzzles/junction.js';
 import * as Reply from '../src/puzzles/reply.js';
 import * as Cipher from '../src/puzzles/cipher.js';
 import { NODES } from '../src/data/nodes.js';
+import { chapterTwoState } from '../src/engine/state.js';
+import * as Gen from '../src/puzzles/generator.js';
+import * as Rx from '../src/puzzles/receiver.js';
+import * as Vault from '../src/puzzles/vault.js';
+import { DOCS, ITEMS } from '../src/data/documents.js';
 
 describe('pump', () => {
   it('can be solved, and not in fewer than six turns of a valve', () => {
@@ -144,5 +149,33 @@ describe('the Subterranean Station on the map', () => {
       }
     }
     expect(crossings.sort()).toEqual([['stairfoot', 'vault', true], ['vault', 'stairfoot', true]]);
+  });
+});
+
+describe('starting at chapter two', () => {
+  const s = chapterTwoState();
+
+  it('counts chapter one as properly solved', () => {
+    expect(Gen.busLive(s.gen)).toBe(true);
+    for (const id of ['door', 'ops', 'vault', 'lighting']) expect(Gen.powered(s.gen, id)).toBe(true);
+    expect(Rx.reception(s.rx)).toBe('locked');
+    expect(s.rx.printed).toBe(true);
+    expect(Vault.reading(s.vault)).toBe(Cipher.COMBINATION);
+    expect(s.vault.open).toBe(true);
+    expect(s.flags.hatchOpen).toBe(true);
+  });
+
+  it('starts at the foot of the stairs with chapter two untouched', () => {
+    expect(s.node).toBe('stairfoot');
+    expect(NODES[s.node].realm).toBe('below');
+    expect(s.pump).toEqual(Pump.initial());
+    expect(s.junction).toEqual(Junction.initial());
+    expect(s.reply).toEqual(Reply.initial());
+  });
+
+  it('carries the papers and things you would have, the code booklet included', () => {
+    expect(s.docs).toContain('pad');
+    for (const id of s.docs) expect(DOCS[id], id).toBeTruthy();
+    for (const id of s.inv) expect(ITEMS[id], id).toBeTruthy();
   });
 });
