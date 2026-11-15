@@ -116,7 +116,7 @@ export function buildPen(parent) {
   });
   note.rotation.z = -0.12;
   put(root, note, SX0 - 0.2, SHELF + 0.86, z1 + 0.135);
-  hot(put(root, proxy(0.34, 0.4, 0.12), SX0 - 0.2, SHELF + 0.86, z1 + 0.14), { id: 'note-okafor', nodes: ['gallery'], cursor: 'look', action: ['doc', 'note-okafor'] });
+  hot(put(root, proxy(0.34, 0.4, 0.12), SX0 - 0.2, SHELF + 0.86, z1 + 0.14), { id: 'note-rush', nodes: ['gallery'], cursor: 'look', action: ['doc', 'note-rush'] });
   hot(put(root, proxy(1.9, 2.3, 0.3), 6.95, SHELF + 1.2, south + 0.6), { id: 'passage', nodes: ['gallery'], cursor: 'fwd', action: ['passage', 'beyond', 'S'] });
 
   // ---------------------------------------------------------------- lamps along the quay

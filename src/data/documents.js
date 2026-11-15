@@ -57,9 +57,9 @@ export const DOCS = {
       <p>Personnel remaining do so under separate instruction. No reference is to be made to that instruction off the island, in writing or otherwise.</p>
       <hr>
       <p class="head">WATCH BILL</p>
-      <p>HARLAN, A. (Cdr.) &mdash; commanding<br>VOSS, I. &mdash; signals<br>LUND, P. &mdash; plant<br>OKAFOR, N. &mdash; cipher</p>
+      <p>HARLAN, A. (Cdr.) &mdash; commanding<br>VOSS, I. &mdash; signals<br>LUND, P. &mdash; plant<br>RUSH, N. &mdash; cipher</p>
       <hr>
-      <p class="ink">Day 41 of the same message. Somebody else can make the tea. &mdash; O.</p>`,
+      <p class="ink">Day 41 of the same message. Somebody else can make the tea. &mdash; R.</p>`,
   },
   logbook: {
     title: 'Intercept log, target K-7',
@@ -72,7 +72,7 @@ export const DOCS = {
       </table>
       <p>Aerial bearing: as plotted on the C.O.'s chart. It no longer comes up on any other.</p>
       <hr>
-      <p><b>Day 39.</b> Same three groups, same sheet. Okafor says the first two are a day and a year and that neither has happened.</p>
+      <p><b>Day 39.</b> Same three groups, same sheet. Rush says the first two are a day and a year and that neither has happened.</p>
       <p><b>Day 41.</b> The clock in here has stopped. Since then K-7 does not change slot at all. It sits where it was when the clock stopped, day and night, as if it has finished moving and is waiting.</p>
       <p><b>Day 43.</b> Harlan has us taking it in turns at the vault door. Nobody will say what for.</p>
       <p class="faint">(There are no further entries.)</p>`,
@@ -97,7 +97,7 @@ export const DOCS = {
     html: `
       <p>For whoever relieves us.</p>
       <p>The vault is set to the <u>third group</u> of the message, as deciphered. I did not choose the number. It was the only part of the thing I could bring myself to use.</p>
-      <p>The first two groups Okafor read as a day and a year. Neither had come when we first took it down.</p>
+      <p>The first two groups Rush read as a day and a year. Neither had come when we first took it down.</p>
       <p>The pad is in my desk. The key to the desk hangs with Lund's in the plant shed, where nobody would think to look for it.</p>
       <p class="right">&mdash; A. Harlan</p>`,
   },
@@ -148,7 +148,7 @@ export const LOOK = {
   monitor: 'Snow. Now and then it very nearly resolves into something.',
   monitorLocked: 'The snow has thinned. There is a shape in it that does not move.',
   clock: `A flip clock, stopped at ${STOPPED_CLOCK}.`,
-  watchbill: 'Harlan, Voss, Lund, Okafor. Someone has struck a red line through the whole bill.',
+  watchbill: 'Harlan, Voss, Lund, Rush. Someone has struck a red line through the whole bill.',
   photo: 'Four people on the jetty in summer, squinting. The date on the corner has been scratched out.',
   binders: 'Intercept returns, 1986 to 1991, then nothing filed at all.',
   reels: 'The tape is turning. It is recording, not playing.',

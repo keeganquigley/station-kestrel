@@ -20,7 +20,7 @@ export function clockWords(hhmm) {
   return m < 30 ? `${step[m]} past ${hour(h)}` : `${step[60 - m]} to ${hour(h + 1)}`;
 }
 
-const INITIAL = { harlan: 'A. Harlan', voss: 'I. Voss', lund: 'P. Lund', okafor: 'N. Okafor' };
+const INITIAL = { harlan: 'A. Harlan', voss: 'I. Voss', lund: 'P. Lund', rush: 'N. Rush' };
 const SAILING = '14 November 1996';
 
 /** The body of the release, which differs only in who is going. */
@@ -41,7 +41,7 @@ const release = ({ sailing, party, participant, signature, tally, aside }) => `
   <p class="aside">${aside}</p>`;
 
 export const PEN_DOCS = {
-  'note-okafor': {
+  'note-rush': {
     title: 'Page wedged in the gallery rail',
     kind: 'hand',
     html: `
@@ -49,7 +49,7 @@ export const PEN_DOCS = {
       <p>There is a harbour under the island and nobody ever told us. One boat in it. She was old before the station above was built.</p>
       <p>We were expected. The diving store stood open with four brass tallies laid out on the counter, like cloakroom tickets. Mine beats Voss's, and Voss knows it.</p>
       <p>I had it wrong upstairs. The message was never the date of something that would happen to the world. It was a sailing.</p>
-      <p class="right">&mdash; N. Okafor</p>`,
+      <p class="right">&mdash; N. Rush</p>`,
   },
   berthlog: {
     title: 'Berth log, K7',
@@ -112,7 +112,7 @@ export const PEN_DOCS = {
     kind: 'hand',
     html: `
       <p>The cable ends in her. I have had my hand on the gland where it goes through the hull and it is warm. She is what has been sending.</p>
-      <p>Harlan's tally is an even number. Okafor says that figures.</p>
+      <p>Harlan's tally is an even number. Rush says that figures.</p>
       <p>I shall sign. Somebody has to, and I was the one who found it.</p>
       <p class="right">&mdash; I. V.</p>`,
   },
@@ -137,7 +137,7 @@ export const PEN_DOCS = {
         <tr><td>HARLAN, A. (Cdr.)</td><td>DECEASED</td></tr>
         <tr><td>VOSS, I.</td><td>DECEASED</td></tr>
         <tr><td>LUND, P.</td><td>DECEASED</td></tr>
-        <tr><td>OKAFOR, N.</td><td>DECEASED</td></tr>
+        <tr><td>RUSH, N.</td><td>DECEASED</td></tr>
       </table>
       <table class="form">
         <tr><td>Cause</td><td class="blank">&nbsp;</td></tr>
@@ -198,7 +198,7 @@ export const PEN_LOOK = {
   thermo: `The thermometer for the developer bath. It reads ${TEMPERATURE} degrees.`,
   bottles: 'Developer, stop bath, fixer, mixed and labelled. The dates on the labels have been left blank.',
   enlarger: 'An enlarger under a dust sheet. There is no dust on the sheet.',
-  effects: 'Four canvas bags, tied and labelled: HARLAN, VOSS, LUND, OKAFOR. Spectacles, a pipe, a wedding ring, a stub of blue pencil. Everything a person has on them.',
+  effects: 'Four canvas bags, tied and labelled: HARLAN, VOSS, LUND, RUSH. Spectacles, a pipe, a wedding ring, a stub of blue pencil. Everything a person has on them.',
   watches: `Four wristwatches, laid out in a row. All four have stopped at ${clockWords(STOPPED_CLOCK)}. So did the clock in the ops room.`,
 };
 

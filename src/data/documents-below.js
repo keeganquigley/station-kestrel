@@ -14,8 +14,8 @@ export const BELOW_DOCS = {
     html: `
       <p class="head">SUBTERRANEAN STATION &mdash; GALLEY ROTA</p>
       <table class="sched">
-        <tr><td>Week 1</td><td>Lund</td><td>Okafor</td><td>Voss</td><td>Harlan</td></tr>
-        <tr><td>Week 2</td><td>Lund</td><td>Okafor</td><td>Voss</td><td>Harlan</td></tr>
+        <tr><td>Week 1</td><td>Lund</td><td>Rush</td><td>Voss</td><td>Harlan</td></tr>
+        <tr><td>Week 2</td><td>Lund</td><td>Rush</td><td>Voss</td><td>Harlan</td></tr>
         <tr><td>Week 3</td><td>Lund</td><td><span class="ink">listening</span></td><td>Voss</td><td>Harlan</td></tr>
         <tr><td>Week 4</td><td>Lund</td><td><span class="ink">listening</span></td><td><span class="ink">listening</span></td><td>whoever</td></tr>
         <tr><td>Week 5</td><td><span class="ink">listening</span></td><td><span class="ink">listening</span></td><td><span class="ink">listening</span></td><td>whoever</td></tr>
@@ -57,15 +57,15 @@ export const BELOW_DOCS = {
       <p>It can be done in ${WORD[solve().length]} turns. I have done it in the dark.</p>
       <p class="right">&mdash; P. Lund</p>`,
   },
-  'nb-okafor': {
-    title: "Okafor's notebook",
+  'nb-rush': {
+    title: "Rush's notebook",
     kind: 'hand',
     html: `
       <p><b>Answering.</b> It asks at the far door now the way it asks on the air. It names a sheet and it waits.</p>
       <p>What it wants is its own date back: <u>the day, then the year</u>, the same two groups it has sent since Day 1.</p>
       <p>To answer you go the other way from reading. <u>Add</u> the key to the text, figure by figure, no carrying. Text 7, key 5, gives 2. The day goes on the first four wheels, the year on the last four. Then SEND.</p>
       <p>It will not take the groups off the air. Those were made on Sheet ${sheetLabel(SHEET)}, and it has never yet named the same sheet twice.</p>
-      <p class="right">&mdash; N. Okafor</p>`,
+      <p class="right">&mdash; N. Rush</p>`,
   },
   'nb-voss': {
     title: "Voss's notebook",
@@ -83,7 +83,7 @@ export const BELOW_DOCS = {
     html: `
       <p>Our instruction of 1 March 1991 was to remain and to listen. Nobody said for how long, and after the second winter nobody was asked.</p>
       <p>I want one thing understood by whoever reads this. We are not prisoners of it and we were never afraid of it. It has been courteous throughout.</p>
-      <p>On Day 41 it stopped moving. On Day 43 it asked, in clear, for the far door. We talked it over at supper and nobody argued. Lund primed the pump, Voss made the line good, Okafor answered.</p>
+      <p>On Day 41 it stopped moving. On Day 43 it asked, in clear, for the far door. We talked it over at supper and nobody argued. Lund primed the pump, Voss made the line good, Rush answered.</p>
       <p>We have taken the mugs. If you have come this far, you have been answering it all the way down yourself.</p>
       <p class="right">&mdash; A. Harlan</p>`,
   },
