@@ -103,7 +103,7 @@ describe('tally board', () => {
 
   it('draws the bar only on the true arrangement', () => {
     expect(Tally.pullBar(Tally.initial()).result).toBe('held');
-    const swapped = { ...Tally.OWNER, harlan: Tally.OWNER.rush, rush: Tally.OWNER.harlan };
+    const swapped = { ...Tally.OWNER, harlan: Tally.OWNER.okafor, okafor: Tally.OWNER.harlan };
     expect(Tally.pullBar(set(swapped)).result).toBe('held');
     const ok = Tally.pullBar(set(Tally.OWNER));
     expect(ok.result).toBe('open');
@@ -168,7 +168,7 @@ describe('the papers of chapter three', () => {
 
   it('the casualty return lists all four as deceased today and gives no cause', () => {
     const t = strip(DOCS.casualty.html);
-    for (const n of ['HARLAN', 'VOSS', 'LUND', 'RUSH']) expect(t).toContain(n);
+    for (const n of ['HARLAN', 'VOSS', 'LUND', 'OKAFOR']) expect(t).toContain(n);
     expect(t.match(/DECEASED/g)).toHaveLength(4);
     expect(t).toContain('14 November 1996');
     expect(t).toContain(STOPPED_CLOCK);
@@ -196,10 +196,10 @@ describe('the papers of chapter three', () => {
   });
 
   it('the four remarks are written down in four different papers', () => {
-    const where = { lund: 'note-lund', harlan: 'berthlog', rush: 'note-rush', voss: 'note-voss' };
+    const where = { lund: 'note-lund', harlan: 'berthlog', okafor: 'note-okafor', voss: 'note-voss' };
     expect(strip(DOCS[where.lund].html)).toMatch(/Voss drew a higher tally than me/);
     expect(strip(DOCS[where.harlan].html)).toMatch(/Mine is a higher number than Voss's/);
-    expect(strip(DOCS[where.rush].html)).toMatch(/Mine beats Voss's/);
+    expect(strip(DOCS[where.okafor].html)).toMatch(/Mine beats Voss's/);
     expect(strip(DOCS[where.voss].html)).toMatch(/Harlan's tally is an even number/);
     // and no paper gives a tally number away outright, except the waiver you get at the end
     for (const [id, d] of Object.entries(DOCS)) {
@@ -265,7 +265,7 @@ describe('starting at chapter three', () => {
   });
 
   it('carries every paper from the first two chapters, and each one exists', () => {
-    for (const id of ['pad', 'nb-rush', 'nb-voss', 'comedown']) expect(s.docs).toContain(id);
+    for (const id of ['pad', 'nb-okafor', 'nb-voss', 'comedown']) expect(s.docs).toContain(id);
     expect(new Set(s.docs).size).toBe(s.docs.length);
     for (const id of s.docs) expect(DOCS[id], id).toBeTruthy();
     for (const id of s.inv) expect(ITEMS[id], id).toBeTruthy();

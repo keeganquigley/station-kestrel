@@ -67,7 +67,7 @@ export function chapterThreeState() {
   s.junction = { sel: { ...Junction.WIRING }, live: true };
   s.reply = { wheels: Reply.EXPECTED.split('').map(Number), open: true };
   Object.assign(s.flags, { belowSeen: true, lowSeen: true, beyondSeen: true });
-  s.docs.push('rota', 'ledger', 'schedule', 'nb-lund', 'nb-rush', 'nb-voss', 'nb-harlan', 'challenge', 'comedown');
+  s.docs.push('rota', 'ledger', 'schedule', 'nb-lund', 'nb-okafor', 'nb-voss', 'nb-harlan', 'challenge', 'comedown');
   s.node = 'gallery';
   s.facing = 'N';
   return s;
@@ -81,24 +81,13 @@ export function save(state) {
   }
 }
 
-/** One of the four was renamed after people had saves. Carry the old ids over. */
-function renamed(s) {
-  const OLD = 'oka' + 'for';
-  if (Array.isArray(s.docs)) s.docs = s.docs.map((id) => id.replace(OLD, 'rush'));
-  if (s.tally && s.tally.set && OLD in s.tally.set) {
-    const { [OLD]: tally, ...rest } = s.tally.set;
-    s.tally = { ...s.tally, set: { ...rest, rush: tally } };
-  }
-  return s;
-}
-
 export function load() {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return null;
     const s = JSON.parse(raw);
     if (!s || s.v !== 1 || !NODES[s.node] || !s.gen || !s.rx || !s.vault) return null;
-    return renamed({ ...newState(), ...s });
+    return { ...newState(), ...s };
   } catch {
     return null;
   }

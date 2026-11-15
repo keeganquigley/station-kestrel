@@ -256,7 +256,7 @@ export function buildQuarters(parent) {
     g.lineWidth = 8;
     g.strokeRect(4, 4, W - 8, H - 8);
     const ink = 'rgba(232,232,220,0.9)';
-    ['H', 'V', 'L', 'R'].forEach((n, i) => {
+    ['H', 'V', 'L', 'O'].forEach((n, i) => {
       const x = 28 + i * 36;
       text(g, n, x, 26, { size: 20, color: ink });
       [501, 441 - i * 23, 356 - i * 31, 255 - i * 12, 170 + i * 9].forEach((v, r) => {
@@ -402,7 +402,7 @@ export function buildQuarters(parent) {
   // ================================================================ bunk room
   const U = QUARTERS.bunks;
   room(U, mat.cream);
-  const covers = { harlan: mat.navy, voss: mat.red, lund: mat.green, rush: mat.black };
+  const covers = { harlan: mat.navy, voss: mat.red, lund: mat.green, okafor: mat.black };
   /** A double bunk along a wall. face is the compass direction it faces into the room. */
   const bunk = (z, face, lower, upper) => {
     const b = grp(root, 3.95, F, z, RY[face]);
@@ -433,9 +433,9 @@ export function buildQuarters(parent) {
     for (let i = 0; i < 5; i++) put(b, box(0.03, 0.03, 0.42, mat.darkMetal), 1.03, 0.3 + i * 0.3, 0.2);
   };
   bunk(U.z0 + 0.45, 'S', 'harlan', 'voss');
-  bunk(U.z1 - 0.45, 'N', 'lund', 'rush');
+  bunk(U.z1 - 0.45, 'N', 'lund', 'okafor');
   // four lockers, nothing taken
-  ['HARLAN', 'VOSS', 'LUND', 'RUSH'].forEach((name, i) => {
+  ['HARLAN', 'VOSS', 'LUND', 'OKAFOR'].forEach((name, i) => {
     const z = -20.1 + i * 0.56,
       x = U.x1 - 0.24;
     put(root, box(0.46, 1.8, 0.52, mat.steel, 1), x, F + 0.9, z);

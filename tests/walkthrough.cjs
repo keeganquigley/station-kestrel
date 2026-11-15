@@ -420,7 +420,7 @@ const shots = process.argv[2] || null;
       const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
       const charge = WORDS.indexOf(lund.match(/wants (\w+) gallons/)[1]);
       const feedSize = Number(lund.match(/feed tank is the (\d)/)[1]);
-      await use('nb-rush');
+      await use('nb-okafor');
       await readAndClose('no carrying');
       await face('W');
       await fwd();
@@ -626,8 +626,8 @@ const shots = process.argv[2] || null;
     await face('N');
     await fwd();
     await expectAt('gallery', 'N');
-    await use('note-rush');
-    const remarks = { rush: await readAndClose('cloakroom tickets') };
+    await use('note-okafor');
+    const remarks = { okafor: await readAndClose('cloakroom tickets') };
     log('the rock passage fades both ways; first sight of the pen');
 
     // --- the quay, and the dock office
@@ -803,10 +803,10 @@ const shots = process.argv[2] || null;
     const rules = [];
     if (/Voss drew a higher tally than me/.test(remarks.lund)) rules.push((o) => o.voss > o.lund);
     if (/Mine is a higher number than Voss's/.test(remarks.harlan)) rules.push((o) => o.harlan > o.voss);
-    if (/Mine beats Voss's/.test(remarks.rush)) rules.push((o) => o.rush > o.voss);
+    if (/Mine beats Voss's/.test(remarks.okafor)) rules.push((o) => o.okafor > o.voss);
     if (/Harlan's tally is an even number/.test(remarks.voss)) rules.push((o) => o.harlan % 2 === 0);
     if (rules.length !== 4) fail('expected four remarks about the tallies, found ' + rules.length);
-    const names = ['harlan', 'voss', 'lund', 'rush'],
+    const names = ['harlan', 'voss', 'lund', 'okafor'],
       fits = [];
     const permute = (left, acc) => {
       if (!left.length) {
@@ -943,26 +943,6 @@ const shots = process.argv[2] || null;
     if (!(await page.evaluate(() => window.kestrel.point('waydown')))) fail('the way down should be open in an old finished save');
     log('a finished save from the old demo reopens in the vault with the way down open');
 
-    // --- a save made before one of the four was renamed keeps its papers and its tally board
-    await page.evaluate(() => {
-      const old = 'oka' + 'for';
-      const s = JSON.parse(localStorage.getItem('station-kestrel-save-v1'));
-      s.docs = ['orders', 'nb-' + old, 'note-' + old];
-      s.tally = { set: { harlan: 46, voss: 23, lund: 14, [old]: 31 }, open: false };
-      localStorage.setItem('station-kestrel-save-v1', JSON.stringify(s));
-    });
-    await page.reload();
-    await ready();
-    await page.click('#btn-continue');
-    await settle();
-    const carried = await state();
-    if (carried.tally.set.rush !== 31 || Object.keys(carried.tally.set).length !== 4) fail('the tally board did not carry over: ' + JSON.stringify(carried.tally.set));
-    if (carried.docs.join() !== 'orders,nb-rush,note-rush') fail('the papers did not carry over: ' + carried.docs);
-    await page.click('#btn-notes');
-    if (!(await page.innerText('#doc-paper')).includes("Rush's notebook")) fail('the notebook should list the renamed papers');
-    await page.click('#doc-close');
-    log('a save from before the rename keeps its papers and its tally board');
-
     // --- the title screen's Chapter two button skips straight below
     await page.evaluate(() => localStorage.clear());
     await page.reload();
@@ -1001,7 +981,7 @@ const shots = process.argv[2] || null;
     if (!(await caption()).includes('harbour')) fail('chapter three should open with its arrival caption');
     if (!(await page.evaluate(() => window.kestrel.scene.getObjectByName('pen').visible))) fail('chapter three should start in the pen');
     await page.click('#btn-notes');
-    if (!(await page.innerText('#doc-paper')).includes("Rush's notebook")) fail('the papers of chapter two should be in the notebook');
+    if (!(await page.innerText('#doc-paper')).includes("Okafor's notebook")) fail('the papers of chapter two should be in the notebook');
     await page.click('#doc-close');
     await face('S');
     await fwd();

@@ -146,7 +146,7 @@ export function buildOps(scene) {
       g.lineTo(W - 16, 52 + i * 28);
       g.stroke();
     }
-    ['HARLAN', 'VOSS', 'LUND', 'RUSH'].forEach((n, i) => text(g, n, 26, 67 + i * 28, { size: 18, color: '#1d2a5a', align: 'left' }));
+    ['HARLAN', 'VOSS', 'LUND', 'OKAFOR'].forEach((n, i) => text(g, n, 26, 67 + i * 28, { size: 18, color: '#1d2a5a', align: 'left' }));
     g.strokeStyle = '#a3261c';
     g.lineWidth = 4;
     g.beginPath();

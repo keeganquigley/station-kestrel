@@ -2,13 +2,13 @@
 // Four numbered brass tallies were issued to the four of them. The property cage stays barred
 // until each number is set against its owner. Pure logic, no rendering.
 
-export const NAMES = ['harlan', 'voss', 'lund', 'rush'];
+export const NAMES = ['harlan', 'voss', 'lund', 'okafor'];
 
 /** The numbers stamped on the four tallies, lowest first. */
 export const TALLIES = [14, 23, 31, 46];
 
 /** Who was issued which. */
-export const OWNER = { harlan: 46, voss: 23, lund: 14, rush: 31 };
+export const OWNER = { harlan: 46, voss: 23, lund: 14, okafor: 31 };
 
 /**
  * Four remarks, one from each of them, left in four different places.
@@ -17,7 +17,7 @@ export const OWNER = { harlan: 46, voss: 23, lund: 14, rush: 31 };
 export const REMARKS = [
   { by: 'lund', holds: (o) => o.voss > o.lund },
   { by: 'harlan', holds: (o) => o.harlan > o.voss },
-  { by: 'rush', holds: (o) => o.rush > o.voss },
+  { by: 'okafor', holds: (o) => o.okafor > o.voss },
   { by: 'voss', holds: (o) => o.harlan % 2 === 0 },
 ];
 
