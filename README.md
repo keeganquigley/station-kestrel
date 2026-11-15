@@ -24,6 +24,10 @@ also start at chapter two or three, with the earlier ones counted as solved.
 
 ## Play
 
+In the browser, nothing to install: <https://keeganquigley.github.io/station-kestrel/>
+
+Or run it yourself:
+
 ```bash
 npm install
 ```
@@ -115,6 +119,9 @@ npm run format
 ESLint checks the code and Prettier formats it. Both, with the build and the
 unit tests, run on GitHub for every push and pull request
 (`.github/workflows/ci.yml`). Node 22 is expected; see `.nvmrc`.
+
+Every push to `main` also rebuilds and republishes the game on GitHub Pages
+(`.github/workflows/pages.yml`).
 
 The browser tests need [Playwright](https://playwright.dev) installed and the
 built game being served:
