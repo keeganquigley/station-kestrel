@@ -154,8 +154,8 @@ describe('the papers of chapter three', () => {
   it('the waiver carries the letterhead, the boat, today, and the signature', () => {
     const t = strip(DOCS.waiver.html);
     expect(DOCS.waiver.html).toContain(`<p class="letterhead">${LETTERHEAD}</p>`);
-    expect(LETTERHEAD).toBe('OceanGate');
-    expect(VESSEL).toBe('TITAN 2');
+    expect(LETTERHEAD).toBe('OceanMate');
+    expect(VESSEL).toBe('LITAN');
     for (const want of [VESSEL, Telegraph.HULL, '14 November 1996', 'I. Voss', 'four (4)', String(Tally.OWNER.voss)]) expect(t).toContain(want);
   });
 

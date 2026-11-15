@@ -87,8 +87,8 @@ levels are the `TUNNEL_MIX` numbers at the top of `src/engine/audio.js`, and eac
 place scales them in its `amb` entry in `src/data/nodes.js`. The pen adds water
 against the quay and the boat shifting at her chains: `PEN_MIX`, same file.
 
-Chapter three borrows two names from the real world, for the letterhead on one
-paper and the name on the boat. Both are in `src/data/names.js` and nowhere else.
+The letterhead on chapter three's last paper and the name on the boat are both
+in `src/data/names.js` and nowhere else.
 
 Clues are generated from the same constants the puzzles check against (the
 schedule in the log, the pad, the bearing on the chart, the developing times,
@@ -133,3 +133,8 @@ npm run seethrough
 
 `tests/walkthrough.cjs` contains the full solution, so do not read it if you
 want to play first. Set `KESTREL_FROM3=1` to play only chapter three.
+
+## Licence
+
+[MIT](LICENSE). Station Kestrel is a work of fiction. Its people, companies and
+vessels are invented.
