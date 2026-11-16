@@ -9,6 +9,7 @@ import { buildStation } from './station.js';
 import { buildOps } from './ops.js';
 import { buildOffice } from './office.js';
 import { buildVault } from './vault.js';
+import { buildDecor } from './decor.js';
 import { buildTunnel } from './tunnel.js';
 import { buildQuarters } from './quarters.js';
 import { buildPen } from './pen.js';
@@ -32,7 +33,7 @@ export function buildWorld(scene) {
   const vault = buildVault(surface);
   const tunnel = buildTunnel(below);
   const pen = buildPen(penGroup);
-  const parts = [island, buildShed(surface), buildStation(surface), ops, buildOffice(surface), vault, tunnel, buildQuarters(below), pen, buildDockRooms(penGroup)];
+  const parts = [island, buildShed(surface), buildStation(surface), ops, buildOffice(surface), vault, buildDecor(surface), tunnel, buildQuarters(below), pen, buildDockRooms(penGroup)];
   // the tunnel closes in within a few yards; the cavern is big, and should look it
   const realms = {
     surface: { group: surface, fog: island.fog },

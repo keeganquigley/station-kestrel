@@ -206,6 +206,27 @@ const shots = process.argv[2] || null;
       if (await page.evaluate(() => window.kestrel.point('key'))) fail('key hotspot should be gone');
       log('cold start card read, C.O. key taken');
 
+      // --- what the crew put up: jokes, not clues, and one thing you only find by looking up
+      await use('swearbox');
+      if (!(await caption()).includes('SWEAR BOX')) fail('swear box caption: ' + (await caption()));
+      await use('centrefold');
+      if (!(await caption()).includes('Diesel Monthly')) fail('centrefold caption: ' + (await caption()));
+      await face('N');
+      await use('teamwork');
+      if (!(await caption()).includes('TEAMWORK')) fail('poster caption: ' + (await caption()));
+      await face('S');
+      if (await page.evaluate(() => window.kestrel.point('gnome'))) fail('the gnome should be out of sight from the ordinary view');
+      await page.evaluate(() => window.kestrel.jump('shed', 'S', 180, 34));
+      await use('gnome');
+      if (!(await caption()).includes('RELIEF OPERATOR')) fail('gnome caption: ' + (await caption()));
+      await use('gnome');
+      if (!(await caption()).includes('listening')) fail('the gnome should have more to say: ' + (await caption()));
+      await use('gnome');
+      await use('gnome');
+      if (!(await caption()).includes('still at his post')) fail('the gnome should settle on his last line: ' + (await caption()));
+      await shot('05b-gnome');
+      log('posters and the swear box caption; the gnome is found only by looking up');
+
       // --- mast
       await face('W');
       await fwd();
@@ -1023,6 +1044,7 @@ const shots = process.argv[2] || null;
       walk(k.scene);
       for (const h of hots) {
         if (['door', 'vaultdoor', 'water', 'enddoor'].includes(h.id)) continue; // these switch themselves off once passed; exercised above
+        if (h.id === 'gnome') continue; // out of sight from every ordinary view, on purpose; exercised above
         ids.push(h.id);
         let ok = false;
         for (const n of h.nodes) {

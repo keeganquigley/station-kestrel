@@ -154,6 +154,18 @@ export const LOOK = {
   reels: 'The tape is turning. It is recording, not playing.',
   rx2: 'A second receiver, tuned to nothing. Its aerial socket is empty and the lead beside it ends in bare wire.',
   chairs: 'Four chairs drawn up close to the machine. As if for a briefing.',
+  // what they put on the walls; none of it is a clue
+  teamwork: 'A poster. TEAMWORK: "Because none of us can lift the generator alone." Added underneath in biro: nor together.',
+  centrefold: 'The centrefold from Diesel Monthly, taped up over the bench. Somebody has drawn a heart round the fuel pump.',
+  swearbox: 'A cocoa tin with a slot cut in the lid. SWEAR BOX. It lives in the generator shed, and it is very nearly full.',
+  perseverance: 'A poster. PERSEVERANCE: "The supply boat always comes. Eventually." Pencilled below: define eventually.',
+  football: 'Holland Island Athletic F.C. A squad of four, no substitutes, unbeaten at home. Nobody has ever come out to play them.',
+  suggestions: 'A suggestion box. One slip inside, in a looping hand: "More biscuits." Under it, in a square one: "Noted."',
+  filmLongWave: 'A film poster. THEY CAME FROM LONG WAVE. "They only wanted to be heard." Somebody has underlined that, twice.',
+  filmColdFront: 'A film poster. COLD FRONT II: COLDER FRONT. "This time, it is slightly worse." A weatherman with a flare gun.',
+  patience: 'A poster. PATIENCE: "Good things come to those who wait. So does everything else."',
+  certificate: 'A framed certificate. Best-Kept Outstation, Northern Area: Highly Commended. In small type: three stations entered.',
+  sampler: 'A cross-stitch sampler, framed: THE FLOGGINGS WILL CONTINUE UNTIL MORALE IMPROVES. A present from the other three. He hung it up.',
 };
 
 export const SAY = {
@@ -194,6 +206,12 @@ export const SAY = {
   vaultOpen: 'The bolts draw back one after another. The door swings out toward you under its own weight.',
   vaultEnter: 'Red light, and the smell of warm valves. Something in here is still running.',
   printingNow: 'Somewhere inside the station, a machine has started to hammer.',
+  // found only by looking up; he has more to say each time
+  gnome: [
+    'A garden gnome on the roof tie, in a pair of headphones. The label round his neck reads RELIEF OPERATOR.',
+    'He is listening to something. He does not say what.',
+    'Of the whole complement, he is the only one still at his post.',
+  ],
 };
 
 export const ITEMS = {
