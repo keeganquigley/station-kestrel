@@ -90,7 +90,7 @@ const shots = process.argv[2] || null;
       if (!(await page.innerText('#title')).includes('Holland Island')) fail('title should say Holland Island');
       // the title explains whichever way of looking is chosen
       {
-        const how = () => page.evaluate(() => ['how-free', 'how-drag', 'how-switch'].filter((id) => !document.getElementById(id).hidden).join(' '));
+        const how = () => page.evaluate(() => ['how-free', 'how-drag', 'how-switch'].filter((id) => document.getElementById(id).getClientRects().length).join(' '));
         if ((await how()) !== 'how-drag how-switch') fail('with the pointer chosen the title should explain dragging, and how to switch: ' + (await how()));
         await page.evaluate(() => window.kestrel.setLook('free'));
         if ((await how()) !== 'how-free') fail('with free look chosen the title should explain free look: ' + (await how()));
