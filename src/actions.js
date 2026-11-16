@@ -196,6 +196,14 @@ export function createActions(game) {
       });
     },
 
+    /** The one thing in the shed you have to look up to find. */
+    gnome() {
+      const seen = S().flags.gnome || 0;
+      game.say(SAY.gnome[Math.min(seen, SAY.gnome.length - 1)]);
+      S().flags.gnome = seen + 1;
+      game.changed(0);
+    },
+
     // ---------------------------------------------------------------- chapter two
 
     descend() {
