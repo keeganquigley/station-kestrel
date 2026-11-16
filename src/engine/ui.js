@@ -115,10 +115,13 @@ export class UI {
 
   /** Which way of looking is in use, and whether this device can do free look at all. */
   look(mode, available) {
+    const free = mode === 'free';
     $('btn-look').hidden = !available;
-    $('btn-look').textContent = mode === 'free' ? 'Look: free' : 'Look: pointer';
-    $('how-free').hidden = !available;
-    $('how-drag').hidden = available;
+    $('btn-look').textContent = free ? 'Look: free' : 'Look: pointer';
+    // the title explains the mode that is chosen, not merely the one that is possible
+    $('how-free').hidden = !free;
+    $('how-drag').hidden = free;
+    $('how-switch').hidden = !available;
   }
 
   title(hasSave, onNew, onContinue, onChapterTwo, onChapterThree) {

@@ -88,6 +88,15 @@ const shots = process.argv[2] || null;
       // --- title
       if (await page.isVisible('#btn-continue')) fail('Continue offered with no save');
       if (!(await page.innerText('#title')).includes('Holland Island')) fail('title should say Holland Island');
+      // the title explains whichever way of looking is chosen
+      {
+        const how = () => page.evaluate(() => ['how-free', 'how-drag', 'how-switch'].filter((id) => !document.getElementById(id).hidden).join(' '));
+        if ((await how()) !== 'how-drag how-switch') fail('with the pointer chosen the title should explain dragging, and how to switch: ' + (await how()));
+        await page.evaluate(() => window.kestrel.setLook('free'));
+        if ((await how()) !== 'how-free') fail('with free look chosen the title should explain free look: ' + (await how()));
+        if (await page.evaluate(() => !!document.pointerLockElement)) fail('the title screen should never take the mouse');
+        await page.evaluate(() => window.kestrel.setLook('cursor'));
+      }
       await shot('01-title');
       await page.click('#btn-new');
       if ((await readAndClose('FIELD INSTRUCTION 96/311')).includes('Hollund')) fail('old spelling in the orders');
