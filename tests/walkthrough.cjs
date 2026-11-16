@@ -205,9 +205,31 @@ const shots = process.argv[2] || null;
         await held(true);
         await page.evaluate(() => document.exitPointerLock());
         await held(false);
-        await page.waitForTimeout(100);
-        if ((await look()).mode !== 'cursor') fail('Esc should leave you in pointer mode');
-        if ((await page.evaluate(() => localStorage.getItem('station-kestrel-look'))) !== 'cursor') fail('the choice of mode should be remembered');
+        await page.waitForFunction(() => window.kestrel.look() === 'cursor', null, { timeout: 2000 }).catch(() => fail('Esc should leave you in pointer mode'));
+        const stored = () => page.evaluate(() => localStorage.getItem('station-kestrel-look'));
+        if ((await stored()) !== 'free') fail('Esc is for now: it should not change the mode remembered for next time, which is ' + (await stored()));
+        // the browser also lets go of the mouse when another window comes to the front: that changes nothing
+        await page.keyboard.press('Space');
+        await held(true);
+        await page.evaluate(() => {
+          document.hasFocus = () => false;
+          document.exitPointerLock();
+        });
+        await page.waitForFunction(() => !document.pointerLockElement);
+        await page.waitForTimeout(300);
+        await page.evaluate(() => delete document.hasFocus);
+        if ((await look()).mode !== 'free') fail('losing the mouse to another window should leave free look chosen');
+        {
+          // and coming back, a click in the picture takes the mouse again without walking anywhere
+          const box = await (await page.$('#view')).boundingBox();
+          await page.mouse.click(box.x + box.width / 2, box.y + box.height * 0.3);
+          await held(true);
+          if ((await state()).node !== 'jetty') fail('the click that takes the mouse back should not walk anywhere');
+        }
+        // a deliberate switch is remembered
+        await page.keyboard.press('Space');
+        await held(false);
+        if ((await stored()) !== 'cursor') fail('a deliberate choice of mode should be remembered');
         await face('N');
         await expectAt('jetty', 'N');
         log('free look: mouse turns, click walks, WASD, and Space, right-click and Esc bring the pointer back');

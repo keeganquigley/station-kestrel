@@ -439,12 +439,15 @@ function syncLook() {
   markerDirty = true;
 }
 
-function setLook(mode) {
+/** Choose a way of looking. Only a deliberate choice is remembered for the next visit. */
+function setLook(mode, remember = true) {
   look = mode === 'free' && canLock ? 'free' : 'cursor';
-  try {
-    localStorage.setItem(LOOK_KEY, look);
-  } catch {
-    // no storage: the choice lasts for this visit
+  if (remember) {
+    try {
+      localStorage.setItem(LOOK_KEY, look);
+    } catch {
+      // no storage: the choice lasts for this visit
+    }
   }
   ui.look(look, canLock);
   syncLook();
@@ -462,8 +465,15 @@ document.addEventListener('pointerlockchange', () => {
     releasing = true;
     return document.exitPointerLock();
   }
-  // losing the mouse without our asking means the player pressed Esc: they want the pointer back
-  if (!locked() && !releasing && look === 'free' && wantLock()) setLook('cursor');
+  // Losing the mouse without our asking: if the player pressed Esc they want the pointer back, for now.
+  // The browser also lets go when another window or tab comes to the front, and that is not a request
+  // for anything, so then the mode stays as it is and the next click in the picture takes the mouse again.
+  // The window's focus tells the two apart, once it has had a moment to change.
+  if (!locked() && !releasing && look === 'free' && wantLock()) {
+    setTimeout(() => {
+      if (document.hasFocus() && !locked() && look === 'free' && wantLock()) setLook('cursor', false);
+    }, 60);
+  }
   releasing = false;
   markerDirty = true;
   marker.hidden = !locked();
