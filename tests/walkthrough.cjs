@@ -151,7 +151,7 @@ const shots = process.argv[2] || null;
         if ((await state()).yaw !== 0) fail('taking the mouse should not jerk the view round');
         const p0 = (await state()).pitch;
         await mouse(100, -40);
-        let s = await state();
+        const s = await state();
         if (!(s.yaw > 10 && s.yaw < 12)) fail('mouse right should turn you right by about eleven degrees, yaw is ' + s.yaw);
         if (!(s.pitch > p0 + 4 && s.pitch < p0 + 5)) fail('mouse up should tip the view up, pitch went from ' + p0 + ' to ' + s.pitch);
         await mouse(5000, 0);
