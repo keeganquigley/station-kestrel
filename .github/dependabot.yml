@@ -5,11 +5,14 @@ updates:
     schedule:
       interval: weekly
     groups:
-      # minor and patch updates arrive together in one pull request
+      # minor and patch updates arrive together in one pull request, all but Three.js
       everything:
         update-types: [minor, patch]
-    # major versions come one at a time: a new Three.js can change lighting and colour,
-    # which no test will catch, so each one wants looking at
+        exclude-patterns: ['three']
+    # Three.js is numbered 0.x (r187 is 0.187.0), so Dependabot counts every release of it
+    # as minor. It is kept out of the group and comes in a pull request of its own: a new
+    # Three.js can change lighting and colour, which no test will catch, so each one wants
+    # looking at. Major versions of everything else come one at a time as well.
 
   - package-ecosystem: github-actions
     directory: /

@@ -84,10 +84,12 @@ each, and delete an item from this list in the pull request that completes it.
 ## Ongoing
 
 - **Dependabot pull requests.** Merge grouped minor and patch updates once CI
-  is green. For a **major** version of Three.js, Vite or Vitest: run the
-  browser tests, read the release notes, and leave it for the owner to merge.
-  A new Three.js can change lighting and colour in ways no test catches, so a
-  person needs to look at the game.
+  is green. For **any** new release of Three.js, or a **major** version of Vite
+  or Vitest: run the browser tests, read the release notes, and leave it for
+  the owner to merge. Three.js is numbered 0.x, so Dependabot counts every
+  release as minor; it is kept out of the group and comes in a pull request of
+  its own. A new Three.js can change lighting and colour in ways no test
+  catches, so a person needs to look at the game.
 - **CodeQL alerts.** Fix genuine ones in a pull request. If you believe one is
   a false positive, say why and leave it for the owner to dismiss.
 - **Workflow runner warnings** (deprecated actions, runner image changes): fix
