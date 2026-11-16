@@ -31,6 +31,8 @@ const shots = process.argv[2] || null;
   const ready = async () => {
     await page.waitForFunction(() => window.kestrel, null, { timeout: 30000 });
     await page.evaluate(() => (window.kestrel.timeScale = 0.3));
+    // play with the pointer on show, so that clicks land where they are aimed; free look has its own step
+    await page.evaluate(() => window.kestrel.setLook('cursor'));
   };
   const shot = async (name) => shots && (await (await page.$('#stage')).screenshot({ path: path.join(shots, name + '.png') }));
 
@@ -86,6 +88,15 @@ const shots = process.argv[2] || null;
       // --- title
       if (await page.isVisible('#btn-continue')) fail('Continue offered with no save');
       if (!(await page.innerText('#title')).includes('Holland Island')) fail('title should say Holland Island');
+      // the title explains whichever way of looking is chosen
+      {
+        const how = () => page.evaluate(() => ['how-free', 'how-drag', 'how-switch'].filter((id) => document.getElementById(id).getClientRects().length).join(' '));
+        if ((await how()) !== 'how-drag how-switch') fail('with the pointer chosen the title should explain dragging, and how to switch: ' + (await how()));
+        await page.evaluate(() => window.kestrel.setLook('free'));
+        if ((await how()) !== 'how-free') fail('with free look chosen the title should explain free look: ' + (await how()));
+        if (await page.evaluate(() => !!document.pointerLockElement)) fail('the title screen should never take the mouse');
+        await page.evaluate(() => window.kestrel.setLook('cursor'));
+      }
       await shot('01-title');
       await page.click('#btn-new');
       if ((await readAndClose('FIELD INSTRUCTION 96/311')).includes('Hollund')) fail('old spelling in the orders');
@@ -115,6 +126,89 @@ const shots = process.argv[2] || null;
         await expectAt('jetty', 'N');
         if ((await state()).yaw !== 0) fail('arrow keys should snap back onto north');
         log('dragging looks around; arrow keys turn in 45 degree stops');
+      }
+
+      // --- free look: the mouse turns your head, and a click acts on the middle of the picture
+      {
+        const look = () =>
+          page.evaluate(() => ({
+            mode: window.kestrel.look(),
+            held: document.pointerLockElement === document.getElementById('view'),
+            marker: !document.getElementById('marker').hidden,
+            centre: window.kestrel.centre(),
+          }));
+        // the browser takes the mouse a moment before it tells the page, so wait for the marker too
+        const held = (want) =>
+          page.waitForFunction((w) => (document.pointerLockElement === document.getElementById('view')) === w && document.getElementById('marker').hidden === !w, want, { timeout: 5000 });
+        // the mouse cannot really be moved while the browser holds it in a test, so report the travel directly
+        const mouse = async (dx, dy) => {
+          await page.evaluate(([x, y]) => document.dispatchEvent(new MouseEvent('mousemove', { movementX: x, movementY: y })), [dx, dy]);
+          await page.waitForTimeout(60);
+        };
+        // (a name further down this block shadows the key() helper, so this step has its own)
+        const press = async (k) => {
+          await page.keyboard.press(k);
+          await settle();
+        };
+        if ((await look()).held) fail('the tests should start with the pointer on show');
+        await page.click('#btn-look');
+        await held(true);
+        if ((await look()).mode !== 'free' || !(await look()).marker) fail('the Look button should hide the pointer and show the marker');
+        // the first report after the mouse is taken is thrown away, and the browser may or may not have sent one already
+        await mouse(0, 0);
+        await page.waitForTimeout(250);
+        if ((await state()).yaw !== 0) fail('taking the mouse should not jerk the view round');
+        const p0 = (await state()).pitch;
+        await mouse(100, -40);
+        const s = await state();
+        if (!(s.yaw > 10 && s.yaw < 12)) fail('mouse right should turn you right by about eleven degrees, yaw is ' + s.yaw);
+        if (!(s.pitch > p0 + 4 && s.pitch < p0 + 5)) fail('mouse up should tip the view up, pitch went from ' + p0 + ' to ' + s.pitch);
+        await mouse(5000, 0);
+        if (!((await state()).yaw < 40)) fail('one wild report should not spin you round: yaw ' + (await state()).yaw);
+        // W A S D are the arrow keys
+        await press('a');
+        if ((await state()).yaw !== 0) fail('A should turn left in 45 degree stops, yaw is ' + (await state()).yaw);
+        await press('d');
+        if ((await state()).yaw !== 45) fail('D should turn right');
+        await press('a');
+        if ((await look()).centre.id !== 'path') fail('the marker should be on the way ahead: ' + JSON.stringify((await look()).centre));
+        await page.mouse.down();
+        await page.mouse.up();
+        await settle();
+        await expectAt('path', 'N');
+        if (!(await look()).held) fail('walking should keep hold of the mouse');
+        for (let i = 0; i < 4; i++) await press('d');
+        await press('w');
+        await expectAt('jetty', 'S');
+        // a paper gives the pointer back by itself, and takes it again when put down
+        await page.evaluate(() => window.kestrel.game.read('orders'));
+        await held(false);
+        if ((await look()).mode !== 'free') fail('reading a paper should not change the mode');
+        await page.click('#doc-close');
+        await held(true);
+        // Space and the right button switch, either way
+        await page.keyboard.press('Space');
+        await held(false);
+        if ((await look()).mode !== 'cursor' || (await look()).marker) fail('Space should bring the pointer back');
+        const box = await (await page.$('#view')).boundingBox();
+        await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, { button: 'right' });
+        await held(true);
+        if ((await state()).node !== 'jetty') fail('a right-click should only switch the mode');
+        await page.mouse.down({ button: 'right' });
+        await page.mouse.up({ button: 'right' });
+        await held(false);
+        if ((await look()).mode !== 'cursor') fail('a right-click in free look should bring the pointer back');
+        // losing the mouse without asking, which is what Esc does, also means "pointer, please"
+        await page.keyboard.press('Space');
+        await held(true);
+        await page.evaluate(() => document.exitPointerLock());
+        await held(false);
+        await page.waitForTimeout(100);
+        if ((await look()).mode !== 'cursor') fail('Esc should leave you in pointer mode');
+        if ((await page.evaluate(() => localStorage.getItem('station-kestrel-look'))) !== 'cursor') fail('the choice of mode should be remembered');
+        await face('N');
+        await expectAt('jetty', 'N');
+        log('free look: mouse turns, click walks, WASD, and Space, right-click and Esc bring the pointer back');
       }
 
       // --- mouse navigation: edges turn, middle walks

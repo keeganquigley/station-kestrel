@@ -11,6 +11,7 @@ const { chromium } = require('playwright');
   const page = await browser.newPage();
   await page.goto(url);
   await page.waitForFunction(() => window.kestrel, null, { timeout: 30000 });
+  await page.evaluate(() => window.kestrel.setLook('cursor'));
   await page.click('#btn-new');
   await page.click('#doc-close');
   const { bad, views } = await page.evaluate(() => {

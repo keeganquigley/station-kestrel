@@ -41,6 +41,29 @@ body {
 }
 
 /* ---- bottom bar ---- */
+/* free look: what a click would act on, in the middle of the picture */
+#marker {
+  position: absolute;
+  left: 304px;
+  top: 184px;
+  width: 32px;
+  height: 32px;
+  background: center / 32px 32px no-repeat;
+  pointer-events: none;
+}
+
+#btn-look {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  opacity: 0.55;
+}
+
+#btn-look:hover,
+#btn-look:focus-visible {
+  opacity: 1;
+}
+
 #bar {
   height: 64px;
   box-sizing: border-box;

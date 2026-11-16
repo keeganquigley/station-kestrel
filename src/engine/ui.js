@@ -22,6 +22,7 @@ export class UI {
     });
     $('btn-notes').addEventListener('click', () => this.notebook());
     $('btn-sound').addEventListener('click', () => game.toggleSound());
+    $('btn-look').addEventListener('click', () => game.toggleLook());
     this.fit();
     window.addEventListener('resize', () => this.fit());
   }
@@ -57,6 +58,7 @@ export class UI {
     $('doc').dataset.doc = id;
     $('doc').hidden = false;
     this.onDocClose = onClose || null;
+    this.game.uiChanged();
   }
 
   notebook() {
@@ -80,6 +82,7 @@ export class UI {
     $('doc').hidden = false;
     this.onDocClose = null;
     this.game.sfx('paper');
+    this.game.uiChanged();
   }
 
   closeDoc() {
@@ -89,6 +92,7 @@ export class UI {
     const cb = this.onDocClose;
     this.onDocClose = null;
     if (cb) cb();
+    this.game.uiChanged();
   }
 
   inventory(state) {
@@ -107,6 +111,17 @@ export class UI {
 
   sound(on) {
     $('btn-sound').textContent = on ? 'Sound: on' : 'Sound: off';
+  }
+
+  /** Which way of looking is in use, and whether this device can do free look at all. */
+  look(mode, available) {
+    const free = mode === 'free';
+    $('btn-look').hidden = !available;
+    $('btn-look').textContent = free ? 'Look: free' : 'Look: pointer';
+    // the title explains the mode that is chosen, not merely the one that is possible
+    $('how-free').hidden = !free;
+    $('how-drag').hidden = free;
+    $('how-switch').hidden = !available;
   }
 
   title(hasSave, onNew, onContinue, onChapterTwo, onChapterThree) {
@@ -133,6 +148,7 @@ export class UI {
 
   ending(onAgain) {
     $('ending').hidden = false;
+    this.game.uiChanged();
     $('btn-again').onclick = () => {
       $('ending').hidden = true;
       onAgain();
