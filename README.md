@@ -92,6 +92,7 @@ tests/
   below.test.js    chapter two: the same for the pump, the junction box and the door
   pen.test.js      chapter three: the darkroom, the tally board, the telegraph and its papers
   save.test.js     a save is checked before it is resumed: corrupt, tampered and old saves
+  actions.test.js  what each click does, on a game that only takes notes: gates, pickups, follow-ups, captions
   walkthrough.cjs  plays all three chapters in a real browser
   seethrough.cjs   checks no wall lets the one behind it show, and that nothing underground has a gap
   tour.cjs         screenshots every view
