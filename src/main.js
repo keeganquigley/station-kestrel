@@ -685,6 +685,11 @@ const api = {
   timeScale: 1,
   /** True while the camera is gliding or turning. */
   busy,
+  /** Rough, quick drawing for the automated play-through (see renderer.smooth). */
+  draft(on = true) {
+    renderer.smooth(!on);
+    renderer.refresh(scene, camera);
+  },
   /** Screen point (0..1) that triggers a hotspot from the current view, or null. */
   point: (id, dir = 0) => pointFor(scene, camera, id, game.state.node, dir, !NODES[game.state.node].cam),
   /** 'free' or 'cursor', and a way to choose. Tests play in 'cursor'. */

@@ -23,7 +23,11 @@ function shown(obj) {
 export function pick(scene, camera, x, y, nodeId) {
   ndc.set(x * 2 - 1, -(y * 2 - 1));
   ray.setFromCamera(ndc, camera);
-  const hits = ray.intersectObjects(scene.children, true);
+  // each chapter's world is one group in the scene and only one is on show, so the others are not searched
+  const hits = ray.intersectObjects(
+    scene.children.filter((c) => c.visible),
+    true,
+  );
   for (const hit of hits) {
     const obj = hit.object;
     if (obj.userData.nopick || obj.isLine) continue;

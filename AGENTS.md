@@ -59,10 +59,15 @@ npm run walkthrough
 npm run seethrough
 ```
 
-The walkthrough plays all three chapters with real clicks and takes ten minutes
-or more. It fails on any browser console error. `KESTREL_URL` overrides the
+The walkthrough plays all three chapters with real clicks and takes about ten
+minutes. It fails on any browser console error. `KESTREL_URL` overrides the
 address, and `KESTREL_FROM3=1` plays only chapter three. `seethrough` checks the
 scenery for gaps. Both launch Chromium with software rendering flags; keep those.
+
+Drawing without a graphics card is the slow part, so keep the tests from doing
+more of it than they need. The walkthrough calls `kestrel.draft()` to draw without
+anti-aliasing, because nothing in it judges the picture. `seethrough` does judge
+the picture, so it must not. On GitHub the two run as separate jobs, side by side.
 
 ## Open jobs
 
