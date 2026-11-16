@@ -9,7 +9,8 @@ import * as Darkroom from '../puzzles/darkroom.js';
 import * as Tally from '../puzzles/tally.js';
 import * as Telegraph from '../puzzles/telegraph.js';
 import { COMBINATION } from '../puzzles/cipher.js';
-import { START, NODES } from '../data/nodes.js';
+import { START, NODES, ORDER } from '../data/nodes.js';
+import { DOCS, ITEMS } from '../data/documents.js';
 
 const KEY = 'station-kestrel-save-v1';
 
@@ -81,13 +82,63 @@ export function save(state) {
   }
 }
 
+const PUZZLES = ['gen', 'rx', 'vault', 'pump', 'junction', 'reply', 'darkroom', 'tally', 'telegraph'];
+// saves from before chapters two and three have no state for them yet; these three every save has
+const REQUIRED = ['gen', 'rx', 'vault'];
+
+const isObject = (x) => typeof x === 'object' && x !== null && !Array.isArray(x);
+const isNumber = (x) => typeof x === 'number' && Number.isFinite(x);
+
+/** A copy of value if it has the same shape and types as template, else undefined. */
+function fit(template, value) {
+  if (Array.isArray(template)) {
+    if (!Array.isArray(value) || value.length !== template.length) return undefined;
+    const out = template.map((t, i) => fit(t, value[i]));
+    return out.includes(undefined) ? undefined : out;
+  }
+  if (isObject(template)) {
+    if (!isObject(value)) return undefined;
+    const out = {};
+    for (const k of Object.keys(template)) {
+      if (!Object.hasOwn(value, k)) return undefined;
+      out[k] = fit(template[k], value[k]);
+      if (out[k] === undefined) return undefined;
+    }
+    return out;
+  }
+  if (typeof template === 'number') return isNumber(value) ? value : undefined;
+  return typeof value === typeof template ? value : undefined;
+}
+
+const known = (list, registry) => (Array.isArray(list) ? [...new Set(list.filter((id) => typeof id === 'string' && Object.hasOwn(registry, id)))] : undefined);
+
+/**
+ * Check a parsed save against the shape of a new game. Unknown documents and items are
+ * dropped; anything else that does not fit means there is no save to resume.
+ */
+export function repair(s) {
+  if (!isObject(s) || s.v !== 1 || typeof s.node !== 'string' || !Object.hasOwn(NODES, s.node)) return null;
+  const fresh = newState();
+  const out = { ...fresh, node: s.node, facing: ORDER.includes(s.facing) ? s.facing : START.facing };
+  for (const k of PUZZLES) {
+    if (s[k] === undefined && !REQUIRED.includes(k)) continue;
+    out[k] = fit(fresh[k], s[k]);
+    if (out[k] === undefined) return null;
+  }
+  if (!isObject(s.flags)) return null;
+  out.flags = {};
+  for (const [k, f] of Object.entries(s.flags)) if (typeof f === 'boolean' || isNumber(f)) out.flags[k] = f;
+  out.inv = known(s.inv, ITEMS);
+  out.docs = known(s.docs, DOCS);
+  if (!out.inv || !out.docs) return null;
+  if (isNumber(s.yaw) && isNumber(s.pitch)) Object.assign(out, { yaw: s.yaw, pitch: s.pitch });
+  return out;
+}
+
 export function load() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (!raw) return null;
-    const s = JSON.parse(raw);
-    if (!s || s.v !== 1 || !NODES[s.node] || !s.gen || !s.rx || !s.vault) return null;
-    return { ...newState(), ...s };
+    return raw ? repair(JSON.parse(raw)) : null;
   } catch {
     return null;
   }
