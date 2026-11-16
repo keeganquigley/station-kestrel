@@ -51,10 +51,14 @@ between them.
 - **Free look** (the default on a computer). The pointer is hidden and the mouse
   turns your head. A marker in the middle of the picture shows what a click
   would do: walk that way, or use the thing it is on. Esc brings the pointer
-  back, as it does in any browser.
+  back, as it does in any browser, until you switch again or reload.
 - **Pointer.** Drag the picture to look around. Click in the direction you want
   to walk, and click things to use them. The left and right edges of the
   picture turn you a quarter turn.
+
+The way you choose with right-click, Space or the Look button is remembered for
+next time. If the browser lets go of the mouse because you went to another
+window, free look is still chosen: click in the picture to carry on.
 
 In both, W or the up arrow walks toward wherever you are looking, A and D (or
 left and right) turn, and S or the down arrow steps back from a close-up.
