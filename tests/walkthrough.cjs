@@ -29,7 +29,11 @@ const shots = process.argv[2] || null;
     await page.waitForTimeout(40);
   };
   const ready = async () => {
-    await page.waitForFunction(() => window.kestrel, null, { timeout: 30000 });
+    await page
+      .waitForFunction(() => window.kestrel, null, { timeout: 30000 })
+      .catch(() => {
+        throw new Error('this page has no test hook. Build with "npm run build:test": the published build (npm run build) leaves the hook out');
+      });
     await page.evaluate(() => (window.kestrel.timeScale = 0.3));
     // play with the pointer on show, so that clicks land where they are aimed; free look has its own step
     await page.evaluate(() => window.kestrel.setLook('cursor'));

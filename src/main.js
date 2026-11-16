@@ -107,12 +107,14 @@ function linksFrom(nodeId) {
 // ---------------------------------------------------------------- camera moves
 let move = null; // a glide or a turn in progress
 let fading = false; // walking the stairs between the realms
+/** Multiplies the length of every glide and turn. The tests set it low, through the hook at the foot of this file. */
+let timeScale = 1;
 const busy = () => !!move || fading;
 let lookDirty = false;
 const timers = new Set();
 
 function startMove(from, to, ms, followGround) {
-  move = { from, to, t0: performance.now(), dur: Math.max(1, ms * api.timeScale), followGround };
+  move = { from, to, t0: performance.now(), dur: Math.max(1, ms * timeScale), followGround };
 }
 
 function stepMove(now) {
@@ -216,9 +218,9 @@ const game = {
     if (fading) return;
     fading = true;
     sound.sfx(sfx);
-    renderer.fade(0, Math.max(40, 900 * api.timeScale), () => {
+    renderer.fade(0, Math.max(40, 900 * timeScale), () => {
       game.go(node, facing, true);
-      renderer.fade(1, Math.max(40, 1100 * api.timeScale), () => (fading = false));
+      renderer.fade(1, Math.max(40, 1100 * timeScale), () => (fading = false));
     });
   },
 
@@ -684,45 +686,53 @@ function frame(now) {
   drawMarker(now);
 }
 
-// For the automated walkthrough and for poking around in the browser console.
-const api = {
-  game,
-  renderer,
-  scene,
-  nodes: NODES,
-  start: START,
-  /** Multiplies the length of every glide and turn. Tests set it low. */
-  timeScale: 1,
-  /** True while the camera is gliding or turning. */
-  busy,
-  /** Rough, quick drawing for the automated play-through (see renderer.smooth). */
-  draft(on = true) {
-    renderer.smooth(!on);
-    renderer.refresh(scene, camera);
-  },
-  /** Screen point (0..1) that triggers a hotspot from the current view, or null. */
-  point: (id, dir = 0) => pointFor(scene, camera, id, game.state.node, dir, !NODES[game.state.node].cam),
-  /** 'free' or 'cursor', and a way to choose. Tests play in 'cursor'. */
-  look: () => look,
-  setLook,
-  /** What a click in free look would act on: null, or { kind, id }. */
-  centre() {
-    const t = targetAt(0.5, 0.5);
-    return t && { kind: t.kind, id: t.kind === 'hot' ? t.hot.id : t.kind === 'fwd' ? t.link.to : null };
-  },
-  /** Cut straight to a node, optionally at an exact yaw and pitch in degrees. */
-  jump(node, facing, yaw, pitch) {
-    game.go(node, facing, true);
-    if (typeof yaw === 'number' && !NODES[node].cam) {
-      game.state.yaw = norm(yaw);
-      game.state.pitch = pitch || 0;
-      game.state.facing = nearestFace(yaw);
-      placeCamera();
-      renderer.show(scene, camera, 0);
-    }
-  },
-};
-window.kestrel = api;
+// The hook the automated tests drive the game through, also handy in the browser console while developing.
+// The published game does not carry it: `npm run build` leaves this whole block out.
+// `npm run dev` keeps it, and so does `npm run build:test`, which sets the flag (see .env.test).
+if (import.meta.env.DEV || import.meta.env.VITE_KESTREL_HOOK) {
+  window.kestrel = {
+    game,
+    renderer,
+    scene,
+    nodes: NODES,
+    start: START,
+    /** Multiplies the length of every glide and turn. Tests set it low. */
+    get timeScale() {
+      return timeScale;
+    },
+    set timeScale(v) {
+      timeScale = v;
+    },
+    /** True while the camera is gliding or turning. */
+    busy,
+    /** Rough, quick drawing for the automated play-through (see renderer.smooth). */
+    draft(on = true) {
+      renderer.smooth(!on);
+      renderer.refresh(scene, camera);
+    },
+    /** Screen point (0..1) that triggers a hotspot from the current view, or null. */
+    point: (id, dir = 0) => pointFor(scene, camera, id, game.state.node, dir, !NODES[game.state.node].cam),
+    /** 'free' or 'cursor', and a way to choose. Tests play in 'cursor'. */
+    look: () => look,
+    setLook,
+    /** What a click in free look would act on: null, or { kind, id }. */
+    centre() {
+      const t = targetAt(0.5, 0.5);
+      return t && { kind: t.kind, id: t.kind === 'hot' ? t.hot.id : t.kind === 'fwd' ? t.link.to : null };
+    },
+    /** Cut straight to a node, optionally at an exact yaw and pitch in degrees. */
+    jump(node, facing, yaw, pitch) {
+      game.go(node, facing, true);
+      if (typeof yaw === 'number' && !NODES[node].cam) {
+        game.state.yaw = norm(yaw);
+        game.state.pitch = pitch || 0;
+        game.state.facing = nearestFace(yaw);
+        placeCamera();
+        renderer.show(scene, camera, 0);
+      }
+    },
+  };
+}
 
 ui.sound(true);
 ui.look(look, canLock);

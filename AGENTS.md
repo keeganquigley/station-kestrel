@@ -40,16 +40,23 @@ Read `README.md` first. It explains the layout of `src/` and the tests.
    quote it in pull request descriptions or comments.
 6. Do not edit `LICENSE`, change the licence, or rewrite git history.
 7. Do not reformat files by hand or change the Prettier or ESLint settings.
+8. Keep the test hook out of the published game. `window.kestrel` exists only
+   in `npm run dev` and `npm run build:test`. Do not set `VITE_KESTREL_HOOK` in
+   `.github/workflows/pages.yml`, and do not make the game itself depend on the
+   hook.
 
 ## Browser tests
 
 They need Playwright with Chromium, and the built game being served:
 
 ```bash
-npm run build && npm run preview
+npm run build:test && npm run preview
 ```
 
-That serves the game on `http://localhost:4173`. Then, in another shell:
+That serves the game on `http://localhost:4173`. `build:test` is the ordinary
+build plus `window.kestrel`, the hook the tests drive the game through. The
+published game (`npm run build`) leaves the hook out, so the tests cannot run
+against it. Then, in another shell:
 
 ```bash
 npm run walkthrough
@@ -71,15 +78,8 @@ the picture, so it must not. On GitHub the two run as separate jobs, side by sid
 
 ## Open jobs
 
-Do these in order, one pull request each. Delete an item from this list in the
-pull request that completes it.
-
-### 1. Keep the debug hook out of the published build
-
-`src/main.js` exposes `window.kestrel` for the tests. Gate it behind a
-build-time flag (for example a `VITE_` environment variable), set that flag for
-the build the browser tests use, and leave it unset in
-`.github/workflows/pages.yml`.
+None at present. When the owner adds some, do them in order, one pull request
+each, and delete an item from this list in the pull request that completes it.
 
 ## Ongoing
 

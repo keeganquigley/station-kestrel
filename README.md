@@ -142,11 +142,14 @@ Every push to `main` also rebuilds and republishes the game on GitHub Pages
 
 The browser tests use [Playwright](https://playwright.dev) (a dev dependency;
 install its Chromium once with `npx playwright install --with-deps chromium`)
-and need the built game being served:
+and need the test build being served:
 
 ```bash
-npm run build && npm run preview
+npm run build:test && npm run preview
 ```
+
+`build:test` is the ordinary build plus `window.kestrel`, the hook the tests
+drive the game through. The published game (`npm run build`) leaves it out.
 
 ```bash
 npm run walkthrough

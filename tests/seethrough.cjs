@@ -10,7 +10,11 @@ const { chromium } = require('playwright');
   const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const page = await browser.newPage();
   await page.goto(url);
-  await page.waitForFunction(() => window.kestrel, null, { timeout: 30000 });
+  await page
+    .waitForFunction(() => window.kestrel, null, { timeout: 30000 })
+    .catch(() => {
+      throw new Error('this page has no test hook. Build with "npm run build:test": the published build (npm run build) leaves the hook out');
+    });
   await page.evaluate(() => window.kestrel.setLook('cursor'));
   await page.click('#btn-new');
   await page.click('#doc-close');

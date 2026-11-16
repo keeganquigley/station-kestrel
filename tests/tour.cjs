@@ -14,7 +14,11 @@ const fs = require('fs');
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto(url);
-  await page.waitForFunction(() => window.kestrel, null, { timeout: 30000 });
+  await page
+    .waitForFunction(() => window.kestrel, null, { timeout: 30000 })
+    .catch(() => {
+      throw new Error('this page has no test hook. Build with "npm run build:test": the published build (npm run build) leaves the hook out');
+    });
   await page.evaluate(() => window.kestrel.setLook('cursor'));
   await page.waitForTimeout(500);
   if (!only) await page.screenshot({ path: path.join(out, '00-title.png') });
