@@ -123,8 +123,9 @@ unit tests, run on GitHub for every push and pull request
 Every push to `main` also rebuilds and republishes the game on GitHub Pages
 (`.github/workflows/pages.yml`).
 
-The browser tests need [Playwright](https://playwright.dev) installed and the
-built game being served:
+The browser tests use [Playwright](https://playwright.dev) (a dev dependency;
+install its Chromium once with `npx playwright install --with-deps chromium`)
+and need the built game being served:
 
 ```bash
 npm run build && npm run preview
@@ -140,6 +141,9 @@ npm run seethrough
 
 `tests/walkthrough.cjs` contains the full solution, so do not read it if you
 want to play first. Set `KESTREL_FROM3=1` to play only chapter three.
+
+On pull requests to `main` both browser tests also run on GitHub
+(`.github/workflows/browser-tests.yml`).
 
 ## Licence
 

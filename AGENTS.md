@@ -69,32 +69,20 @@ scenery for gaps. Both launch Chromium with software rendering flags; keep those
 Do these in order, one pull request each. Delete an item from this list in the
 pull request that completes it.
 
-### 1. Run the browser tests in CI
-
-- Add `playwright` as a dev dependency (the scripts currently assume it is
-  installed globally).
-- Add a workflow that, on pull requests to `main`, installs Chromium
-  (`npx playwright install --with-deps chromium`), builds, serves the build,
-  and runs `npm run walkthrough` and `npm run seethrough`.
-- Give the job a 30 minute timeout. Pass the walkthrough a screenshot
-  directory as its first argument and upload it as an artifact on failure.
-- Keep it a separate job from "Lint, build and unit tests" and do not rename
-  that job; branch protection depends on the name.
-
-### 2. Validate the save
+### 1. Validate the save
 
 `load()` in `src/engine/state.js` trusts whatever is in `localStorage`. Check
 types and shapes; drop document and inventory ids that do not exist in `DOCS`
 and `ITEMS`; fall back to no save if it cannot be repaired. Add unit tests for
 a corrupt save and a tampered one.
 
-### 3. Content Security Policy
+### 2. Content Security Policy
 
 Add one to `index.html` as a `<meta>` tag. Start from `default-src 'self'` and
 loosen only what the game needs (the mouse cursors are `data:` SVG images). The
 full walkthrough must pass with no console errors.
 
-### 4. Keep the debug hook out of the published build
+### 3. Keep the debug hook out of the published build
 
 `src/main.js` exposes `window.kestrel` for the tests. Gate it behind a
 build-time flag (for example a `VITE_` environment variable), set that flag for
