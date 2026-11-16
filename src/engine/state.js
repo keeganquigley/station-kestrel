@@ -110,11 +110,28 @@ function fit(template, value) {
   return typeof value === typeof template ? value : undefined;
 }
 
+const between = (n, lo, hi) => Number.isInteger(n) && n >= lo && n <= hi;
+const digits = (p) => p.wheels.every((n) => between(n, 0, 9));
+const sum = (list) => list.reduce((a, b) => a + b, 0);
+
+// what each puzzle's own moves can reach; a value outside it was not put there by playing
+const IN_RANGE = {
+  gen: (p) => between(p.primes, 0, Gen.PRIME_COUNT + 2),
+  rx: (p) => between(p.khz, Rx.MIN_KHZ, Rx.MAX_KHZ) && between(p.bearing, 0, 359) && p.bearing % Rx.BEARING_STEP === 0,
+  vault: digits,
+  pump: (p) => p.levels.every((n, i) => between(n, 0, Pump.CAPACITY[i])) && sum(p.levels) === sum(Pump.initial().levels),
+  junction: (p) => Object.values(p.sel).every((n) => Junction.TERMINALS.includes(n)),
+  reply: digits,
+  darkroom: digits,
+  tally: (p) => Object.values(p.set).every((n) => Tally.TALLIES.includes(n)),
+  telegraph: digits,
+};
+
 const known = (list, registry) => (Array.isArray(list) ? [...new Set(list.filter((id) => typeof id === 'string' && Object.hasOwn(registry, id)))] : undefined);
 
 /**
- * Check a parsed save against the shape of a new game. Unknown documents and items are
- * dropped; anything else that does not fit means there is no save to resume.
+ * Check a parsed save against the shape of a new game and the range of each puzzle's values.
+ * Unknown documents and items are dropped; anything else that does not fit means there is no save to resume.
  */
 export function repair(s) {
   if (!isObject(s) || s.v !== 1 || typeof s.node !== 'string' || !Object.hasOwn(NODES, s.node)) return null;
@@ -123,7 +140,7 @@ export function repair(s) {
   for (const k of PUZZLES) {
     if (s[k] === undefined && !REQUIRED.includes(k)) continue;
     out[k] = fit(fresh[k], s[k]);
-    if (out[k] === undefined) return null;
+    if (out[k] === undefined || !IN_RANGE[k](out[k])) return null;
   }
   if (!isObject(s.flags)) return null;
   out.flags = {};

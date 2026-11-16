@@ -59,6 +59,32 @@ describe('a corrupt save', () => {
     expect(load()).toBeNull();
   });
 
+  it('is no save when a puzzle holds a value its own moves cannot reach', () => {
+    const outOfRange = [
+      (s) => (s.gen.primes = -1),
+      (s) => (s.gen.primes = 99),
+      (s) => (s.rx.khz = 2999),
+      (s) => (s.rx.khz = 10001),
+      (s) => (s.rx.khz = 6990.5),
+      (s) => (s.rx.bearing = 360),
+      (s) => (s.rx.bearing = 55),
+      (s) => (s.vault.wheels[0] = 12),
+      (s) => (s.vault.wheels[3] = -1),
+      (s) => (s.pump.levels = [9, 0, 0]),
+      (s) => (s.pump.levels = [8, 5, 3]),
+      (s) => (s.junction.sel.red = 6),
+      (s) => (s.reply.wheels[0] = 1.5),
+      (s) => (s.darkroom.wheels[5] = 10),
+      (s) => (s.tally.set[Object.keys(s.tally.set)[0]] = 15),
+      (s) => (s.telegraph.wheels[0] = 10),
+    ];
+    for (const mangle of outOfRange) {
+      const s = copy(chapterThreeState());
+      mangle(s);
+      expect(repair(s), mangle.toString()).toBeNull();
+    }
+  });
+
   it('is no save when a part it cannot do without is missing or the wrong shape', () => {
     const broken = [
       (s) => (s.v = 2),
