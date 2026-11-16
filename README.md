@@ -1,5 +1,7 @@
 # Station Kestrel
 
+**[Play it in your browser](https://keeganquigley.github.io/station-kestrel/).** Nothing to install.
+
 A point-and-click mystery for the browser, in the manner of the mid-90s slideshow
 adventures: fixed standing places you can look around from, nobody about, and machines that
 have to be understood before they will work.

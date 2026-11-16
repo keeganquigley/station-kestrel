@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Station Kestrel - a point-and-click mystery in three chapters, for the browser",
+  "homepage": "https://keeganquigley.github.io/station-kestrel/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
