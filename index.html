@@ -10,6 +10,8 @@
     <div id="stage">
       <div id="viewwrap">
         <canvas id="view" width="640" height="400"></canvas>
+        <div id="marker" hidden></div>
+        <button id="btn-look" class="btn" hidden title="Right-click or Space also switches">Look: free</button>
 
         <div id="doc" hidden>
           <div id="doc-paper" class="paper"></div>
@@ -26,7 +28,10 @@
               <button id="btn-ch2" class="btn big">Chapter two</button>
               <button id="btn-ch3" class="btn big">Chapter three</button>
             </div>
-            <p class="how">Click ahead to walk. Drag to look around.<br />Click things to use them. Keep a pencil handy.</p>
+            <p class="how" id="how-free" hidden>
+              Move the mouse to look. Click, or press W, to walk. Click things to use them.<br />Right-click or Space brings the pointer back. Keep a pencil handy.
+            </p>
+            <p class="how" id="how-drag">Click ahead to walk. Drag to look around.<br />Click things to use them. Keep a pencil handy.</p>
           </div>
         </div>
 
