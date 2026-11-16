@@ -33,6 +33,8 @@ const shots = process.argv[2] || null;
     await page.evaluate(() => (window.kestrel.timeScale = 0.3));
     // play with the pointer on show, so that clicks land where they are aimed; free look has its own step
     await page.evaluate(() => window.kestrel.setLook('cursor'));
+    // nothing here judges the picture, and without a graphics card it draws much quicker unsmoothed
+    await page.evaluate(() => window.kestrel.draft());
   };
   const shot = async (name) => shots && (await (await page.$('#stage')).screenshot({ path: path.join(shots, name + '.png') }));
 
@@ -1125,35 +1127,49 @@ const shots = process.argv[2] || null;
       const k = window.kestrel,
         g = k.game,
         missing = [],
+        astray = [],
         ids = [];
       g.state.gen = { valve: true, primes: 0, choke: false, running: true, breakers: { lighting: true, heating: false, ops: true, door: true, vault: true, deice: false } };
       g.state.flags.hatchOpen = true;
       g.state.pump.drained = true;
       g.state.darkroom.printed = true; // so the print is on the line
-      const hots = [];
-      const walk = (o) => {
-        if (o.userData && o.userData.hot) hots.push(o.userData.hot);
-        o.children.forEach(walk);
+      // what a click would hit does not depend on the picture, so nothing is drawn: only the positions are brought up to date
+      const show = k.renderer.show;
+      k.renderer.show = (scene, camera) => {
+        scene.updateMatrixWorld();
+        camera.updateMatrixWorld();
       };
-      walk(k.scene);
-      for (const h of hots) {
+      const hots = [];
+      const walk = (o, realm) => {
+        if (o.userData && o.userData.hot) hots.push([o.userData.hot, realm]);
+        o.children.forEach((c) => walk(c, realm));
+      };
+      k.scene.children.forEach((c) => walk(c, c.name));
+      for (const [h, realm] of hots) {
+        // a click searches only the chapter on show, so a hotspot must be built in the chapter of the places it serves
+        for (const n of h.nodes) if ((k.nodes[n].realm || 'surface') !== realm) astray.push(`${h.id} (built in ${realm}, used from ${n})`);
         if (['door', 'vaultdoor', 'water', 'enddoor'].includes(h.id)) continue; // these switch themselves off once passed; exercised above
         if (h.id === 'gnome') continue; // out of sight from every ordinary view, on purpose; exercised above
         ids.push(h.id);
         let ok = false;
-        for (const n of h.nodes) {
+        search: for (const n of h.nodes) {
           const node = k.nodes[n];
           for (const f of node.cam ? [null] : node.faces.split('')) {
             g.state.vault.open = n === 'vault';
             g.state.reply.open = n === 'beyond' || h.id === 'mugs'; // the mugs are behind the door until it opens
             k.jump(n, f);
-            if (k.point(h.id, h.dir ? 1 : 0) && (!h.dir || k.point(h.id, -1))) ok = true;
+            if (k.point(h.id, h.dir ? 1 : 0) && (!h.dir || k.point(h.id, -1))) {
+              ok = true;
+              break search; // one view is enough
+            }
           }
         }
         if (!ok) missing.push(h.id);
       }
-      return { count: ids.length, missing };
+      k.renderer.show = show;
+      return { count: ids.length, missing, astray };
     });
+    if (audit.astray.length) fail('hotspots built in the wrong chapter: ' + audit.astray.join(', '));
     if (audit.missing.length) fail('hotspots that cannot be clicked: ' + audit.missing.join(', '));
     log(`all ${audit.count} other hotspots are clickable from the views they belong to`);
 

@@ -14,9 +14,18 @@ permissions:
 
 jobs:
   browser:
-    name: Walkthrough and seethrough
+    # the two tests do not depend on each other, so they run side by side and the wait is the longer one
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Walkthrough
+            run: npm run walkthrough -- tests/shots
+          - name: Seethrough
+            run: npm run seethrough
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -35,8 +44,8 @@ jobs:
           done
           cat preview.log
           exit 1
-      - run: npm run walkthrough -- tests/shots
-      - run: npm run seethrough
+      - name: ${{ matrix.name }}
+        run: ${{ matrix.run }}
       - if: failure()
         uses: actions/upload-artifact@v7
         with:

@@ -153,7 +153,7 @@ npm run seethrough
 `tests/walkthrough.cjs` contains the full solution, so do not read it if you
 want to play first. Set `KESTREL_FROM3=1` to play only chapter three.
 
-On pull requests to `main` both browser tests also run on GitHub
+On pull requests to `main` both browser tests also run on GitHub, side by side
 (`.github/workflows/browser-tests.yml`).
 
 ## Licence

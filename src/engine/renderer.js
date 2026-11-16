@@ -110,6 +110,17 @@ export function createRenderer(canvas) {
       fadeDur = ms;
       fadeDone = done || null;
     },
+    /**
+     * Anti-aliasing on or off. The automated play-through turns it off: nothing there judges the
+     * picture, and drawing without a graphics card is much quicker without it.
+     * The stills are thrown away, so draw again afterwards.
+     */
+    smooth(on) {
+      for (const t of [cur, prev]) {
+        t.samples = on ? 4 : 0;
+        t.dispose();
+      }
+    },
     /** Advance any dissolve or fade. Returns true while one is running. */
     tick(now) {
       let busy = false;
