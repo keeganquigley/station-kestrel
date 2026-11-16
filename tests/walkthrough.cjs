@@ -128,17 +128,25 @@ const shots = process.argv[2] || null;
             marker: !document.getElementById('marker').hidden,
             centre: window.kestrel.centre(),
           }));
-        const held = (want) => page.waitForFunction((w) => (document.pointerLockElement === document.getElementById('view')) === w, want, { timeout: 5000 });
+        // the browser takes the mouse a moment before it tells the page, so wait for the marker too
+        const held = (want) =>
+          page.waitForFunction((w) => (document.pointerLockElement === document.getElementById('view')) === w && document.getElementById('marker').hidden === !w, want, { timeout: 5000 });
         // the mouse cannot really be moved while the browser holds it in a test, so report the travel directly
         const mouse = async (dx, dy) => {
           await page.evaluate(([x, y]) => document.dispatchEvent(new MouseEvent('mousemove', { movementX: x, movementY: y })), [dx, dy]);
           await page.waitForTimeout(60);
         };
+        // (a name further down this block shadows the key() helper, so this step has its own)
+        const press = async (k) => {
+          await page.keyboard.press(k);
+          await settle();
+        };
         if ((await look()).held) fail('the tests should start with the pointer on show');
         await page.click('#btn-look');
         await held(true);
         if ((await look()).mode !== 'free' || !(await look()).marker) fail('the Look button should hide the pointer and show the marker');
-        await mouse(150, 150); // the first report after the mouse is taken is thrown away
+        // the first report after the mouse is taken is thrown away, and the browser may or may not have sent one already
+        await mouse(0, 0);
         await page.waitForTimeout(250);
         if ((await state()).yaw !== 0) fail('taking the mouse should not jerk the view round');
         const p0 = (await state()).pitch;
@@ -149,20 +157,19 @@ const shots = process.argv[2] || null;
         await mouse(5000, 0);
         if (!((await state()).yaw < 40)) fail('one wild report should not spin you round: yaw ' + (await state()).yaw);
         // W A S D are the arrow keys
-        await key('a');
-        await key('a');
+        await press('a');
         if ((await state()).yaw !== 0) fail('A should turn left in 45 degree stops, yaw is ' + (await state()).yaw);
-        await key('d');
+        await press('d');
         if ((await state()).yaw !== 45) fail('D should turn right');
-        await key('a');
+        await press('a');
         if ((await look()).centre.id !== 'path') fail('the marker should be on the way ahead: ' + JSON.stringify((await look()).centre));
         await page.mouse.down();
         await page.mouse.up();
         await settle();
         await expectAt('path', 'N');
         if (!(await look()).held) fail('walking should keep hold of the mouse');
-        for (let i = 0; i < 4; i++) await key('d');
-        await key('w');
+        for (let i = 0; i < 4; i++) await press('d');
+        await press('w');
         await expectAt('jetty', 'S');
         // a paper gives the pointer back by itself, and takes it again when put down
         await page.evaluate(() => window.kestrel.game.read('orders'));
