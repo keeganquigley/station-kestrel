@@ -1,0 +1,16 @@
+name: Build the published game
+description: The build that goes to players, and the check that the test hook is not in it. Needs the code checked out and npm ci run.
+
+# One copy of these steps, used by CI and by the Pages workflow, so the check cannot be changed in one and forgotten in the other.
+runs:
+  using: composite
+  steps:
+    - run: npm run build
+      shell: bash
+    - name: The published build must not carry the test hook
+      shell: bash
+      run: |
+        if grep -rq 'window\.kestrel' dist; then
+          echo "window.kestrel found in dist: the test hook must stay out of the published build"
+          exit 1
+        fi

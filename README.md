@@ -134,7 +134,7 @@ npm run format
 ```
 
 ESLint checks the code and Prettier formats it. Both, with the build and the
-unit tests, run on GitHub for every push and pull request
+unit tests, run on GitHub for every pull request and every push to `main`
 (`.github/workflows/ci.yml`). Node 22 is expected; see `.nvmrc`.
 
 Every push to `main` also rebuilds and republishes the game on GitHub Pages
