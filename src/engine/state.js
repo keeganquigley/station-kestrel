@@ -132,6 +132,7 @@ const known = (list, registry) => (Array.isArray(list) ? [...new Set(list.filter
 /**
  * Check a parsed save against the shape of a new game and the range of each puzzle's values.
  * Unknown documents and items are dropped; anything else that does not fit means there is no save to resume.
+ * A save from an older version of the game is brought up to date on the way.
  */
 export function repair(s) {
   if (!isObject(s) || s.v !== 1 || typeof s.node !== 'string' || !Object.hasOwn(NODES, s.node)) return null;
@@ -145,6 +146,11 @@ export function repair(s) {
   if (!isObject(s.flags)) return null;
   out.flags = {};
   for (const [k, f] of Object.entries(s.flags)) if (typeof f === 'boolean' || isNumber(f)) out.flags[k] = f;
+  if (out.flags.finished && !out.flags.finished2) {
+    // a save that reached the old end of the demo, when the vault was the last room: the vault now has a way on
+    delete out.flags.finished;
+    out.flags.hatchOpen = true;
+  }
   out.inv = known(s.inv, ITEMS);
   out.docs = known(s.docs, DOCS);
   if (!out.inv || !out.docs) return null;

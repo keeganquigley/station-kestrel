@@ -605,11 +605,6 @@ function begin(state, fresh) {
     state.pitch = composedPitch(n, state.facing);
   }
   state.pitch = clamp(state.pitch, -PITCH_LIMIT, PITCH_LIMIT);
-  if (state.flags.finished && !state.flags.finished2) {
-    // a save that reached the old end of the demo: the vault now has a way on
-    delete state.flags.finished;
-    state.flags.hatchOpen = true;
-  }
   game.state = state;
   fading = false;
   game.playing = true;

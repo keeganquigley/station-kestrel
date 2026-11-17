@@ -40,6 +40,27 @@ describe('a good save', () => {
     expect(out.telegraph).toEqual(fresh.telegraph);
     expect(out.vault).toEqual(chapterTwoState().vault);
   });
+
+  it('that finished the old one-level game reopens with the way down unlatched', () => {
+    // when the vault was the last room, reaching the end set `finished` and nothing unlatched the rack
+    const s = copy(chapterTwoState());
+    for (const k of ['pump', 'junction', 'reply', 'darkroom', 'tally', 'telegraph', 'yaw', 'pitch']) delete s[k];
+    s.node = 'vault';
+    s.flags = { vaultSeen: true, keyTaken: true, drawerOpen: true, doorOpened: true, finished: true };
+    const out = repair(s);
+    expect(out.flags).toEqual({ vaultSeen: true, keyTaken: true, drawerOpen: true, doorOpened: true, hatchOpen: true });
+    expect(out.node).toBe('vault');
+  });
+
+  it('that finished the old two-chapter game keeps its flags as they were', () => {
+    const s = copy(chapterThreeState());
+    Object.assign(s.flags, { finished: true, finished2: true });
+    expect(repair(s).flags).toEqual(s.flags);
+  });
+
+  it('that has not finished anything is not given the way down', () => {
+    expect(repair(copy(newState())).flags).toEqual({});
+  });
 });
 
 describe('a corrupt save', () => {
