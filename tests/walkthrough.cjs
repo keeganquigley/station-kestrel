@@ -1,5 +1,5 @@
 // Plays all three chapters in a real browser: keyboard to walk, real mouse clicks on every object.
-// Needs the game served somewhere (npm run build && npm run preview) and Playwright available.
+// Needs the test build served somewhere (npm run build:test && npm run preview) and Playwright available.
 // Usage: node tests/walkthrough.cjs [screenshotDir]
 const { chromium } = require('playwright');
 const path = require('path');
