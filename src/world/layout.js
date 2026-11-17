@@ -19,9 +19,6 @@ export const ROOMS = {
   vault: { x0: 10.6, x1: 15.5, z0: -23, z1: -17 },
 };
 
-/** Compass facings as [dx, dz]. */
-export const DIRS = { N: [0, -1], E: [1, 0], S: [0, 1], W: [-1, 0] };
-
 /** rotation.y that makes an object built facing +z face the given compass direction. */
 export const RY = { S: 0, E: Math.PI / 2, N: Math.PI, W: -Math.PI / 2 };
 
