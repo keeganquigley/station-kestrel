@@ -96,6 +96,7 @@ tests/
   walkthrough.cjs  plays all three chapters in a real browser
   seethrough.cjs   checks no wall lets the one behind it show, and that nothing underground has a gap
   tour.cjs         screenshots every view
+  browser.cjs      what those three share: starting Chromium, finding the test hook
 ```
 
 The surface, the Subterranean Station and the pen are three separate groups in
@@ -161,7 +162,10 @@ npm run seethrough
 ```
 
 `tests/walkthrough.cjs` contains the full solution, so do not read it if you
-want to play first. Set `KESTREL_FROM3=1` to play only chapter three.
+want to play first. Set `KESTREL_FROM3=1` to play only chapter three. If Playwright
+cannot download its Chromium, `KESTREL_CHROMIUM` names one that is already installed.
+Name a headless shell (`chrome-headless-shell`): a full Chromium asks every page for a
+`favicon.ico` the game does not have, and the walkthrough fails on the error.
 
 On pull requests to `main` both browser tests also run on GitHub, side by side
 (`.github/workflows/browser-tests.yml`).

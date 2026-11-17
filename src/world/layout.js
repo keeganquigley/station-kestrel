@@ -8,7 +8,8 @@ export const DECK = 0.8; // top of the jetty deck
 
 export const MAST = { x: -22, z: 9, h: 11 };
 export const SHED = { x0: 16, x1: 22, z0: 3.5, z1: 8.5, h: 2.6 };
-export const STN = { x0: -11, x1: 16, z0: -28, z1: -10, h: 3.4 };
+/** The station's outer walls. wall is their thickness, door half the width of the way in. */
+export const STN = { x0: -11, x1: 16, z0: -28, z1: -10, h: 3.4, wall: 0.3, door: 0.75 };
 export const CEIL = 2.8;
 
 export const ROOMS = {

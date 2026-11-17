@@ -69,7 +69,8 @@ npm run seethrough
 The walkthrough plays all three chapters with real clicks and takes about ten
 minutes. It fails on any browser console error. `KESTREL_URL` overrides the
 address, and `KESTREL_FROM3=1` plays only chapter three. `seethrough` checks the
-scenery for gaps. Both launch Chromium with software rendering flags; keep those.
+scenery for gaps. Both launch Chromium with software rendering flags, which are in
+`tests/browser.cjs`; keep those.
 
 Drawing without a graphics card is the slow part, so keep the tests from doing
 more of it than they need. The walkthrough calls `kestrel.draft()` to draw without

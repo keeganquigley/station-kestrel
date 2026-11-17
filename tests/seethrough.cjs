@@ -3,30 +3,26 @@
 // The dangerous angles are the ones where the end of a long wall sits just in front of the plane of
 // the camera, so as well as a coarse sweep it aims precisely at those for every corner of the shell.
 // Usage: node tests/seethrough.cjs   (game must be served, see README)
-const { chromium } = require('playwright');
+const { URL, launch, hook, facts } = require('./browser.cjs');
 
 (async () => {
-  const url = process.env.KESTREL_URL || 'http://localhost:4173/';
-  const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  const browser = await launch();
   const page = await browser.newPage();
-  await page.goto(url);
-  await page
-    .waitForFunction(() => window.kestrel, null, { timeout: 30000 })
-    .catch(() => {
-      throw new Error('this page has no test hook. Build with "npm run build:test": the published build (npm run build) leaves the hook out');
-    });
+  await page.goto(URL);
+  await hook(page);
   await page.evaluate(() => window.kestrel.setLook('cursor'));
   await page.click('#btn-new');
   await page.click('#doc-close');
-  const { bad, views } = await page.evaluate(() => {
+  const game = await facts();
+  const { bad, views } = await page.evaluate(({ powered, STN }) => {
     const k = window.kestrel,
       g = k.game;
-    g.state.gen = { valve: true, primes: 0, choke: false, running: true, breakers: { lighting: true, heating: false, ops: true, door: true, vault: true, deice: false } };
-    // the four outer walls of the station are the only pieces of wall 0.3 thick and 3.4 high
+    g.state.gen = powered;
+    // the four outer walls of the station are the only pieces of wall of their thickness and height
     let shell = 0;
     k.scene.traverse((o) => {
       const p = o.isMesh && o.geometry.parameters;
-      if (p && Math.abs(p.height - 3.4) < 1e-6 && (Math.abs(p.depth - 0.3) < 1e-6 || Math.abs(p.width - 0.3) < 1e-6)) {
+      if (p && Math.abs(p.height - STN.h) < 1e-6 && (Math.abs(p.depth - STN.wall) < 1e-6 || Math.abs(p.width - STN.wall) < 1e-6)) {
         o.material = o.material.clone();
         o.material.map = null;
         o.material.color.setHex(0x000000);
@@ -41,13 +37,14 @@ const { chromium } = require('playwright');
     c2.height = 400;
     const ctx = c2.getContext('2d', { willReadFrequently: true });
     const out = [];
+    // the four corners of the shell, and the two sides of the way in
     const corners = [
-      [-11, -28],
-      [16, -28],
-      [-11, -10],
-      [16, -10],
-      [-0.75, -10.15],
-      [0.75, -10.15],
+      [STN.x0, STN.z0],
+      [STN.x1, STN.z0],
+      [STN.x0, STN.z1],
+      [STN.x1, STN.z1],
+      [-STN.door, STN.z1 - STN.wall / 2],
+      [STN.door, STN.z1 - STN.wall / 2],
     ];
     let views = 0;
     for (const node of ['corridor', 'office', 'vault']) {
@@ -73,7 +70,7 @@ const { chromium } = require('playwright');
         }
     }
     return { bad: out, views };
-  });
+  }, game);
   // Underground there is nothing outside the walls at all, so any gap shows the empty background.
   // Paint that background magenta and sweep every standing place through the whole range of view.
   const sweep = (realm) =>
