@@ -27,13 +27,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: npm run build
-      - name: The published build must not carry the test hook
-        run: |
-          if grep -rq 'window\.kestrel' dist; then
-            echo "window.kestrel found in dist: the test hook must stay out of the published build"
-            exit 1
-          fi
+      - uses: ./.github/actions/build-game
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

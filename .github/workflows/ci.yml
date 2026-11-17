@@ -1,7 +1,9 @@
 name: CI
 
+# pull requests, and main itself after a merge; a push to any other branch is checked by its pull request, not twice
 on:
   push:
+    branches: [main]
   pull_request:
 
 # a newer push to the same branch makes the older run pointless
@@ -25,11 +27,5 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run format:check
-      - run: npm run build
-      - name: The published build must not carry the test hook
-        run: |
-          if grep -rq 'window\.kestrel' dist; then
-            echo "window.kestrel found in dist: the test hook must stay out of the published build"
-            exit 1
-          fi
+      - uses: ./.github/actions/build-game
       - run: npm test

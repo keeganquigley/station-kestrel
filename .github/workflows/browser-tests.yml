@@ -47,7 +47,8 @@ jobs:
           exit 1
       - name: ${{ matrix.name }}
         run: ${{ matrix.run }}
-      - if: failure()
+      # only the walkthrough takes screenshots, and two jobs cannot upload under one name
+      - if: failure() && matrix.name == 'Walkthrough'
         uses: actions/upload-artifact@v7
         with:
           name: walkthrough-screenshots
