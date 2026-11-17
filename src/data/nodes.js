@@ -90,9 +90,3 @@ export const START = { node: 'jetty', facing: 'N' };
 export const ORDER = ['N', 'E', 'S', 'W'];
 
 export const realmOf = (id) => NODES[id].realm || 'surface';
-
-export function turn(node, facing, dir) {
-  const faces = ORDER.filter((f) => NODES[node].faces.includes(f));
-  const i = faces.indexOf(facing);
-  return faces[(i + dir + faces.length) % faces.length];
-}
