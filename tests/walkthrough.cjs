@@ -239,6 +239,12 @@ const shots = process.argv[2] || null;
         log('free look: mouse turns, click walks, WASD, and Space, right-click and Esc bring the pointer back');
       }
 
+      // --- the launch that brought you has its own words, not those of the boat in chapter three
+      await face('S');
+      await use('boat');
+      if (!(await caption()).includes('brought you')) fail('the launch at the jetty should have its own caption: ' + (await caption()));
+      await face('N');
+
       // --- mouse navigation: edges turn, middle walks
       await clickView(0.95, 0.5);
       await expectAt('jetty', 'E');
@@ -849,7 +855,8 @@ const shots = process.argv[2] || null;
     if (!(await caption()).includes('berth light')) fail('beacon caption');
     await face('W');
     await use('seagate');
-    await use('boat');
+    await use('submarine');
+    if (!(await caption()).includes('small submarine')) fail('the boat in the pen should have its own caption: ' + (await caption()));
     await face('E');
     await fwd();
     await expectAt('darkroom', 'E');
@@ -1171,6 +1178,9 @@ const shots = process.argv[2] || null;
         o.children.forEach((c) => walk(c, realm));
       };
       k.scene.children.forEach((c) => walk(c, c.name));
+      // an id names one thing: the tests find a hotspot by its id, and would find the wrong one of two
+      const all = hots.map(([h]) => h.id);
+      const twice = [...new Set(all.filter((id, i) => all.indexOf(id) !== i))];
       for (const [h, realm] of hots) {
         // a click searches only the chapter on show, so a hotspot must be built in the chapter of the places it serves
         for (const n of h.nodes) if ((k.nodes[n].realm || 'surface') !== realm) astray.push(`${h.id} (built in ${realm}, used from ${n})`);
@@ -1193,8 +1203,9 @@ const shots = process.argv[2] || null;
         if (!ok) missing.push(h.id);
       }
       k.renderer.show = show;
-      return { count: ids.length, missing, astray };
+      return { count: ids.length, missing, astray, twice };
     });
+    if (audit.twice.length) fail('two hotspots share an id: ' + audit.twice.join(', '));
     if (audit.astray.length) fail('hotspots built in the wrong chapter: ' + audit.astray.join(', '));
     if (audit.missing.length) fail('hotspots that cannot be clicked: ' + audit.missing.join(', '));
     log(`all ${audit.count} other hotspots are clickable from the views they belong to`);

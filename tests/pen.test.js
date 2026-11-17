@@ -195,6 +195,12 @@ describe('the papers of chapter three', () => {
     for (const line of Object.values(LOOK)) expect(line).not.toContain(Telegraph.HULL);
   });
 
+  it('the launch at the jetty and the boat in the pen each have their own words', () => {
+    // they once shared a key, and chapter three's line replaced chapter one's
+    expect(LOOK.boat).not.toMatch(/submarine/i);
+    expect(LOOK.submarine).toMatch(/submarine/i);
+  });
+
   it('the four remarks are written down in four different papers', () => {
     const where = { lund: 'note-lund', harlan: 'berthlog', okafor: 'note-okafor', voss: 'note-voss' };
     expect(strip(DOCS[where.lund].html)).toMatch(/Voss drew a higher tally than me/);
