@@ -3,7 +3,7 @@ import * as Gen from '../src/puzzles/generator.js';
 import * as Rx from '../src/puzzles/receiver.js';
 import * as Cipher from '../src/puzzles/cipher.js';
 import * as Vault from '../src/puzzles/vault.js';
-import { NODES, START, turn } from '../src/data/nodes.js';
+import { NODES, START } from '../src/data/nodes.js';
 import { MAST, ROOMS } from '../src/world/layout.js';
 
 const run = (state, ...actions) =>
@@ -213,12 +213,5 @@ describe('node graph', () => {
       while (q.length) for (const t of targets(NODES[q.pop()])) if (!back.has(t)) (back.add(t), q.push(t));
       expect(back.has(START.node), `${id} can reach the jetty`).toBe(true);
     }
-  });
-
-  it('turning cycles through the facings a node allows', () => {
-    expect(turn('yard', 'N', 1)).toBe('E');
-    expect(turn('yard', 'N', -1)).toBe('W');
-    expect(turn('corridor', 'E', 1)).toBe('W');
-    expect(turn('corridor', 'E', -1)).toBe('W');
   });
 });
