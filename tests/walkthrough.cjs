@@ -1,6 +1,8 @@
 // Plays all three chapters in a real browser: keyboard to walk, real mouse clicks on every object.
 // Needs the test build served somewhere (npm run build:test && npm run preview) and Playwright available.
 // Usage: node tests/walkthrough.cjs [screenshotDir]
+// KESTREL_CHAPTER=1, 2 or 3 plays one chapter only, starting it from the title screen as a player can;
+// three plays the checks after the ending too. With none set, all three are played straight through.
 const { URL, launch, hook, facts } = require('./browser.cjs');
 const path = require('path');
 const fs = require('fs');
@@ -36,6 +38,26 @@ const shots = process.argv[2] || null;
     await page.evaluate(() => window.kestrel.draft());
   };
   const shot = async (name) => shots && (await (await page.$('#stage')).screenshot({ path: path.join(shots, name + '.png') }));
+
+  // which chapters to play; KESTREL_FROM3=1 is the older way of asking for the third alone
+  const only = process.env.KESTREL_CHAPTER || (process.env.KESTREL_FROM3 ? '3' : '');
+  if (only && !['1', '2', '3'].includes(only)) throw new Error('KESTREL_CHAPTER should be 1, 2 or 3, not ' + only);
+  const plays = (n) => !only || only === String(n);
+  const done = async () => {
+    if (errors.length) fail('browser console errors:\n' + errors.join('\n'));
+    console.log('\nWALKTHROUGH PASSED' + (only ? ` (chapter ${only})` : ''));
+    await browser.close();
+  };
+  /** The figures of a printout, deciphered with one sheet of the code booklet, the way a player would: figure by figure. */
+  const decipher = (groups, padText, sheet) => {
+    const row = padText.match(new RegExp('(?:^|\\n)\\s*' + sheet + '\\s+(\\d{4})\\s+(\\d{4})\\s+(\\d{4})')).slice(1);
+    return groups.map((g, i) =>
+      g
+        .split('')
+        .map((d, k) => (Number(d) - Number(row[i][k]) + 10) % 10)
+        .join(''),
+    );
+  };
 
   const expectAt = async (node, facing) => {
     const s = await state();
@@ -84,8 +106,9 @@ const shots = process.argv[2] || null;
     await page.reload();
     await ready();
 
-    // KESTREL_FROM3=1 skips the first two chapters (for working on the third)
-    if (!process.env.KESTREL_FROM3) {
+    // what chapter two needs from chapter one: the code booklet, and the broadcast deciphered with it
+    let padText, plain;
+    if (plays(1)) {
       // --- title
       if (await page.isVisible('#btn-continue')) fail('Continue offered with no save');
       if (!(await page.innerText('#title')).includes('Holland Island')) fail('title should say Holland Island');
@@ -439,7 +462,7 @@ const shots = process.argv[2] || null;
       if (!(await state()).flags.drawerOpen) fail('drawer should open with the key');
       await shot('09-office');
       await use('drawer');
-      const padText = await readAndClose('ONE-TIME KEY');
+      padText = await readAndClose('ONE-TIME KEY');
       await face('N');
       await use('chart');
       await shot('10-chart');
@@ -449,13 +472,7 @@ const shots = process.argv[2] || null;
       await face('S');
       await use('binders');
       // decipher the way a player would: sheet 09 row from the pad, figure by figure
-      const row = padText.match(/(?:^|\n)\s*09\s+(\d{4})\s+(\d{4})\s+(\d{4})/).slice(1);
-      const plain = groups.map((g, i) =>
-        g
-          .split('')
-          .map((d, k) => (Number(d) - Number(row[i][k]) + 10) % 10)
-          .join(''),
-      );
+      plain = decipher(groups, padText, '09');
       if (plain[0] !== '1411' || plain[1] !== '1996') fail('deciphered message wrong: ' + plain.join(' '));
       log(`pad sheet 09 deciphers the printout to ${plain.join(' ')}`);
 
@@ -496,8 +513,31 @@ const shots = process.argv[2] || null;
       if (!(await caption()).includes('unlatches')) fail('rack caption missing: ' + (await caption()));
       if (await page.isVisible('#ending')) fail('chapter one should no longer end the game');
       log('chapter one hands over: the rack swings aside');
+    }
 
-      // ================================================================ chapter two
+    // ================================================================ chapter two
+    if (plays(2)) {
+      if (!plays(1)) {
+        // start where a player can, from the title, and walk back up to the vault to come down the way chapter one ends
+        await page.click('#btn-ch2');
+        await settle();
+        // what chapter one found is in the notebook: read it there
+        const fromNotebook = async (id, expectText) => {
+          await page.click('#btn-notes');
+          await page.click(`#doc-paper button[data-open="${id}"]`);
+          const txt = await readAndClose(expectText);
+          await page.click('#doc-close');
+          return txt;
+        };
+        padText = await fromNotebook('pad', 'ONE-TIME KEY');
+        const printed = await fromNotebook('printout', 'SHEET 09');
+        plain = decipher(printed.match(/\b\d{4} \d{4} \d{4}\b/)[0].split(' '), padText, '09');
+        await face('S');
+        await fwd();
+        await expectAt('vault', 'S');
+        // the Chapter two button has already shown the arrival below; coming down the stairs should show it again
+        await page.evaluate(() => delete window.kestrel.game.state.flags.belowSeen);
+      }
       await face('N');
       await page.waitForTimeout(800);
       await shot('15-way-down');
@@ -746,7 +786,9 @@ const shots = process.argv[2] || null;
       await shot('27-beyond');
       if (await page.isVisible('#ending')) fail('chapter two should no longer end the game');
       log('beyond the door the passage goes on down');
-    } else {
+    }
+    if (!plays(3)) return await done();
+    if (!plays(2)) {
       await page.click('#btn-ch3');
       await settle();
       await face('S');
@@ -1206,9 +1248,7 @@ const shots = process.argv[2] || null;
     if (audit.missing.length) fail('hotspots that cannot be clicked: ' + audit.missing.join(', '));
     log(`all ${audit.count} other hotspots are clickable from the views they belong to`);
 
-    if (errors.length) fail('browser console errors:\n' + errors.join('\n'));
-    console.log('\nWALKTHROUGH PASSED');
-    await browser.close();
+    await done();
   } catch (e) {
     console.error('\nWALKTHROUGH FAILED at step ' + (step + 1) + ': ' + e.message);
     if (errors.length) console.error('console errors:\n' + errors.join('\n'));

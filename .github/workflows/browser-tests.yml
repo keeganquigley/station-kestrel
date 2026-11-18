@@ -14,7 +14,8 @@ permissions:
 
 jobs:
   browser:
-    # the two tests do not depend on each other, so they run side by side and the wait is the longer one
+    # the walkthrough's three chapters and seethrough do not depend on each other, so they run side by side
+    # and the wait is the longest of the four; a failure in one chapter does not hide the others
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -22,8 +23,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Walkthrough
-            run: npm run walkthrough -- tests/shots
+          - name: Walkthrough, chapter one
+            run: KESTREL_CHAPTER=1 npm run walkthrough -- tests/shots
+            shots: walkthrough-screenshots-chapter-one
+          - name: Walkthrough, chapter two
+            run: KESTREL_CHAPTER=2 npm run walkthrough -- tests/shots
+            shots: walkthrough-screenshots-chapter-two
+          - name: Walkthrough, chapter three
+            run: KESTREL_CHAPTER=3 npm run walkthrough -- tests/shots
+            shots: walkthrough-screenshots-chapter-three
           - name: Seethrough
             run: npm run seethrough
     steps:
@@ -47,10 +55,10 @@ jobs:
           exit 1
       - name: ${{ matrix.name }}
         run: ${{ matrix.run }}
-      # only the walkthrough takes screenshots, and two jobs cannot upload under one name
-      - if: failure() && matrix.name == 'Walkthrough'
+      # only the walkthrough takes screenshots, and each of its jobs uploads under a name of its own
+      - if: failure() && matrix.shots
         uses: actions/upload-artifact@v7
         with:
-          name: walkthrough-screenshots
+          name: ${{ matrix.shots }}
           path: tests/shots
           if-no-files-found: ignore
