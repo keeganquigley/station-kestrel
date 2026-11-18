@@ -5,6 +5,7 @@ import { pick, pointFor } from './engine/hotspots.js';
 import * as Store from './engine/state.js';
 import { Sound } from './engine/audio.js';
 import { UI } from './engine/ui.js';
+import { createLook } from './engine/look.js';
 import { NODES, START, realmOf } from './data/nodes.js';
 import { YAW, rad, norm, clamp, smooth, nearestFace, composedPitch, linksFrom, nearestLink, nextStop } from './engine/compass.js';
 import { ITEMS, SAY } from './data/documents.js';
@@ -178,9 +179,9 @@ const game = {
     renderer.show(scene, camera, ms);
   },
 
-  toggleLook: () => toggleLook(),
+  toggleLook: () => freeLook.toggle(),
   /** A paper was picked up or put down, or the title came or went. */
-  uiChanged: () => syncLook(),
+  uiChanged: () => freeLook.sync(),
 
   toggleSound() {
     sound.start();
@@ -239,7 +240,7 @@ function syncAll() {
   ui.inventory(game.state);
   mixSound();
   if (game.playing) Store.save(game.state);
-  syncLook();
+  freeLook.sync();
 }
 
 function mixSound() {
@@ -361,110 +362,34 @@ const usable = () => game.playing && !ui.blocked;
 let drag = null;
 
 // ---------------------------------------------------------------- two ways to look
-// 'cursor' is the pointer you can see: click things, drag the picture round. 'free' hides the
-// pointer (browsers call this pointer lock) so that the mouse turns your head, and a marker in
-// the middle of the picture shows what a click would do. Free look only applies while standing:
-// in a close-up, or with a paper open, the pointer comes back by itself.
-const LOOK_KEY = 'station-kestrel-look';
-const SENSITIVITY = 0.11; // degrees turned per pixel of mouse travel
-const MAX_TRAVEL = 200; // pixels in one report; anything more is a glitch, not a hand
-const canLock = 'requestPointerLock' in canvas && !window.matchMedia('(pointer: coarse)').matches;
-const storedLook = () => {
-  try {
-    return localStorage.getItem(LOOK_KEY);
-  } catch {
-    return null;
-  }
-};
-let look = canLock && storedLook() !== 'cursor' ? 'free' : 'cursor';
-let releasing = false; // we are letting go of the mouse ourselves, as opposed to the player pressing Esc
+// The rules for taking and letting go of the mouse are in engine/look.js. Here is what they act on.
+const LOOK_SAVE_MS = 400; // a turn of the head is saved once the mouse has been still this long
 let markerDirty = true,
   lastMarker = 0,
-  lookSave = 0,
-  lockedAt = 0,
-  lockSeen = false; // has the mouse reported in since it was last taken?
+  lookSave = 0;
 const marker = document.getElementById('marker');
-const locked = () => document.pointerLockElement === canvas;
-const wantLock = () => look === 'free' && canLock && usable() && !NODES[game.state.node].cam;
-
-/** Take or let go of the mouse so that it matches the mode and the place. Safe to call at any time. */
-function syncLook() {
-  if (wantLock() && !locked()) {
-    // browsers only allow this straight after a click or a key press; anywhere else it is refused, harmlessly
-    try {
-      const asked = canvas.requestPointerLock();
-      if (asked && asked.catch) asked.catch(() => {});
-    } catch {
-      // refused: the next click or key press will ask again
-    }
-  } else if (!wantLock() && locked()) {
-    releasing = true;
-    document.exitPointerLock();
-  }
-  markerDirty = true;
-}
-
-/** Choose a way of looking. Only a deliberate choice is remembered for the next visit. */
-function setLook(mode, remember = true) {
-  look = mode === 'free' && canLock ? 'free' : 'cursor';
-  if (remember) {
-    try {
-      localStorage.setItem(LOOK_KEY, look);
-    } catch {
-      // no storage: the choice lasts for this visit
-    }
-  }
-  ui.look(look, canLock);
-  syncLook();
-}
-
-function toggleLook() {
-  if (!canLock) return;
-  if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
-  setLook(look === 'free' ? 'cursor' : 'free');
-}
-
-document.addEventListener('pointerlockchange', () => {
-  if (locked() && !wantLock()) {
-    // granted a moment too late: a paper has been picked up, or a close-up entered, since we asked
-    releasing = true;
-    return document.exitPointerLock();
-  }
-  // Losing the mouse without our asking: if the player pressed Esc they want the pointer back, for now.
-  // The browser also lets go when another window or tab comes to the front, and that is not a request
-  // for anything, so then the mode stays as it is and the next click in the picture takes the mouse again.
-  // The window's focus tells the two apart, once it has had a moment to change.
-  if (!locked() && !releasing && look === 'free' && wantLock()) {
-    setTimeout(() => {
-      if (document.hasFocus() && !locked() && look === 'free' && wantLock()) setLook('cursor', false);
-    }, 60);
-  }
-  releasing = false;
-  markerDirty = true;
-  marker.hidden = !locked();
-  if (!locked()) lockSeen = false;
+const freeLook = createLook({
+  canvas,
+  doc: document,
+  // reaching for localStorage at all throws where storage is blocked, so it is only touched inside look.js's guards
+  storage: { getItem: (k) => localStorage.getItem(k), setItem: (k, v) => localStorage.setItem(k, v) },
+  canLock: 'requestPointerLock' in canvas && !window.matchMedia('(pointer: coarse)').matches,
+  standing: () => usable() && !NODES[game.state.node].cam,
+  steady: () => usable() && !busy(),
+  onTurn(right, down) {
+    const s = game.state;
+    s.yaw = norm(s.yaw + right);
+    s.pitch = clamp(s.pitch - down, -PITCH_LIMIT, PITCH_LIMIT);
+    s.facing = nearestFace(s.yaw);
+    lookDirty = true;
+    clearTimeout(lookSave);
+    lookSave = setTimeout(() => game.playing && Store.save(game.state), LOOK_SAVE_MS);
+  },
+  onMode: (mode, canLock) => ui.look(mode, canLock),
+  onChange: () => (markerDirty = true),
+  onHeld: (held) => (marker.hidden = !held),
 });
-
-document.addEventListener('mousemove', (e) => {
-  if (!locked() || !usable() || busy()) return;
-  // the first report after the mouse is taken can be a wild one (the jump from wherever the pointer was),
-  // so let it settle, and never believe more than a hand could do between two reports
-  if (!lockSeen) {
-    lockSeen = true;
-    lockedAt = performance.now();
-    return;
-  }
-  if (performance.now() - lockedAt < 150) return;
-  const dx = clamp(e.movementX, -MAX_TRAVEL, MAX_TRAVEL),
-    dy = clamp(e.movementY, -MAX_TRAVEL, MAX_TRAVEL);
-  const s = game.state;
-  s.yaw = norm(s.yaw + dx * SENSITIVITY);
-  s.pitch = clamp(s.pitch - dy * SENSITIVITY, -PITCH_LIMIT, PITCH_LIMIT);
-  s.facing = nearestFace(s.yaw);
-  lookDirty = markerDirty = true;
-  clearTimeout(lookSave);
-  lookSave = setTimeout(() => game.playing && Store.save(game.state), 400);
-});
+const locked = freeLook.locked;
 
 /** Show, in the middle of the picture, what a click would do right now. */
 function drawMarker(now) {
@@ -482,12 +407,12 @@ canvas.addEventListener('pointerdown', (e) => {
   if (locked()) {
     // free look: the left button acts on whatever the marker is on, the right one brings the pointer back
     sound.start();
-    if (e.button === 2) toggleLook();
+    if (e.button === 2) freeLook.toggle();
     else if (e.button === 0 && !busy()) act(targetAt(0.5, 0.5));
     return;
   }
-  if (e.button === 2) return toggleLook();
-  if (wantLock()) return syncLook(); // free look lost the mouse without being asked: a click takes it again
+  if (e.button === 2) return freeLook.toggle();
+  if (freeLook.wanted()) return freeLook.sync(); // free look lost the mouse without being asked: a click takes it again
   if (e.button > 0) return;
   sound.start();
   drag = { id: e.pointerId, x: e.clientX, y: e.clientY, yaw: game.state.yaw, pitch: game.state.pitch, moved: false };
@@ -540,14 +465,14 @@ window.addEventListener('keydown', (e) => {
   if (!usable() || e.ctrlKey || e.metaKey || e.altKey) return;
   if (e.key === ' ') {
     e.preventDefault();
-    if (!e.repeat) toggleLook();
+    if (!e.repeat) freeLook.toggle();
     return;
   }
   const dir = MOVES[e.key.length === 1 ? e.key.toLowerCase() : e.key];
   if (!dir) return;
   e.preventDefault();
   if (!busy()) step(dir);
-  syncLook(); // a key press is also a chance to take the mouse back, if free look had lost it
+  freeLook.sync(); // a key press is also a chance to take the mouse back, if free look had lost it
 });
 // Space is the mode switch, so it must not also press whichever button was clicked last
 window.addEventListener('keyup', (e) => e.key === ' ' && usable() && e.preventDefault());
@@ -676,8 +601,8 @@ if (import.meta.env.DEV || import.meta.env.VITE_KESTREL_HOOK) {
     /** Screen point (0..1) that triggers a hotspot from the current view, or null. */
     point: (id, dir = 0) => pointFor(scene, camera, id, game.state.node, dir, !NODES[game.state.node].cam),
     /** 'free' or 'cursor', and a way to choose. Tests play in 'cursor'. */
-    look: () => look,
-    setLook,
+    look: () => freeLook.mode,
+    setLook: (mode, remember) => freeLook.set(mode, remember),
     /** What a click in free look would act on: null, or { kind, id }. */
     centre() {
       const t = targetAt(0.5, 0.5);
@@ -698,6 +623,6 @@ if (import.meta.env.DEV || import.meta.env.VITE_KESTREL_HOOK) {
 }
 
 ui.sound(true);
-ui.look(look, canLock);
+ui.look(freeLook.mode, freeLook.canLock);
 showTitle();
 requestAnimationFrame(frame);
