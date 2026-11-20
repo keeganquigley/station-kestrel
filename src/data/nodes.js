@@ -15,7 +15,8 @@ const quay = (x, z) => [x, PF + EYE, z]; // the pen
  * cam/look/back      a close-up: one fixed view, bottom edge steps back
  * tilt               look up (+) or down (-) on a given facing
  * amb                how loud each background sound is here
- * live               something on screen moves, so keep redrawing
+ * live               something on screen moves here, so keep redrawing. It names the part of the
+ *                    world that moves: 'ops', 'vault', 'tunnel' or 'pen' (see world/index.js)
  * realm              'below' for the Subterranean Station, 'pen' for Berth K7; everything else is the surface
  *
  * A link is a node id, or { to, face, gate, fade }. gate names a check in actions.js;
@@ -47,12 +48,12 @@ export const NODES = {
   breakers: { cam: [18.6, SHED_FLOOR + 1.47, 4.85], look: [18.6, SHED_FLOOR + 1.43, 3.6], back: ['shed', 'N'], amb: { wind: 0.25, gen: 1, room: 0.2 } },
   door: { pos: out(0, -6.2), faces: 'NESW', fwd: { N: { to: 'vestibule', gate: 'door' }, S: 'yard' }, amb: { wind: 0.9, sea: 0.2, gen: 0.15 } },
   vestibule: { pos: inn(0, -12.2), faces: 'NESW', fwd: { N: 'ops', S: 'door' }, tilt: { E: -0.16, W: -0.04 }, amb: { wind: 0.2, room: 0.7 } },
-  ops: { pos: inn(0, -19.6), faces: 'NESW', fwd: { S: 'vestibule', W: 'office', E: 'corridor' }, tilt: { N: -0.1 }, amb: { room: 1, radio: 0.6 }, live: true },
-  console: { cam: [0.24, FLOOR + 1.24, -22.08], look: [0.24, FLOOR + 1.1, -23.3], back: ['ops', 'N'], amb: { room: 1, radio: 1 }, live: true },
+  ops: { pos: inn(0, -19.6), faces: 'NESW', fwd: { S: 'vestibule', W: 'office', E: 'corridor' }, tilt: { N: -0.1 }, amb: { room: 1, radio: 0.6 }, live: 'ops' },
+  console: { cam: [0.24, FLOOR + 1.24, -22.08], look: [0.24, FLOOR + 1.1, -23.3], back: ['ops', 'N'], amb: { room: 1, radio: 1 }, live: 'ops' },
   office: { pos: inn(-7.3, -20), faces: 'NESW', fwd: { E: 'ops' }, tilt: { W: -0.2, N: -0.02 }, amb: { room: 0.8, radio: 0.2 } },
   corridor: { pos: inn(6.3, -20), faces: 'EW', fwd: { W: 'ops', E: { to: 'vault', gate: 'vault' } }, amb: { room: 0.9, radio: 0.15 } },
   vaultlock: { cam: [8.75, FLOOR + 1.36, -19.42], look: [10.2, FLOOR + 1.28, -19.42], back: ['corridor', 'E'], amb: { room: 0.9 } },
-  vault: { pos: inn(11.5, -20), faces: 'NESW', fwd: { W: 'corridor', N: { to: 'stairfoot', gate: 'hatch', fade: true } }, tilt: { E: -0.27 }, amb: { room: 1.2, vault: 1 }, live: true },
+  vault: { pos: inn(11.5, -20), faces: 'NESW', fwd: { W: 'corridor', N: { to: 'stairfoot', gate: 'hatch', fade: true } }, tilt: { E: -0.27 }, amb: { room: 1.2, vault: 1 }, live: 'vault' },
   ...below({
     stairfoot: { pos: up(0, -2), faces: 'NESW', fwd: { N: 'tunnelA', S: { to: 'vault', fade: true } }, tilt: { S: 0.3, W: 0.4 }, amb: TUNNEL_AMB },
     tunnelA: { pos: up(0, -9), faces: 'NESW', fwd: { N: 'tunnelB', S: 'stairfoot', E: 'kitchen', W: 'mess' }, amb: TUNNEL_AMB },
@@ -65,16 +66,16 @@ export const NODES = {
     brink: { pos: up(0, -25.6), faces: 'NESW', fwd: { S: 'tunnelB', N: { to: 'junction', gate: 'water' } }, tilt: { N: -0.2 }, amb: { ...TUNNEL_AMB, drip: 1, whirr: 0.6 } },
     junction: { pos: low(0, -33.5), faces: 'NESW', fwd: { S: 'brink', N: 'blastdoor' }, tilt: { S: 0.08 }, amb: LOW_AMB },
     jbox: { cam: [-0.28, LF + 1.42, -33.5], look: [-1.5, LF + 1.36, -33.5], back: ['junction', 'W'], amb: LOW_AMB },
-    blastdoor: { pos: low(0, -41.0), faces: 'NESW', fwd: { S: 'junction', N: { to: 'beyond', gate: 'blast' } }, amb: LOW_AMB, live: true },
+    blastdoor: { pos: low(0, -41.0), faces: 'NESW', fwd: { S: 'junction', N: { to: 'beyond', gate: 'blast' } }, amb: LOW_AMB, live: 'tunnel' },
     sender: { cam: [0.2, LF + 1.42, -41.45], look: [1.5, LF + 1.36, -41.45], back: ['blastdoor', 'E'], amb: LOW_AMB },
-    beyond: { pos: low(0, -45.6), faces: 'NS', fwd: { S: 'blastdoor', N: { to: 'gallery', fade: true } }, tilt: { N: -0.16, S: -0.3 }, amb: { ...LOW_AMB, deep: 1 }, live: true },
+    beyond: { pos: low(0, -45.6), faces: 'NS', fwd: { S: 'blastdoor', N: { to: 'gallery', fade: true } }, tilt: { N: -0.16, S: -0.3 }, amb: { ...LOW_AMB, deep: 1 }, live: 'tunnel' },
   }),
   ...pen({
-    gallery: { pos: [7.0, PF + PEN.shelf + EYE, -106.3], faces: 'NESW', fwd: { N: 'quayS', S: { to: 'beyond', fade: true } }, tilt: { N: -0.24, W: -0.2, E: 0.02 }, amb: PEN_AMB, live: true },
-    quayS: { pos: quay(5, DOCK.office.door), faces: 'NESW', fwd: { S: 'gallery', N: 'quayMid', E: 'dockoffice' }, tilt: { N: -0.1, S: 0.16, W: -0.1 }, amb: PEN_AMB, live: true },
-    quayMid: { pos: quay(5, DOCK.store.door), faces: 'NESW', fwd: { S: 'quayS', N: 'quayN', E: 'store' }, tilt: { W: -0.04, N: -0.06 }, amb: PEN_AMB, live: true },
-    sail: { cam: [1.15, PF + 1.8, BOAT.z + 0.6], look: [BOAT.x + 0.46, PF + 1.86, BOAT.z + 0.6], back: ['quayMid', 'W'], amb: PEN_AMB, live: true },
-    quayN: { pos: quay(5, DOCK.darkroom.door), faces: 'NESW', fwd: { S: 'quayMid', E: 'darkroom' }, tilt: { N: 0.04, W: -0.06 }, amb: PEN_AMB, live: true },
+    gallery: { pos: [7.0, PF + PEN.shelf + EYE, -106.3], faces: 'NESW', fwd: { N: 'quayS', S: { to: 'beyond', fade: true } }, tilt: { N: -0.24, W: -0.2, E: 0.02 }, amb: PEN_AMB, live: 'pen' },
+    quayS: { pos: quay(5, DOCK.office.door), faces: 'NESW', fwd: { S: 'gallery', N: 'quayMid', E: 'dockoffice' }, tilt: { N: -0.1, S: 0.16, W: -0.1 }, amb: PEN_AMB, live: 'pen' },
+    quayMid: { pos: quay(5, DOCK.store.door), faces: 'NESW', fwd: { S: 'quayS', N: 'quayN', E: 'store' }, tilt: { W: -0.04, N: -0.06 }, amb: PEN_AMB, live: 'pen' },
+    sail: { cam: [1.15, PF + 1.8, BOAT.z + 0.6], look: [BOAT.x + 0.46, PF + 1.86, BOAT.z + 0.6], back: ['quayMid', 'W'], amb: PEN_AMB, live: 'pen' },
+    quayN: { pos: quay(5, DOCK.darkroom.door), faces: 'NESW', fwd: { S: 'quayMid', E: 'darkroom' }, tilt: { N: 0.04, W: -0.06 }, amb: PEN_AMB, live: 'pen' },
     dockoffice: { pos: quay(10.6, DOCK.office.door), faces: 'NESW', fwd: { W: 'quayS' }, tilt: { N: -0.14, E: -0.16, S: -0.06 }, amb: DOCK_AMB },
     telegraph: { cam: [11.2, PF + 1.42, DOCK.office.z0 + 1.5], look: [11.2, PF + 1.06, DOCK.office.z0 + 0.3], back: ['dockoffice', 'N'], amb: DOCK_AMB },
     store: { pos: quay(10.6, DOCK.store.door), faces: 'NESW', fwd: { W: 'quayMid' }, tilt: { N: -0.06, S: -0.1, E: -0.1 }, amb: DOCK_AMB },

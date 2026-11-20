@@ -14,7 +14,7 @@ import { buildTunnel } from './tunnel.js';
 import { buildQuarters } from './quarters.js';
 import { buildPen } from './pen.js';
 import { buildDockRooms } from './dockrooms.js';
-import { realmOf } from '../data/nodes.js';
+import { NODES, realmOf } from '../data/nodes.js';
 
 export function buildWorld(scene) {
   buildMaterials();
@@ -41,6 +41,11 @@ export function buildWorld(scene) {
     pen: { group: penGroup, fog: new THREE.FogExp2(0x040708, 0.021) },
   };
 
+  // The parts with something that moves. A place says which of them to keep going with `live` in data/nodes.js.
+  const movers = { ops, vault, tunnel, pen };
+  for (const [id, n] of Object.entries(NODES))
+    if (n.live && !movers[n.live]) throw new Error(`${id} is live for "${n.live}", which is not one of the parts that move: ${Object.keys(movers).join(', ')}`);
+
   return {
     /** Make every prop match the saved state, and show the realm you are in. */
     sync(state) {
@@ -51,11 +56,8 @@ export function buildWorld(scene) {
     },
     /** Advance anything that moves in the given place. True if the view needs redrawing. */
     tick(node) {
-      if (node === 'ops' || node === 'console') return ops.tick();
-      if (node === 'vault') return vault.tick();
-      if (node === 'blastdoor' || node === 'beyond') return tunnel.tick();
-      if (realmOf(node) === 'pen') return pen.tick();
-      return false;
+      const mover = movers[NODES[node].live];
+      return mover ? mover.tick() : false;
     },
   };
 }

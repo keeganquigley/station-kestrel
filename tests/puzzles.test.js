@@ -200,6 +200,11 @@ describe('node graph', () => {
     }
   });
 
+  it('a place where something moves names what moves', () => {
+    // world/index.js checks the names themselves when the world is built; this keeps a bare `true` from creeping back
+    for (const [id, n] of Object.entries(NODES)) if ('live' in n) expect(typeof n.live, id).toBe('string');
+  });
+
   it('you can walk back out of every standing place', () => {
     // close-ups are entered through hotspots, so only check that walking nodes form one connected set
     const walk = Object.keys(NODES).filter((id) => !NODES[id].cam);
