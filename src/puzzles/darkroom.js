@@ -1,5 +1,6 @@
 // Chapter three, puzzle 1: develop the film from the camera on the quay.
 // Three baths, three timers and a safelight. Pure logic, no rendering.
+import { turned } from './wheels.js';
 
 /** What the thermometer standing in the developer reads, in degrees C. */
 export const TEMPERATURE = 16;
@@ -32,9 +33,7 @@ export function initial() {
 
 export function spin(s, index, dir) {
   if (s.printed) return s;
-  const wheels = s.wheels.slice();
-  wheels[index] = (wheels[index] + dir + 10) % 10;
-  return { ...s, wheels };
+  return { ...s, wheels: turned(s.wheels, index, dir) };
 }
 
 /** Minutes set on each of the three timers. */

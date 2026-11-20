@@ -3,6 +3,7 @@ import * as Gen from '../src/puzzles/generator.js';
 import * as Rx from '../src/puzzles/receiver.js';
 import * as Cipher from '../src/puzzles/cipher.js';
 import * as Vault from '../src/puzzles/vault.js';
+import { turned, read } from '../src/puzzles/wheels.js';
 import { NODES, START } from '../src/data/nodes.js';
 import { MAST, ROOMS } from '../src/world/layout.js';
 
@@ -155,6 +156,27 @@ describe('cipher', () => {
       expect(groups).toHaveLength(3);
       for (const g of groups) expect(g).toMatch(/^\d{4}$/);
     }
+  });
+});
+
+describe('thumbwheels', () => {
+  it('a wheel turns one figure at a time and runs round at both ends', () => {
+    expect(turned([0, 0, 0], 1, 1)).toEqual([0, 1, 0]);
+    expect(turned([0, 0, 0], 0, -1)).toEqual([9, 0, 0]);
+    expect(turned([4, 9, 2], 1, 1)).toEqual([4, 0, 2]);
+    let row = [3, 7];
+    for (let i = 0; i < 10; i++) row = turned(row, 0, 1);
+    expect(row).toEqual([3, 7]);
+  });
+
+  it('turning a wheel leaves the row it was given alone', () => {
+    const row = [1, 2, 3];
+    turned(row, 2, 1);
+    expect(row).toEqual([1, 2, 3]);
+  });
+
+  it('the row reads across, noughts and all', () => {
+    expect(read([0, 4, 0, 7])).toBe('0407');
   });
 });
 

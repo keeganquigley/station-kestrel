@@ -2,6 +2,7 @@
 // Papers are filed against a vessel's hull number and the tally of whoever signed them.
 // Pure logic, no rendering.
 import { OWNER, TALLIES } from './tally.js';
+import { turned, read } from './wheels.js';
 
 /** Painted on the boat's conning tower. Gone from the boat itself; plain in the photograph. */
 export const HULL = '306';
@@ -22,12 +23,10 @@ export function initial() {
 
 export function spin(s, index, dir) {
   if (s.drawn) return s;
-  const wheels = s.wheels.slice();
-  wheels[index] = (wheels[index] + dir + 10) % 10;
-  return { ...s, wheels };
+  return { ...s, wheels: turned(s.wheels, index, dir) };
 }
 
-export const reading = (s) => s.wheels.join('');
+export const reading = (s) => read(s.wheels);
 
 /**
  * Press CALL.
