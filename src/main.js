@@ -5,7 +5,8 @@ import { pick, pointFor } from './engine/hotspots.js';
 import * as Store from './engine/state.js';
 import { Sound } from './engine/audio.js';
 import { UI } from './engine/ui.js';
-import { NODES, START, ORDER, realmOf } from './data/nodes.js';
+import { NODES, START, realmOf } from './data/nodes.js';
+import { YAW, rad, norm, clamp, smooth, nearestFace, composedPitch, linksFrom, nearestLink, nextStop } from './engine/compass.js';
 import { ITEMS, SAY } from './data/documents.js';
 import { EYE } from './world/layout.js';
 import { terrainH } from './world/terrain.js';
@@ -54,22 +55,8 @@ const CURSORS = {
 CURSORS.zoom = CURSORS.look;
 const DOT = cursorSvg("<circle cx='16' cy='16' r='2.6'/>");
 
-// ---------------------------------------------------------------- angles
-// Yaw is a compass bearing in degrees: 0 north, 90 east. Pitch is degrees above the horizon.
-const YAW = { N: 0, E: 90, S: 180, W: 270 };
-const rad = (d) => (d * Math.PI) / 180;
-const norm = (d) => ((d % 360) + 360) % 360;
-const turnBetween = (a, b) => {
-  const d = norm(a - b);
-  return d > 180 ? d - 360 : d;
-};
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-const smooth = (k) => k * k * (3 - 2 * k);
-const nearestFace = (yaw) => ORDER[Math.round(norm(yaw) / 90) % 4];
-/** The pitch each standing place was composed for, per compass facing. */
-const composedPitch = (n, face) => (Math.atan(((n.tilt && n.tilt[face]) || 0) - 0.05) * 180) / Math.PI;
-const bearingTo = (from, to) => norm((Math.atan2(to[0] - from[0], -(to[2] - from[2])) * 180) / Math.PI);
-
+// ---------------------------------------------------------------- the camera
+// The arithmetic of bearings and turns is in engine/compass.js.
 const euler = new THREE.Euler(0, 0, 0, 'YXZ');
 const aim = new THREE.PerspectiveCamera();
 
@@ -90,18 +77,6 @@ function placeCamera() {
   camera.position.copy(p.pos);
   camera.quaternion.copy(p.quat);
   camera.updateMatrixWorld();
-}
-
-/** Places you can walk to from here, with the compass bearing each lies on. */
-function linksFrom(nodeId) {
-  const n = NODES[nodeId];
-  if (n.cam) return [];
-  return Object.entries(n.fwd).map(([face, link]) => {
-    const l = typeof link === 'string' ? { to: link } : link;
-    const t = NODES[l.to];
-    // a fade leads to the other realm, which is nowhere near: point it the way the link is labelled
-    return { ...l, face: l.face || face, bearing: l.fade ? YAW[face] : bearingTo(n.pos, t.pos || t.look) };
-  });
 }
 
 // ---------------------------------------------------------------- camera moves
@@ -292,18 +267,7 @@ function sightThrough(x, y) {
 /** A way that is shut does not even show the walk-forward arrow. */
 const passable = (link) => !(link.gate && shut[link.gate] && shut[link.gate]());
 
-function linkToward(bearing, within) {
-  let best = null,
-    bestOff = within;
-  for (const l of linksFrom(game.state.node)) {
-    const off = Math.abs(turnBetween(l.bearing, bearing));
-    if (off <= bestOff && passable(l)) {
-      best = l;
-      bestOff = off;
-    }
-  }
-  return best;
-}
+const linkToward = (bearing, within) => nearestLink(linksFrom(game.state.node), bearing, within, passable);
 
 /** What a click at this point of the view would do. */
 function targetAt(x, y) {
@@ -354,8 +318,7 @@ function turnBy(dir, stepDeg) {
     n = NODES[s.node];
   if (n.cam) return;
   const from = here();
-  const steps = s.yaw / stepDeg;
-  s.yaw = norm((dir > 0 ? Math.floor(steps + 1e-6) + 1 : Math.ceil(steps - 1e-6) - 1) * stepDeg);
+  s.yaw = nextStop(s.yaw, dir, stepDeg);
   s.facing = nearestFace(s.yaw);
   if (s.yaw % 90 === 0) s.pitch = composedPitch(n, s.facing);
   startMove(from, poseOf(s), stepDeg >= 90 ? 340 : 220, false);

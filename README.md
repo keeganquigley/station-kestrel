@@ -85,7 +85,7 @@ src/
   actions.js       what each clickable thing does
   puzzles/         the rules of each puzzle, as plain functions with no rendering
   data/            the node graph, every readable paper, the wall chart, the photograph
-  engine/          renderer, picking, sound, save, on-screen interface
+  engine/          renderer, picking, sound, save, on-screen interface, compass arithmetic
   world/           the island, the Subterranean Station and the pen, built area by area
 tests/
   puzzles.test.js  chapter one: rules, clues and the node graph
@@ -93,6 +93,7 @@ tests/
   pen.test.js      chapter three: the darkroom, the tally board, the telegraph and its papers
   save.test.js     a save is checked before it is resumed: corrupt, tampered and old saves
   actions.test.js  what each click does, on a game that only takes notes: gates, pickups, follow-ups, captions
+  compass.test.js  bearings, turns, and that each way out of a place lies where its facing says
   walkthrough.cjs  plays all three chapters in a real browser
   seethrough.cjs   checks no wall lets the one behind it show, and that nothing underground has a gap
   tour.cjs         screenshots every view
