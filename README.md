@@ -162,12 +162,14 @@ npm run seethrough
 ```
 
 `tests/walkthrough.cjs` contains the full solution, so do not read it if you
-want to play first. Set `KESTREL_FROM3=1` to play only chapter three. If Playwright
-cannot download its Chromium, `KESTREL_CHROMIUM` names one that is already installed.
-Name a headless shell (`chrome-headless-shell`): a full Chromium asks every page for a
-`favicon.ico` the game does not have, and the walkthrough fails on the error.
+want to play first. Set `KESTREL_CHAPTER` to 1, 2 or 3 to play one chapter only,
+started from the title screen. If Playwright cannot download its Chromium,
+`KESTREL_CHROMIUM` names one that is already installed. Name a headless shell
+(`chrome-headless-shell`): a full Chromium asks every page for a `favicon.ico` the
+game does not have, and the walkthrough fails on the error.
 
-On pull requests to `main` both browser tests also run on GitHub, side by side
+On pull requests to `main` the browser tests also run on GitHub, side by side:
+each chapter of the walkthrough as a job of its own, and seethrough
 (`.github/workflows/browser-tests.yml`).
 
 ## Licence
