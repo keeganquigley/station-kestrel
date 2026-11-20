@@ -17,8 +17,8 @@ export function buildStation(scene) {
 
   // --- shell
   put(root, box(x1 - x0 + 0.8, 0.5, z1 - z0 + 0.8, mat.concreteDark, 2), cx, F - 0.25, cz);
-  const t = 0.3;
-  wall(root, mat.concrete, x0, z1 - t / 2, x1, z1 - t / 2, F, h, t, [{ a: -0.75, b: 0.75, y0: 0, y1: DOOR_H }]);
+  const t = STN.wall;
+  wall(root, mat.concrete, x0, z1 - t / 2, x1, z1 - t / 2, F, h, t, [{ a: -STN.door, b: STN.door, y0: 0, y1: DOOR_H }]);
   wall(root, mat.concrete, x0, z0 + t / 2, x1, z0 + t / 2, F, h, t);
   wall(root, mat.concrete, x0 + t / 2, z0, x0 + t / 2, z1, F, h, t);
   wall(root, mat.concrete, x1 - t / 2, z0, x1 - t / 2, z1, F, h, t);

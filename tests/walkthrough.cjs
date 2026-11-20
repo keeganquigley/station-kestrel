@@ -1,16 +1,15 @@
 // Plays all three chapters in a real browser: keyboard to walk, real mouse clicks on every object.
 // Needs the test build served somewhere (npm run build:test && npm run preview) and Playwright available.
 // Usage: node tests/walkthrough.cjs [screenshotDir]
-const { chromium } = require('playwright');
+const { URL, launch, hook, facts } = require('./browser.cjs');
 const path = require('path');
 const fs = require('fs');
 
-const URL = process.env.KESTREL_URL || 'http://localhost:4173/';
 const shots = process.argv[2] || null;
 
 (async () => {
   if (shots) fs.mkdirSync(shots, { recursive: true });
-  const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  const browser = await launch();
   const page = await browser.newPage({ viewport: { width: 1280, height: 928 } });
   const errors = [];
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
@@ -29,11 +28,7 @@ const shots = process.argv[2] || null;
     await page.waitForTimeout(40);
   };
   const ready = async () => {
-    await page
-      .waitForFunction(() => window.kestrel, null, { timeout: 30000 })
-      .catch(() => {
-        throw new Error('this page has no test hook. Build with "npm run build:test": the published build (npm run build) leaves the hook out');
-      });
+    await hook(page);
     await page.evaluate(() => (window.kestrel.timeScale = 0.3));
     // play with the pointer on show, so that clicks land where they are aimed; free look has its own step
     await page.evaluate(() => window.kestrel.setLook('cursor'));
@@ -1156,13 +1151,14 @@ const shots = process.argv[2] || null;
     log('notebook lists and reopens papers');
 
     // --- every hotspot in the scene must be clickable from somewhere it claims to be
-    const audit = await page.evaluate(() => {
+    const { powered } = await facts();
+    const audit = await page.evaluate((powered) => {
       const k = window.kestrel,
         g = k.game,
         missing = [],
         astray = [],
         ids = [];
-      g.state.gen = { valve: true, primes: 0, choke: false, running: true, breakers: { lighting: true, heating: false, ops: true, door: true, vault: true, deice: false } };
+      g.state.gen = powered;
       g.state.flags.hatchOpen = true;
       g.state.pump.drained = true;
       g.state.darkroom.printed = true; // so the print is on the line
@@ -1204,7 +1200,7 @@ const shots = process.argv[2] || null;
       }
       k.renderer.show = show;
       return { count: ids.length, missing, astray, twice };
-    });
+    }, powered);
     if (audit.twice.length) fail('two hotspots share an id: ' + audit.twice.join(', '));
     if (audit.astray.length) fail('hotspots built in the wrong chapter: ' + audit.astray.join(', '));
     if (audit.missing.length) fail('hotspots that cannot be clicked: ' + audit.missing.join(', '));
