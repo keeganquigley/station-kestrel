@@ -344,7 +344,7 @@ export function buildPen(parent) {
     const h = 0.1 + R() * 0.2; // short, so it never hangs across her name
     put(boat, box(0.02, h, 0.08 + R() * 0.12, mat.weed), 0.475, ST + SH - h / 2, -0.3 + R() * 2.4);
   }
-  hot(put(root, proxy(0.6, 2.6, 9), BOAT.x + r + 0.2, PF + 0.4, BOAT.z - 4.6), { id: 'boat', nodes: ['quayMid', 'quayN'], cursor: 'look', action: ['look', 'boat'] });
+  hot(put(root, proxy(0.6, 2.6, 9), BOAT.x + r + 0.2, PF + 0.4, BOAT.z - 4.6), { id: 'submarine', nodes: ['quayMid', 'quayN'], cursor: 'look', action: ['look', 'submarine'] });
   hot(put(root, proxy(0.4, 2.3, 3.2), BOAT.x + 0.9, PF + 1.7, BOAT.z + 0.9), { id: 'sailzoom', nodes: ['quayMid'], cursor: 'zoom', action: ['go', 'sail'] });
 
   // ---------------------------------------------------------------- things that change

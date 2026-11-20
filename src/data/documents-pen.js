@@ -186,7 +186,7 @@ export const PEN_LOOK = {
   cameraEmpty: 'A camera on a tripod, aimed at the boat. The back hangs open and the spool is gone.',
   seagate: 'A sea gate, shut, both leaves grown over with weed. Nothing has gone through it in a very long time.',
   beacon: 'The berth light. It comes up and goes down in time with the hum. You watched it from the top of the passage.',
-  boat: 'A small submarine, rust from stem to stern and bearded with weed. She has not moved in decades.',
+  submarine: 'A small submarine, rust from stem to stern and bearded with weed. She has not moved in decades.',
   name: `${VESSEL}. The paint has gone, but not the shape of the letters.`,
   number: 'There was a number under the name. Three figures, eaten out by rust.',
   hatch: 'No gangway, and three yards of black water. The hatch wheel is a single lump of rust. Nobody has gone aboard that way in your lifetime.',

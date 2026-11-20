@@ -220,15 +220,26 @@ export const ITEMS = {
   printout: { name: 'Printout', doc: 'printout' },
 };
 
+/**
+ * Add a later chapter's entries to a table. A key may only be used once across the three chapters:
+ * a second use would quietly replace the first, and the earlier chapter would show the later one's words.
+ */
+function add(table, more, name) {
+  for (const [key, value] of Object.entries(more)) {
+    if (Object.hasOwn(table, key)) throw new Error(`${name}.${key} is used by two chapters; give one of them another key`);
+    table[key] = value;
+  }
+}
+
 // chapter two
-Object.assign(DOCS, BELOW_DOCS);
-Object.assign(LOOK, BELOW_LOOK);
-Object.assign(SAY, BELOW_SAY);
+add(DOCS, BELOW_DOCS, 'DOCS');
+add(LOOK, BELOW_LOOK, 'LOOK');
+add(SAY, BELOW_SAY, 'SAY');
 
 // chapter three
-Object.assign(DOCS, PEN_DOCS);
-Object.assign(LOOK, PEN_LOOK);
-Object.assign(SAY, PEN_SAY);
-Object.assign(ITEMS, PEN_ITEMS);
+add(DOCS, PEN_DOCS, 'DOCS');
+add(LOOK, PEN_LOOK, 'LOOK');
+add(SAY, PEN_SAY, 'SAY');
+add(ITEMS, PEN_ITEMS, 'ITEMS');
 
 export { BREAKERS };
